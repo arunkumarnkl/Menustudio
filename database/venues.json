@@ -1,0 +1,362 @@
+[
+  {
+    "id": "github-venue-2",
+    "name": "Addington Palace",
+    "hall": "",
+    "location": "Gravel Hill, Surrey, CR0 5BB"
+  },
+  {
+    "id": "github-venue-3",
+    "name": "Bickley Manor",
+    "hall": "",
+    "location": "Thornet Wood Road, Bromley, Kent, BR1 2LW"
+  },
+  {
+    "id": "github-venue-4",
+    "name": "Boreham House",
+    "hall": "",
+    "location": "Main Rd, Boreham, Chelmsford CM3 3HY"
+  },
+  {
+    "id": "github-venue-5",
+    "name": "Botley Mansion",
+    "hall": "",
+    "location": "Stonehill Rd, Lyne, Chertsey KT16 0AP"
+  },
+  {
+    "id": "github-venue-6",
+    "name": "Braxted Park",
+    "hall": "",
+    "location": "Braxted Park Estate, Great Braxted, Witham CM8 3EN"
+  },
+  {
+    "id": "github-venue-7",
+    "name": "Burnham Beaches",
+    "hall": "",
+    "location": "Burnham Beeches Hotel, Grove Road, Slough, Berkshire, SL1 8DP"
+  },
+  {
+    "id": "github-venue-8",
+    "name": "Crowne Plaza Gerrads Cross",
+    "hall": "",
+    "location": "Oxford Rd, Beaconsfield, HP9 2XE"
+  },
+  {
+    "id": "github-venue-9",
+    "name": "Crownplaza Marlow",
+    "hall": "",
+    "location": "Fieldhouse Lane, Marlow, Buckinghamshire, SL7 1GJ"
+  },
+  {
+    "id": "github-venue-10",
+    "name": "De Vere Wokefield Park",
+    "hall": "",
+    "location": "Goodboys, Lane, Mortimer, Reading. RG7 3AH"
+  },
+  {
+    "id": "github-venue-11",
+    "name": "Devere Beaumont Estate - Chapel Room",
+    "hall": "",
+    "location": "Burfield Rd, Old Windsor, Windsor SL4 2JJ"
+  },
+  {
+    "id": "github-venue-12",
+    "name": "Devere Beaumont Estate - Hanover Suite",
+    "hall": "",
+    "location": "Burfield Rd, Old Windsor, Windsor SL4 2JJ"
+  },
+  {
+    "id": "github-venue-13",
+    "name": "Ditton Manor",
+    "hall": "",
+    "location": "Ditton Park Manor, Royal Berkshire, Slough, SL3 7JF"
+  },
+  {
+    "id": "github-venue-14",
+    "name": "East Hampstead Park",
+    "hall": "",
+    "location": "Off Peacock Ln, Bracknell, Wokingham RG40 3DF"
+  },
+  {
+    "id": "github-venue-15",
+    "name": "Fairmont, Windsor Park ( B )",
+    "hall": "",
+    "location": "Ball Room, Wick Lane, Egham, Surrey, Tw20 Oxn"
+  },
+  {
+    "id": "github-venue-16",
+    "name": "Fairmont, Windsor Park ( M)",
+    "hall": "",
+    "location": "Monarch Foyer & Suite, Wick Lane, Egham, Surrey, Tw20 Oxn"
+  },
+  {
+    "id": "github-venue-17",
+    "name": "Fennes Estate",
+    "hall": "",
+    "location": "Fennes - Wedding Venue, Fennes Rd, Bocking, Braintree CM7 5PL"
+  },
+  {
+    "id": "github-venue-18",
+    "name": "Froyle Park",
+    "hall": "",
+    "location": "Ryebridge Lane, Upper Froyle, Alton, Hampshire, GU34 4JH"
+  },
+  {
+    "id": "github-venue-21",
+    "name": "Hedsor House",
+    "hall": "",
+    "location": "Taplow, Buckinghamshire, SL6 0HX"
+  },
+  {
+    "id": "github-venue-22",
+    "name": "Heston Hyde",
+    "hall": "",
+    "location": "N Hyde Ln, Hounslow TW5 0EP"
+  },
+  {
+    "id": "github-venue-23",
+    "name": "Hilton - Terminal 5",
+    "hall": "",
+    "location": "Terminal 5, Poyle Rd, Colnbrook, Slough SL3 0FF"
+  },
+  {
+    "id": "github-venue-24",
+    "name": "Hilton Parklane",
+    "hall": "",
+    "location": "22 Park Lane, W1K 1BE"
+  },
+  {
+    "id": "github-venue-25",
+    "name": "Hilton Syon Park",
+    "hall": "",
+    "location": "Park Road, Isleworth TW8 8JF"
+  },
+  {
+    "id": "github-venue-26",
+    "name": "Hilton Waldorf Aldwych",
+    "hall": "",
+    "location": "Aldwych, London WC2B 4DD"
+  },
+  {
+    "id": "github-venue-27",
+    "name": "Hilton Watford",
+    "hall": "",
+    "location": "Elton Way, Watford WD25 8HA"
+  },
+  {
+    "id": "github-venue-28",
+    "name": "Hilton Wembley",
+    "hall": "",
+    "location": "Lakeside Way, Wembley, HA90BU"
+  },
+  {
+    "id": "github-venue-30",
+    "name": "Hyatt Regency London The Churchill",
+    "hall": "",
+    "location": "30 Portman Square, London W1H 7BH"
+  },
+  {
+    "id": "github-venue-31",
+    "name": "Indian High Commission London",
+    "hall": "",
+    "location": "India House, Aldwych, London WC2B 4NA"
+  },
+  {
+    "id": "github-venue-32",
+    "name": "Intercontinental London - The O2",
+    "hall": "",
+    "location": "1 Waterview Drive, Greenwich Peninsula SE10 0TW"
+  },
+  {
+    "id": "github-venue-33",
+    "name": "Intercontinental Park Lane",
+    "hall": "",
+    "location": "One Hamilton Place, Park Ln, London W1J 7QY"
+  },
+  {
+    "id": "github-venue-34",
+    "name": "Jw Marriott Grosvenor House ( B )",
+    "hall": "",
+    "location": "Ball Room, 86-90 Park Ln, London W1K 7TN"
+  },
+  {
+    "id": "github-venue-35",
+    "name": "Jw Marriott Grosvenor House ( G )",
+    "hall": "",
+    "location": "Great Room, 86-90 Park Ln, London W1K 7TN"
+  },
+  {
+    "id": "github-venue-36",
+    "name": "London Heathrow Marriott Hotel",
+    "hall": "",
+    "location": "Bath Road Heathrow, Airport, Hayes UB3 5AN"
+  },
+  {
+    "id": "github-venue-37",
+    "name": "London Marriott Hotel - Grosv Square",
+    "hall": "",
+    "location": "Grosvenor Square, London W1K 6JP"
+  },
+  {
+    "id": "github-venue-38",
+    "name": "Marriott Delta Langley",
+    "hall": "",
+    "location": "Ditton Rd, Langley, Slough SL3 8PT"
+  },
+  {
+    "id": "github-venue-40",
+    "name": "Micklefield Hall",
+    "hall": "",
+    "location": "Sarratt Road, WD3 6AQ"
+  },
+  {
+    "id": "github-venue-43",
+    "name": "Natural History Museum",
+    "hall": "",
+    "location": "Cromwell Road South, Kensington, SW7 5BD"
+  },
+  {
+    "id": "github-venue-44",
+    "name": "North Mymms Park",
+    "hall": "",
+    "location": "Hatfield, Hertfordshire, AL9 7TR"
+  },
+  {
+    "id": "github-venue-45",
+    "name": "Novotel Hammersmith Hotel",
+    "hall": "",
+    "location": "1 Shortlands Hammersmith International Ctre, London W6 8DR"
+  },
+  {
+    "id": "github-venue-46",
+    "name": "Oakley Hall",
+    "hall": "",
+    "location": "Basingstoke, Hampshire, RG23 7EL"
+  },
+  {
+    "id": "github-venue-47",
+    "name": "Oatlands Park Hotel",
+    "hall": "",
+    "location": "Oatlands Drive, Weybridge, Surrey , KT13 9HB"
+  },
+  {
+    "id": "github-venue-48",
+    "name": "Offley Place",
+    "hall": "",
+    "location": "Kings Walden Road, Great Offley, Hitchin, SG3 3DX"
+  },
+  {
+    "id": "github-venue-49",
+    "name": "Old Royal Naval College",
+    "hall": "",
+    "location": "Painted Hall, Old Royal Naval College, London SE10 9NN"
+  },
+  {
+    "id": "github-venue-50",
+    "name": "One Great George Street",
+    "hall": "",
+    "location": "Westminster, London- SW1P3AA"
+  },
+  {
+    "id": "github-venue-51",
+    "name": "Parklands, Quendon Hal",
+    "hall": "",
+    "location": "Newport Dr, Saffron Walden, CB113XN"
+  },
+  {
+    "id": "github-venue-52",
+    "name": "Pendley Manor",
+    "hall": "",
+    "location": "Cow Ln, Tring HP23 5QY"
+  },
+  {
+    "id": "github-venue-53",
+    "name": "Radisson Edwardian Bath Road",
+    "hall": "",
+    "location": "Bath Road, Heathrow, London - UB3 5AW"
+  },
+  {
+    "id": "github-venue-54",
+    "name": "Radisson Red Heathrow",
+    "hall": "",
+    "location": "Building B, Bath Rd, Heathrow Blvd, Sipson, West Drayton UB7 0DU"
+  },
+  {
+    "id": "github-venue-55",
+    "name": "Rosewood London",
+    "hall": "",
+    "location": "252 High Holborn, WC1V 7EN"
+  },
+  {
+    "id": "github-venue-56",
+    "name": "Sheraton Grand London Park Lane",
+    "hall": "",
+    "location": "Piccadilly, London W1J 7BX"
+  },
+  {
+    "id": "github-venue-57",
+    "name": "Sofitel Terminal 5",
+    "hall": "",
+    "location": "Terminal 5 London Heathrow Airport, London TW6 2GD"
+  },
+  {
+    "id": "github-venue-58",
+    "name": "Sopwell House",
+    "hall": "",
+    "location": "Sopwell House Hotel & Country Club, Cottonmill Lane, St.Albans, Hertfordshire, AL1 2HQ"
+  },
+  {
+    "id": "github-venue-59",
+    "name": "Syon House Conservatory",
+    "hall": "",
+    "location": "Brentford TW8 8JF"
+  },
+  {
+    "id": "github-venue-60",
+    "name": "Syon House Marquee",
+    "hall": "",
+    "location": "Syon Park, Brentford TW8 8JF"
+  },
+  {
+    "id": "github-venue-61",
+    "name": "The Dilly London",
+    "hall": "",
+    "location": "21 Piccadilly, London W1J 0BH"
+  },
+  {
+    "id": "github-venue-62",
+    "name": "The Grand Brighton",
+    "hall": "",
+    "location": "97-99 Kings Rd, Brighton And Hove, Brighton BN1 2FW"
+  },
+  {
+    "id": "github-venue-63",
+    "name": "The Langham Hotel",
+    "hall": "",
+    "location": "1C Portland Pl, London W1B 1JA"
+  },
+  {
+    "id": "github-venue-64",
+    "name": "The Old Sessions House",
+    "hall": "",
+    "location": "23 Clerkenwell Grn, London EC1R 0NA"
+  },
+  {
+    "id": "github-venue-66",
+    "name": "Thistle London Heathrow",
+    "hall": "",
+    "location": "Thistle London Heathrow Terminal 5 Hotel, Terminal 5, Bath Rd, Longford, London UB7 0EQ"
+  },
+  {
+    "id": "github-venue-67",
+    "name": "Victoria & Alburt Museum",
+    "hall": "",
+    "location": "V&A South Kensington, Cromwell Road, London, SW7 2RL"
+  },
+  {
+    "id": "github-venue-68",
+    "name": "Waddesdon Manor, The Dairy",
+    "hall": "",
+    "location": "The Estate Yard I Queen Street I Waddesdon I Bucks I HP18 0JW"
+  }
+]
