@@ -1,0 +1,3116 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Allergen Database & Menu Generator | Ragasaan</title>
+  <!-- Bundled CSS keeps the menu editor usable when offline. -->
+  <style id="bundled-tailwind">
+/*! tailwindcss v4.1.10 | MIT License | https://tailwindcss.com */
+@layer properties;
+:root, :host {
+  --font-sans: Inter,sans-serif;
+  --font-serif: "Playfair Display",serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+    monospace;
+  --color-orange-400: oklch(75% 0.183 55.934);
+  --color-amber-300: oklch(87.9% 0.169 91.605);
+  --color-amber-400: oklch(82.8% 0.189 84.429);
+  --color-emerald-400: oklch(76.5% 0.177 163.223);
+  --color-emerald-500: oklch(69.6% 0.17 162.48);
+  --color-emerald-600: oklch(59.6% 0.145 163.225);
+  --color-blue-400: oklch(70.7% 0.165 254.624);
+  --color-rose-300: oklch(81% 0.117 11.638);
+  --color-rose-400: oklch(71.2% 0.194 13.428);
+  --color-rose-900: oklch(41% 0.159 10.272);
+  --color-slate-100: oklch(96.8% 0.007 247.896);
+  --color-slate-200: oklch(92.9% 0.013 255.508);
+  --color-slate-300: oklch(86.9% 0.022 252.894);
+  --color-slate-400: oklch(70.4% 0.04 256.788);
+  --color-slate-500: oklch(55.4% 0.046 257.417);
+  --color-slate-700: oklch(37.2% 0.044 257.287);
+  --color-slate-800: oklch(27.9% 0.041 260.031);
+  --color-slate-900: oklch(20.8% 0.042 265.755);
+  --color-slate-950: oklch(12.9% 0.042 264.695);
+  --color-white: #fff;
+  --spacing: 0.25rem;
+  --container-sm: 24rem;
+  --container-lg: 32rem;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: calc(1 / 0.75);
+  --text-sm: 0.875rem;
+  --text-sm--line-height: calc(1.25 / 0.875);
+  --text-base: 1rem;
+  --text-base--line-height: calc(1.5 / 1);
+  --text-lg: 1.125rem;
+  --text-lg--line-height: calc(1.75 / 1.125);
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --tracking-tight: -0.025em;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+  --tracking-widest: 0.1em;
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-relaxed: 1.625;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --blur-sm: 8px;
+  --default-transition-duration: 150ms;
+  --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  --default-font-family: var(--font-sans);
+  --default-mono-font-family: var(--font-mono);
+  --color-gold-400: #facc15;
+  --color-gold-500: #eab308;
+  --color-gold-600: #ca8a04;
+}
+*, ::after, ::before, ::backdrop, ::file-selector-button {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0 solid;
+}
+html, :host {
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  tab-size: 4;
+  font-family: var(--default-font-family, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji');
+  font-feature-settings: var(--default-font-feature-settings, normal);
+  font-variation-settings: var(--default-font-variation-settings, normal);
+  -webkit-tap-highlight-color: transparent;
+}
+hr {
+  height: 0;
+  color: inherit;
+  border-top-width: 1px;
+}
+abbr:where([title]) {
+  -webkit-text-decoration: underline dotted;
+  text-decoration: underline dotted;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+a {
+  color: inherit;
+  -webkit-text-decoration: inherit;
+  text-decoration: inherit;
+}
+b, strong {
+  font-weight: bolder;
+}
+code, kbd, samp, pre {
+  font-family: var(--default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace);
+  font-feature-settings: var(--default-mono-font-feature-settings, normal);
+  font-variation-settings: var(--default-mono-font-variation-settings, normal);
+  font-size: 1em;
+}
+small {
+  font-size: 80%;
+}
+sub, sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+sub {
+  bottom: -0.25em;
+}
+sup {
+  top: -0.5em;
+}
+table {
+  text-indent: 0;
+  border-color: inherit;
+  border-collapse: collapse;
+}
+:-moz-focusring {
+  outline: auto;
+}
+progress {
+  vertical-align: baseline;
+}
+summary {
+  display: list-item;
+}
+ol, ul, menu {
+  list-style: none;
+}
+img, svg, video, canvas, audio, iframe, embed, object {
+  display: block;
+  vertical-align: middle;
+}
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+button, input, select, optgroup, textarea, ::file-selector-button {
+  font: inherit;
+  font-feature-settings: inherit;
+  font-variation-settings: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  border-radius: 0;
+  background-color: transparent;
+  opacity: 1;
+}
+:where(select:is([multiple], [size])) optgroup {
+  font-weight: bolder;
+}
+:where(select:is([multiple], [size])) optgroup option {
+  padding-inline-start: 20px;
+}
+::file-selector-button {
+  margin-inline-end: 4px;
+}
+::placeholder {
+  opacity: 1;
+}
+@supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {
+  ::placeholder {
+    color: currentcolor;
+    @supports (color: color-mix(in lab, red, red)) {
+      color: color-mix(in oklab, currentcolor 50%, transparent);
+    }
+  }
+}
+textarea {
+  resize: vertical;
+}
+::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+::-webkit-date-and-time-value {
+  min-height: 1lh;
+  text-align: inherit;
+}
+::-webkit-datetime-edit {
+  display: inline-flex;
+}
+::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {
+  padding-block: 0;
+}
+:-moz-ui-invalid {
+  box-shadow: none;
+}
+button, input:where([type='button'], [type='reset'], [type='submit']), ::file-selector-button {
+  appearance: button;
+}
+::-webkit-inner-spin-button, ::-webkit-outer-spin-button {
+  height: auto;
+}
+[hidden]:where(:not([hidden='until-found'])) {
+  display: none !important;
+}
+.fixed {
+  position: fixed;
+}
+.relative {
+  position: relative;
+}
+.sticky {
+  position: sticky;
+}
+.inset-0 {
+  inset: calc(var(--spacing) * 0);
+}
+.top-0 {
+  top: calc(var(--spacing) * 0);
+}
+.z-10 {
+  z-index: 10;
+}
+.z-20 {
+  z-index: 20;
+}
+.z-50 {
+  z-index: 50;
+}
+.m-auto {
+  margin: auto;
+}
+.mx-auto {
+  margin-inline: auto;
+}
+.mt-1 {
+  margin-top: calc(var(--spacing) * 1);
+}
+.mr-1 {
+  margin-right: calc(var(--spacing) * 1);
+}
+.mb-1 {
+  margin-bottom: calc(var(--spacing) * 1);
+}
+.mb-1\.5 {
+  margin-bottom: calc(var(--spacing) * 1.5);
+}
+.mb-2 {
+  margin-bottom: calc(var(--spacing) * 2);
+}
+.mb-4 {
+  margin-bottom: calc(var(--spacing) * 4);
+}
+.block {
+  display: block;
+}
+.flex {
+  display: flex;
+}
+.grid {
+  display: grid;
+}
+.hidden {
+  display: none;
+}
+.inline-block {
+  display: inline-block;
+}
+.h-3 {
+  height: calc(var(--spacing) * 3);
+}
+.h-8 {
+  height: calc(var(--spacing) * 8);
+}
+.h-9 {
+  height: calc(var(--spacing) * 9);
+}
+.h-10 {
+  height: calc(var(--spacing) * 10);
+}
+.h-full {
+  height: 100%;
+}
+.max-h-28 {
+  max-height: calc(var(--spacing) * 28);
+}
+.max-h-32 {
+  max-height: calc(var(--spacing) * 32);
+}
+.max-h-\[90vh\] {
+  max-height: 90vh;
+}
+.w-1\/2 {
+  width: calc(1/2 * 100%);
+}
+.w-1\/3 {
+  width: calc(1/3 * 100%);
+}
+.w-3 {
+  width: calc(var(--spacing) * 3);
+}
+.w-9 {
+  width: calc(var(--spacing) * 9);
+}
+.w-10 {
+  width: calc(var(--spacing) * 10);
+}
+.w-12 {
+  width: calc(var(--spacing) * 12);
+}
+.w-\[7\%\] {
+  width: 7%;
+}
+.w-\[12\%\] {
+  width: 12%;
+}
+.w-\[14\%\] {
+  width: 14%;
+}
+.w-\[15\%\] {
+  width: 15%;
+}
+.w-\[18\%\] {
+  width: 18%;
+}
+.w-\[22\%\] {
+  width: 22%;
+}
+.w-full {
+  width: 100%;
+}
+.max-w-lg {
+  max-width: var(--container-lg);
+}
+.max-w-sm {
+  max-width: var(--container-sm);
+}
+.flex-1 {
+  flex: 1;
+}
+.shrink-0 {
+  flex-shrink: 0;
+}
+.table-fixed {
+  table-layout: fixed;
+}
+.cursor-pointer {
+  cursor: pointer;
+}
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.flex-col {
+  flex-direction: column;
+}
+.items-center {
+  align-items: center;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.justify-center {
+  justify-content: center;
+}
+.justify-end {
+  justify-content: flex-end;
+}
+.gap-1 {
+  gap: calc(var(--spacing) * 1);
+}
+.gap-1\.5 {
+  gap: calc(var(--spacing) * 1.5);
+}
+.gap-2 {
+  gap: calc(var(--spacing) * 2);
+}
+.gap-3 {
+  gap: calc(var(--spacing) * 3);
+}
+.gap-4 {
+  gap: calc(var(--spacing) * 4);
+}
+.gap-8 {
+  gap: calc(var(--spacing) * 8);
+}
+.space-y-1 {
+  :where(& > :not(:last-child)) {
+    --tw-space-y-reverse: 0;
+    margin-block-start: calc(calc(var(--spacing) * 1) * var(--tw-space-y-reverse));
+    margin-block-end: calc(calc(var(--spacing) * 1) * calc(1 - var(--tw-space-y-reverse)));
+  }
+}
+.space-y-2 {
+  :where(& > :not(:last-child)) {
+    --tw-space-y-reverse: 0;
+    margin-block-start: calc(calc(var(--spacing) * 2) * var(--tw-space-y-reverse));
+    margin-block-end: calc(calc(var(--spacing) * 2) * calc(1 - var(--tw-space-y-reverse)));
+  }
+}
+.space-y-3 {
+  :where(& > :not(:last-child)) {
+    --tw-space-y-reverse: 0;
+    margin-block-start: calc(calc(var(--spacing) * 3) * var(--tw-space-y-reverse));
+    margin-block-end: calc(calc(var(--spacing) * 3) * calc(1 - var(--tw-space-y-reverse)));
+  }
+}
+.space-y-4 {
+  :where(& > :not(:last-child)) {
+    --tw-space-y-reverse: 0;
+    margin-block-start: calc(calc(var(--spacing) * 4) * var(--tw-space-y-reverse));
+    margin-block-end: calc(calc(var(--spacing) * 4) * calc(1 - var(--tw-space-y-reverse)));
+  }
+}
+.space-x-1 {
+  :where(& > :not(:last-child)) {
+    --tw-space-x-reverse: 0;
+    margin-inline-start: calc(calc(var(--spacing) * 1) * var(--tw-space-x-reverse));
+    margin-inline-end: calc(calc(var(--spacing) * 1) * calc(1 - var(--tw-space-x-reverse)));
+  }
+}
+.divide-y {
+  :where(& > :not(:last-child)) {
+    --tw-divide-y-reverse: 0;
+    border-bottom-style: var(--tw-border-style);
+    border-top-style: var(--tw-border-style);
+    border-top-width: calc(1px * var(--tw-divide-y-reverse));
+    border-bottom-width: calc(1px * calc(1 - var(--tw-divide-y-reverse)));
+  }
+}
+.divide-slate-800\/60 {
+  :where(& > :not(:last-child)) {
+    border-color: color-mix(in srgb, oklch(27.9% 0.041 260.031) 60%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-slate-800) 60%, transparent);
+    }
+  }
+}
+.overflow-auto {
+  overflow: auto;
+}
+.overflow-hidden {
+  overflow: hidden;
+}
+.overflow-y-auto {
+  overflow-y: auto;
+}
+.rounded {
+  border-radius: 0.25rem;
+}
+.rounded-2xl {
+  border-radius: var(--radius-2xl);
+}
+.rounded-full {
+  border-radius: calc(infinity * 1px);
+}
+.rounded-lg {
+  border-radius: var(--radius-lg);
+}
+.rounded-xl {
+  border-radius: var(--radius-xl);
+}
+.border {
+  border-style: var(--tw-border-style);
+  border-width: 1px;
+}
+.border-t {
+  border-top-style: var(--tw-border-style);
+  border-top-width: 1px;
+}
+.border-r {
+  border-right-style: var(--tw-border-style);
+  border-right-width: 1px;
+}
+.border-b {
+  border-bottom-style: var(--tw-border-style);
+  border-bottom-width: 1px;
+}
+.border-gold-500 {
+  border-color: var(--color-gold-500);
+}
+.border-slate-700 {
+  border-color: var(--color-slate-700);
+}
+.border-slate-800 {
+  border-color: var(--color-slate-800);
+}
+.bg-emerald-600 {
+  background-color: var(--color-emerald-600);
+}
+.bg-gold-500 {
+  background-color: var(--color-gold-500);
+}
+.bg-gold-500\/10 {
+  background-color: color-mix(in srgb, #eab308 10%, transparent);
+  @supports (color: color-mix(in lab, red, red)) {
+    background-color: color-mix(in oklab, var(--color-gold-500) 10%, transparent);
+  }
+}
+.bg-slate-800 {
+  background-color: var(--color-slate-800);
+}
+.bg-slate-900 {
+  background-color: var(--color-slate-900);
+}
+.bg-slate-950 {
+  background-color: var(--color-slate-950);
+}
+.bg-slate-950\/80 {
+  background-color: color-mix(in srgb, oklch(12.9% 0.042 264.695) 80%, transparent);
+  @supports (color: color-mix(in lab, red, red)) {
+    background-color: color-mix(in oklab, var(--color-slate-950) 80%, transparent);
+  }
+}
+.bg-slate-950\/85 {
+  background-color: color-mix(in srgb, oklch(12.9% 0.042 264.695) 85%, transparent);
+  @supports (color: color-mix(in lab, red, red)) {
+    background-color: color-mix(in oklab, var(--color-slate-950) 85%, transparent);
+  }
+}
+.bg-gradient-to-tr {
+  --tw-gradient-position: to top right in oklab;
+  background-image: linear-gradient(var(--tw-gradient-stops));
+}
+.from-gold-600 {
+  --tw-gradient-from: var(--color-gold-600);
+  --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+}
+.to-gold-400 {
+  --tw-gradient-to: var(--color-gold-400);
+  --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+}
+.p-1 {
+  padding: calc(var(--spacing) * 1);
+}
+.p-1\.5 {
+  padding: calc(var(--spacing) * 1.5);
+}
+.p-2 {
+  padding: calc(var(--spacing) * 2);
+}
+.p-2\.5 {
+  padding: calc(var(--spacing) * 2.5);
+}
+.p-3 {
+  padding: calc(var(--spacing) * 3);
+}
+.p-3\.5 {
+  padding: calc(var(--spacing) * 3.5);
+}
+.p-4 {
+  padding: calc(var(--spacing) * 4);
+}
+.p-5 {
+  padding: calc(var(--spacing) * 5);
+}
+.p-6 {
+  padding: calc(var(--spacing) * 6);
+}
+.p-8 {
+  padding: calc(var(--spacing) * 8);
+}
+.px-2 {
+  padding-inline: calc(var(--spacing) * 2);
+}
+.px-2\.5 {
+  padding-inline: calc(var(--spacing) * 2.5);
+}
+.px-3 {
+  padding-inline: calc(var(--spacing) * 3);
+}
+.px-3\.5 {
+  padding-inline: calc(var(--spacing) * 3.5);
+}
+.px-4 {
+  padding-inline: calc(var(--spacing) * 4);
+}
+.px-5 {
+  padding-inline: calc(var(--spacing) * 5);
+}
+.py-0\.5 {
+  padding-block: calc(var(--spacing) * 0.5);
+}
+.py-1 {
+  padding-block: calc(var(--spacing) * 1);
+}
+.py-1\.5 {
+  padding-block: calc(var(--spacing) * 1.5);
+}
+.py-2 {
+  padding-block: calc(var(--spacing) * 2);
+}
+.py-3 {
+  padding-block: calc(var(--spacing) * 3);
+}
+.py-3\.5 {
+  padding-block: calc(var(--spacing) * 3.5);
+}
+.pt-1 {
+  padding-top: calc(var(--spacing) * 1);
+}
+.pt-2 {
+  padding-top: calc(var(--spacing) * 2);
+}
+.pt-3 {
+  padding-top: calc(var(--spacing) * 3);
+}
+.pr-1 {
+  padding-right: calc(var(--spacing) * 1);
+}
+.text-center {
+  text-align: center;
+}
+.text-left {
+  text-align: left;
+}
+.align-middle {
+  vertical-align: middle;
+}
+.font-mono {
+  font-family: var(--font-mono);
+}
+.font-sans {
+  font-family: var(--font-sans);
+}
+.font-serif {
+  font-family: var(--font-serif);
+}
+.text-base {
+  font-size: var(--text-base);
+  line-height: var(--tw-leading, var(--text-base--line-height));
+}
+.text-lg {
+  font-size: var(--text-lg);
+  line-height: var(--tw-leading, var(--text-lg--line-height));
+}
+.text-sm {
+  font-size: var(--text-sm);
+  line-height: var(--tw-leading, var(--text-sm--line-height));
+}
+.text-xs {
+  font-size: var(--text-xs);
+  line-height: var(--tw-leading, var(--text-xs--line-height));
+}
+.text-\[10px\] {
+  font-size: 10px;
+}
+.text-\[11px\] {
+  font-size: 11px;
+}
+.leading-relaxed {
+  --tw-leading: var(--leading-relaxed);
+  line-height: var(--leading-relaxed);
+}
+.leading-snug {
+  --tw-leading: var(--leading-snug);
+  line-height: var(--leading-snug);
+}
+.leading-tight {
+  --tw-leading: var(--leading-tight);
+  line-height: var(--leading-tight);
+}
+.font-bold {
+  --tw-font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-bold);
+}
+.font-medium {
+  --tw-font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-medium);
+}
+.font-normal {
+  --tw-font-weight: var(--font-weight-normal);
+  font-weight: var(--font-weight-normal);
+}
+.font-semibold {
+  --tw-font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-semibold);
+}
+.tracking-tight {
+  --tw-tracking: var(--tracking-tight);
+  letter-spacing: var(--tracking-tight);
+}
+.tracking-wide {
+  --tw-tracking: var(--tracking-wide);
+  letter-spacing: var(--tracking-wide);
+}
+.tracking-wider {
+  --tw-tracking: var(--tracking-wider);
+  letter-spacing: var(--tracking-wider);
+}
+.tracking-widest {
+  --tw-tracking: var(--tracking-widest);
+  letter-spacing: var(--tracking-widest);
+}
+.text-amber-300 {
+  color: var(--color-amber-300);
+}
+.text-amber-400 {
+  color: var(--color-amber-400);
+}
+.text-blue-400 {
+  color: var(--color-blue-400);
+}
+.text-emerald-400 {
+  color: var(--color-emerald-400);
+}
+.text-gold-400 {
+  color: var(--color-gold-400);
+}
+.text-orange-400 {
+  color: var(--color-orange-400);
+}
+.text-rose-400 {
+  color: var(--color-rose-400);
+}
+.text-slate-100 {
+  color: var(--color-slate-100);
+}
+.text-slate-200 {
+  color: var(--color-slate-200);
+}
+.text-slate-300 {
+  color: var(--color-slate-300);
+}
+.text-slate-400 {
+  color: var(--color-slate-400);
+}
+.text-slate-500 {
+  color: var(--color-slate-500);
+}
+.text-slate-950 {
+  color: var(--color-slate-950);
+}
+.text-white {
+  color: var(--color-white);
+}
+.uppercase {
+  text-transform: uppercase;
+}
+.italic {
+  font-style: italic;
+}
+.antialiased {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.shadow {
+  --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+}
+.shadow-2xl {
+  --tw-shadow: 0 25px 50px -12px var(--tw-shadow-color, rgb(0 0 0 / 0.25));
+  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+}
+.shadow-lg {
+  --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+}
+.shadow-xl {
+  --tw-shadow: 0 20px 25px -5px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 8px 10px -6px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+}
+.shadow-gold-500\/25 {
+  --tw-shadow-color: color-mix(in srgb, #eab308 25%, transparent);
+  @supports (color: color-mix(in lab, red, red)) {
+    --tw-shadow-color: color-mix(in oklab, color-mix(in oklab, var(--color-gold-500) 25%, transparent) var(--tw-shadow-alpha), transparent);
+  }
+}
+.backdrop-blur-sm {
+  --tw-backdrop-blur: blur(var(--blur-sm));
+  -webkit-backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
+  backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
+}
+.transition {
+  transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, visibility, content-visibility, overlay, pointer-events;
+  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+  transition-duration: var(--tw-duration, var(--default-transition-duration));
+}
+.file\:mr-2 {
+  &::file-selector-button {
+    margin-right: calc(var(--spacing) * 2);
+  }
+}
+.file\:rounded {
+  &::file-selector-button {
+    border-radius: 0.25rem;
+  }
+}
+.file\:border-0 {
+  &::file-selector-button {
+    border-style: var(--tw-border-style);
+    border-width: 0px;
+  }
+}
+.file\:bg-slate-800 {
+  &::file-selector-button {
+    background-color: var(--color-slate-800);
+  }
+}
+.file\:px-2 {
+  &::file-selector-button {
+    padding-inline: calc(var(--spacing) * 2);
+  }
+}
+.file\:py-1 {
+  &::file-selector-button {
+    padding-block: calc(var(--spacing) * 1);
+  }
+}
+.file\:text-white {
+  &::file-selector-button {
+    color: var(--color-white);
+  }
+}
+.hover\:border-gold-500 {
+  &:hover {
+    @media (hover: hover) {
+      border-color: var(--color-gold-500);
+    }
+  }
+}
+.hover\:border-slate-700 {
+  &:hover {
+    @media (hover: hover) {
+      border-color: var(--color-slate-700);
+    }
+  }
+}
+.hover\:bg-emerald-500 {
+  &:hover {
+    @media (hover: hover) {
+      background-color: var(--color-emerald-500);
+    }
+  }
+}
+.hover\:bg-gold-400 {
+  &:hover {
+    @media (hover: hover) {
+      background-color: var(--color-gold-400);
+    }
+  }
+}
+.hover\:bg-rose-900\/50 {
+  &:hover {
+    @media (hover: hover) {
+      background-color: color-mix(in srgb, oklch(41% 0.159 10.272) 50%, transparent);
+      @supports (color: color-mix(in lab, red, red)) {
+        background-color: color-mix(in oklab, var(--color-rose-900) 50%, transparent);
+      }
+    }
+  }
+}
+.hover\:bg-slate-700 {
+  &:hover {
+    @media (hover: hover) {
+      background-color: var(--color-slate-700);
+    }
+  }
+}
+.hover\:bg-slate-800 {
+  &:hover {
+    @media (hover: hover) {
+      background-color: var(--color-slate-800);
+    }
+  }
+}
+.hover\:bg-slate-800\/50 {
+  &:hover {
+    @media (hover: hover) {
+      background-color: color-mix(in srgb, oklch(27.9% 0.041 260.031) 50%, transparent);
+      @supports (color: color-mix(in lab, red, red)) {
+        background-color: color-mix(in oklab, var(--color-slate-800) 50%, transparent);
+      }
+    }
+  }
+}
+.hover\:text-rose-300 {
+  &:hover {
+    @media (hover: hover) {
+      color: var(--color-rose-300);
+    }
+  }
+}
+.hover\:text-white {
+  &:hover {
+    @media (hover: hover) {
+      color: var(--color-white);
+    }
+  }
+}
+.hover\:underline {
+  &:hover {
+    @media (hover: hover) {
+      text-decoration-line: underline;
+    }
+  }
+}
+.focus\:border-gold-500 {
+  &:focus {
+    border-color: var(--color-gold-500);
+  }
+}
+.focus\:outline-none {
+  &:focus {
+    --tw-outline-style: none;
+    outline-style: none;
+  }
+}
+.disabled\:cursor-not-allowed {
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+.disabled\:opacity-40 {
+  &:disabled {
+    opacity: 40%;
+  }
+}
+.sm\:block {
+  @media (width >= 40rem) {
+    display: block;
+  }
+}
+.sm\:grid-cols-3 {
+  @media (width >= 40rem) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.md\:inline {
+  @media (width >= 48rem) {
+    display: inline;
+  }
+}
+.md\:w-\[480px\] {
+  @media (width >= 48rem) {
+    width: 480px;
+  }
+}
+.md\:flex-row {
+  @media (width >= 48rem) {
+    flex-direction: row;
+  }
+}
+.lg\:w-\[520px\] {
+  @media (width >= 64rem) {
+    width: 520px;
+  }
+}
+@property --tw-space-y-reverse {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@property --tw-space-x-reverse {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@property --tw-divide-y-reverse {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@property --tw-border-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
+@property --tw-gradient-position {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-gradient-from {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #0000;
+}
+@property --tw-gradient-via {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #0000;
+}
+@property --tw-gradient-to {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #0000;
+}
+@property --tw-gradient-stops {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-gradient-via-stops {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-gradient-from-position {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+@property --tw-gradient-via-position {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 50%;
+}
+@property --tw-gradient-to-position {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-leading {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-font-weight {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-tracking {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-inset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-ring-inset {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-offset-width {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --tw-ring-offset-color {
+  syntax: "*";
+  inherits: false;
+  initial-value: #fff;
+}
+@property --tw-ring-offset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-backdrop-blur {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-brightness {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-contrast {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-grayscale {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-hue-rotate {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-invert {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-opacity {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-saturate {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-sepia {
+  syntax: "*";
+  inherits: false;
+}
+@layer properties {
+  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
+    *, ::before, ::after, ::backdrop {
+      --tw-space-y-reverse: 0;
+      --tw-space-x-reverse: 0;
+      --tw-divide-y-reverse: 0;
+      --tw-border-style: solid;
+      --tw-gradient-position: initial;
+      --tw-gradient-from: #0000;
+      --tw-gradient-via: #0000;
+      --tw-gradient-to: #0000;
+      --tw-gradient-stops: initial;
+      --tw-gradient-via-stops: initial;
+      --tw-gradient-from-position: 0%;
+      --tw-gradient-via-position: 50%;
+      --tw-gradient-to-position: 100%;
+      --tw-leading: initial;
+      --tw-font-weight: initial;
+      --tw-tracking: initial;
+      --tw-shadow: 0 0 #0000;
+      --tw-shadow-color: initial;
+      --tw-shadow-alpha: 100%;
+      --tw-inset-shadow: 0 0 #0000;
+      --tw-inset-shadow-color: initial;
+      --tw-inset-shadow-alpha: 100%;
+      --tw-ring-color: initial;
+      --tw-ring-shadow: 0 0 #0000;
+      --tw-inset-ring-color: initial;
+      --tw-inset-ring-shadow: 0 0 #0000;
+      --tw-ring-inset: initial;
+      --tw-ring-offset-width: 0px;
+      --tw-ring-offset-color: #fff;
+      --tw-ring-offset-shadow: 0 0 #0000;
+      --tw-backdrop-blur: initial;
+      --tw-backdrop-brightness: initial;
+      --tw-backdrop-contrast: initial;
+      --tw-backdrop-grayscale: initial;
+      --tw-backdrop-hue-rotate: initial;
+      --tw-backdrop-invert: initial;
+      --tw-backdrop-opacity: initial;
+      --tw-backdrop-saturate: initial;
+      --tw-backdrop-sepia: initial;
+    }
+  }
+}
+
+  
+    /* The compact export layout is deliberately scoped to the Print & Format tab. */
+    @media (min-width:768px) {
+      #sidebar-controls.print-format-compact { width: 245px !important; }
+      #tab-master.master-preview-split { flex: 1 1 auto; min-width: 0; padding: 14px; }
+      #tab-master.master-preview-split + #preview-main-panel { min-width: 0; }
+    }
+    @media (min-width:1024px) {
+      #sidebar-controls.print-format-compact { width: 270px !important; }
+    }
+</style>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Great+Vibes&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <!-- SheetJS for Excel Import/Export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- html2pdf.js for PDF Export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <script>
+    if (window.tailwind) tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            gold: {
+              100: '#fef9c3', 300: '#fde047', 400: '#facc15', 500: '#eab308',
+              600: '#ca8a04', 700: '#a16207', 800: '#854d0e', 900: '#713f12',
+            }
+          },
+          fontFamily: {
+            serif: ['Playfair Display', 'serif'],
+            cormorant: ['Cormorant Garamond', 'serif'],
+            script: ['Great Vibes', 'cursive'],
+            sans: ['Inter', 'sans-serif'],
+            montserrat: ['Montserrat', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #eab308; }
+
+    @media print {
+      body { background: #ffffff !important; color: #000000 !important; padding: 0 !important; margin: 0 !important; overflow: visible !important; }
+      .no-print { display: none !important; }
+      .page-break { page-break-before: always; break-before: page; }
+      .print-sheet { box-shadow: none !important; margin: 0 !important; border-radius: 0 !important; }
+    }
+
+    @page { size: A4 portrait; margin: 0; }
+
+    .preview-scale-wrapper {
+      transform-origin: top center;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    /* Fixed Standard A4 Dimensions */
+    .paper-a4 { width: 210mm; height: 297mm; max-height: 297mm; box-sizing: border-box; overflow: hidden; position: relative; }
+    .paper-half-a4 { width: 210mm; height: 297mm; max-height: 297mm; box-sizing: border-box; overflow: hidden; position: relative; }
+    
+    .paper-a8-single {
+      width: 74.25mm; height: 52.5mm; box-sizing: border-box;
+      position: relative; overflow: hidden; padding: 3mm;
+      border: 1px solid #ca8a04;
+    }
+    .paper-a8-grid {
+      width: 210mm; height: 297mm;
+      display: grid; grid-template-columns: repeat(2, 105mm); grid-template-rows: repeat(8, 37.125mm);
+      box-sizing: border-box; background: white; padding: 5mm; gap: 2mm; overflow: hidden;
+    }
+
+    .paper-a6-single {
+      width: 105mm; height: 148.5mm; box-sizing: border-box;
+      position: relative; overflow: hidden; padding: 5mm;
+      border: 1px solid #ca8a04;
+    }
+    .paper-a6-grid {
+      width: 210mm; height: 297mm;
+      display: grid; grid-template-columns: repeat(2, 105mm); grid-template-rows: repeat(2, 148.5mm);
+      box-sizing: border-box; background: white; overflow: hidden;
+    }
+
+    .paper-canape-grid {
+      width: 210mm; height: 297mm;
+      display: grid; grid-template-columns: repeat(2, 95mm); grid-template-rows: repeat(4, 67mm);
+      gap: 5mm; padding: 10mm; box-sizing: border-box; background: white; overflow: hidden;
+    }
+    .paper-canape-single {
+      width: 95mm; height: 67mm; box-sizing: border-box;
+      position: relative; overflow: hidden; padding: 4mm;
+      border: 1px solid #ca8a04;
+    }
+
+    [contenteditable="true"]:hover {
+      outline: 1px dashed #ca8a04;
+      background: rgba(202, 138, 4, 0.05);
+      cursor: text;
+    }
+
+    .paper-canape-grid {width:210mm;height:297mm;display:grid;grid-template-columns:95mm 95mm;
+       grid-template-rows:repeat(4,67mm);column-gap:5mm;row-gap:5mm;padding:7mm 7.5mm;
+       box-sizing:border-box;overflow:hidden;align-content:start;justify-content:center;}
+    /* Print-ready ISO labels. A8: 8 physical labels with 20mm cutting gutters. */
+    .paper-a8-grid { width:210mm; height:297mm; padding:13.5mm 21mm; display:grid;
+      grid-template-columns:74mm 74mm; grid-template-rows:repeat(4,52.5mm);
+      column-gap:20mm; row-gap:20mm; align-content:start; justify-content:center; box-sizing:border-box; overflow:hidden; }
+    .paper-a8-single { width:74mm; height:52.5mm; flex-shrink:0; border:3px double var(--label-border, #ca8a04);
+      padding:2.5mm; overflow:hidden; box-sizing:border-box; position:relative; }
+    /* A6 cannot fit two 105 x 148.5mm labels plus a 20mm gutter in a 210mm A4 sheet. */
+    .paper-a6-grid { width:210mm; height:297mm; display:flex; justify-content:center; align-items:center;
+      padding:20mm; box-sizing:border-box; background:white; overflow:hidden; }
+    .paper-a6-single { width:105mm; height:148.5mm; flex-shrink:0; border:3px double var(--label-border, #ca8a04);
+      padding:5mm; box-sizing:border-box; overflow:hidden; position:relative; }
+    .paper-canape-single { border-color:var(--label-border, #ca8a04); }
+    .print-sheet { flex-shrink:0; position:relative; }
+    .print-sheet .menu-body-font { font-family:var(--body-family, 'Cormorant Garamond',serif) !important; }
+    .print-sheet .frame-overlay { position:absolute; pointer-events:none; z-index:1; box-sizing:border-box; }
+    .print-sheet [contenteditable="true"] { overflow-wrap:anywhere; }
+    #master-table-body td { vertical-align:top; }
+    .database-item-wrap { overflow-wrap:anywhere; white-space:normal; word-break:break-word; }
+    @media print {
+      html, body { width:210mm !important; height:auto !important; display:block !important; overflow:visible !important; }
+      #preview-main-panel,#preview-scroll-area,#paper-render-target,#print-canvas-wrapper {
+        display:block !important; overflow:visible !important; width:auto !important; height:auto !important;
+        padding:0 !important; margin:0 !important; background:white !important; gap:0 !important;
+        box-shadow:none !important; }
+      #print-canvas-wrapper { transform:none !important; }
+      .print-sheet { width:210mm !important; height:297mm !important; box-shadow:none !important;
+        margin:0 !important; padding-top:0; break-inside:avoid; page-break-inside:avoid; }
+      .print-sheet + .print-sheet { break-before:page; page-break-before:always; }
+      .preview-scale-wrapper { transform:none !important; }
+    }
+
+    /* A8: portrait A4, 2 columns x 5 rows of landscape A8, 2 mm cutting gaps. */
+    .paper-a8-grid, .paper-a8-grid.print-sheet {width:210mm!important;height:297mm!important;
+      padding:2mm!important;display:grid!important;grid-template-columns:repeat(2,74mm)!important;
+      grid-template-rows:repeat(5,52.5mm)!important;column-gap:2mm!important;row-gap:2mm!important;
+      justify-content:center!important;align-content:center!important;box-sizing:border-box!important;}
+    .paper-a8-single {width:74mm!important;height:52.5mm!important;padding:1mm!important;
+      overflow:hidden!important;box-sizing:border-box!important;border:1px double var(--label-border,#a39161)!important;}
+    .paper-a8-single p,.paper-a6-single p,.paper-canape-single p {overflow-wrap:anywhere;word-break:break-word;white-space:normal;max-width:100%;}
+    @media print {
+      .paper-a8-grid.print-sheet {width:210mm!important;height:297mm!important;}
+    }
+
+    @media print {
+      .canvas-remove-class { display:none!important; }
+      html,body { margin:0!important;padding:0!important;overflow:visible!important; height:auto!important; }
+      body > .flex-1 { display:block!important;position:static!important;overflow:visible!important; }
+      #preview-main-panel { display:block!important;position:static!important;min-height:0!important;overflow:visible!important; }
+      #paper-render-target { display:block!important; }
+      #paper-render-target > .print-sheet { break-after:page; page-break-after:always; }
+      #paper-render-target > .print-sheet:last-child { break-after:auto;page-break-after:auto; }
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col font-sans antialiased text-slate-100 bg-slate-950 overflow-hidden">
+
+  <!-- Top Navigation Bar -->
+  <header class="no-print bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shrink-0 shadow-xl z-20">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-gold-600 to-gold-400 flex items-center justify-center text-slate-950 font-bold shadow-lg shadow-gold-500/25">
+        <i class="fa-solid fa-utensils text-lg"></i>
+      </div>
+      <div>
+        <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+          Ragasaan Menu <span class="text-gold-400 font-serif font-normal italic">& Allergen Studio</span>
+        </h1>
+        <p class="text-xs text-slate-400 hidden sm:block">Allergen Database & Menu Generator</p>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-medium">
+      <button onclick="switchTab('builder')" id="tab-btn-builder" class="tab-btn px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-gold-400 bg-slate-800 font-semibold shadow">
+        <i class="fa-solid fa-list-check"></i> <span class="hidden md:inline">1. Event Menu Builder</span>
+      </button>
+      <button onclick="switchTab('design')" id="tab-btn-design" class="tab-btn px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-white">
+        <i class="fa-solid fa-palette"></i> <span class="hidden md:inline">2. Styling & Graphics</span>
+      </button>
+      <button onclick="switchTab('export')" id="tab-btn-export" class="tab-btn px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-white">
+        <i class="fa-solid fa-print"></i> <span class="hidden md:inline">3. Print & Format Studio</span>
+      </button>
+      <button onclick="switchTab('venues')" id="tab-btn-venues" class="tab-btn px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-white"><i class="fa-solid fa-location-dot"></i><span class="hidden md:inline">4. Venues</span></button>
+      <button onclick="switchTab('master')" id="tab-btn-master" class="tab-btn px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-white">
+        <i class="fa-solid fa-database text-gold-400"></i> <span class="hidden md:inline">5. Master Database</span>
+      </button>
+    </nav>
+
+    <!-- Quick Actions -->
+    <div class="flex items-center gap-2">
+      <label class="text-xs text-slate-300 flex items-center gap-2 whitespace-nowrap">App Theme
+        <select id="header-app-theme" aria-label="Application Theme" onchange="applyAppTheme(this.value)" class="bg-slate-800 text-slate-100 border border-slate-600 rounded p-1.5">
+          <option value="dark">Dark</option><option value="light">Light</option>
+        </select>
+      </label>
+      <button onclick="triggerUndo()" id="undo-btn" title="Undo Last Delete/Edit" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-gold-400 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+        <i class="fa-solid fa-rotate-left"></i> Undo
+      </button>
+      <button onclick="triggerPrint()" class="px-3.5 py-1.5 rounded-lg bg-gold-500 hover:bg-gold-400 text-slate-950 font-semibold text-xs transition flex items-center gap-1.5 shadow-lg shadow-gold-500/25">
+        <i class="fa-solid fa-print"></i> Instant Print
+      </button>
+    </div>
+  </header>
+
+  <div class="no-print bg-amber-950/80 text-amber-100 text-[11px] px-4 py-1 flex items-center justify-between gap-3 border-b border-amber-800">
+    <span><strong>Web edition:</strong> Data is saved in this browser only — not shared between devices. This site has no server-side login. Back up your data regularly.</span>
+    <span class="flex gap-2 shrink-0">
+      <button type="button" onclick="downloadWebBackup()" class="underline font-semibold" title="Save dishes, venues and design settings as JSON">Backup JSON</button>
+      <label class="underline font-semibold cursor-pointer" title="Restore a previously saved JSON backup">Restore JSON<input type="file" accept=".json,application/json" class="hidden" onchange="restoreWebBackup(event)"></label>
+    </span>
+  </div>
+
+  <!-- Main App Workspace -->
+  <div class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+
+    <!-- LEFT SIDEBAR: CONTROL PANELS -->
+    <aside id="sidebar-controls" class="no-print w-full md:w-[480px] lg:w-[520px] bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 overflow-hidden">
+
+      <!-- TAB 1: EVENT MENU BUILDER -->
+      <div id="tab-builder" class="tab-content flex-1 flex flex-col overflow-y-auto p-4 gap-4">
+        <div>
+          <h2 class="text-sm font-semibold text-slate-200">Event Menu Builder</h2>
+          <p class="text-xs text-slate-400">Choose dishes from Master Database to populate active wedding menu</p>
+        </div>
+
+        <!-- Standard Event Header Details -->
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2 text-xs">
+          <h3 class="text-xs font-semibold text-gold-400">Standard Event Header Details</h3>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-slate-400 mb-1">Couple / Event Title</label>
+              <input type="text" id="cfg-couple" value="Charlotte & Alexander" oninput="state.event.title = this.value; renderPreview()" class="w-full bg-slate-900 border border-slate-800 rounded p-1.5 text-slate-100">
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Event Date / Subtitle</label>
+              <input type="date" id="cfg-date" value="2027-09-18" onchange="setEventDate(this.value)" class="w-full bg-slate-900 border border-slate-800 rounded p-1.5 text-slate-100">
+            </div>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Saved Venue</label><select id="builder-venue-select" onchange="applyVenueSelection(this.value)" class="w-full bg-slate-900 border border-slate-800 rounded p-1.5 text-slate-100 mb-2"><option value="">Select venue...</option></select>
+            <label class="block text-slate-400 mb-1">Venue / Header Note</label>
+            <input type="text" id="cfg-venue" value="The Grand Orangery, Cotswolds" oninput="state.event.venue = this.value; renderPreview()" class="w-full bg-slate-900 border border-slate-800 rounded p-1.5 text-slate-100">
+          </div>
+        </div>
+
+        <!-- Optional wedding monogram shared across formats; each format has its own positioning/sizing. -->
+         <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
+           <label class="block text-xs font-semibold text-gold-400">Bride / Groom Image or Logo</label>
+           <input type="file" accept="image/*" onchange="handleCoupleLogoUpload(event)" class="block w-full text-xs text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-800 file:text-white file:px-2 file:py-1">
+           <p class="text-[10px] text-slate-500">Displayed below the couple title; size and alignment can be adjusted for each card type.</p>
+         </div>
+         <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
+           <label class="block text-xs font-semibold text-gold-400">Type Of Menu Card/Tags</label>
+           <select id="builder-format-select" onchange="setLayout(this.value)" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-100">
+             <option value="a4">Buffet Menu (A4)</option><option value="a4-live">Live Station</option>
+             <option value="half-a4">Table Menu Card</option><option value="a8-grid">Tags (A8)</option>
+             <option value="a6-grid">Tags (A6)</option><option value="canape-grid">Canape Labels</option>
+           </select>
+           <p class="text-[10px] text-slate-500">Each format has its own independent Add Menu Items list.</p>
+         </div>
+         <!-- Searchable Add Dish Picker -->
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
+          <label class="text-xs font-semibold text-gold-400 flex items-center justify-between">
+            <span>Add Menu Items</span>
+            <span class="text-[10px] text-slate-400 font-normal">Type name or filter category</span>
+          </label>
+          <div class="flex rounded-lg overflow-hidden border border-slate-700 text-xs mb-2">
+            <button id="add-mode-master" onclick="toggleAddMode('master')" class="flex-1 p-2 bg-amber-600 text-slate-950 font-semibold">Master Database</button>
+            <button id="add-mode-manual" onclick="toggleAddMode('manual')" class="flex-1 p-2 bg-slate-800 text-slate-200">Manual Entry</button>
+          </div>
+          <div id="master-add-controls" class="space-y-2">
+          <div class="flex gap-2">
+            <select id="builder-cat-filter" onchange="filterBuilderDropdown()" class="w-1/3 bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-200">
+              <option value="">All Categories</option>
+            </select>
+            <select id="builder-add-select" class="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-200">
+            </select>
+          </div>
+          <div class="flex gap-2">
+            <input type="text" id="builder-search-input" oninput="filterBuilderDropdown()" placeholder="Type to search dish..." class="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-100">
+            <button onclick="addSelectedDishToMenu()" class="px-4 py-1.5 bg-gold-500 hover:bg-gold-400 text-slate-950 font-semibold rounded-lg text-xs transition flex items-center gap-1 shrink-0">
+              <i class="fa-solid fa-plus"></i> Add Item
+            </button>
+          </div>
+          </div>
+          <div id="manual-add-controls" class="hidden space-y-2 text-xs">
+            <input id="manual-name" placeholder="Dish name *" aria-label="Dish name" class="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white">
+            <div class="grid grid-cols-2 gap-2">
+              <input id="manual-category" list="manual-categories" placeholder="Category (e.g. Starter)" class="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white">
+              <datalist id="manual-categories"><option value="Starter"><option value="Main Course"><option value="Dessert"><option value="Canapés"><option value="Other"></datalist>
+              <input id="manual-subcategory" placeholder="Sub-category (optional)" class="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white">
+            </div>
+            <textarea id="manual-description" rows="2" placeholder="Description (optional)" class="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white"></textarea>
+            <button type="button" onclick="addManualDishToMenu()" class="w-full py-2.5 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shadow"><i class="fa-solid fa-plus mr-1"></i> Add Item to Live Preview</button>
+            <p id="manual-add-feedback" role="status" aria-live="polite" class="text-[11px] text-emerald-400 hidden"></p>
+            <details class="border border-slate-800 rounded-lg p-2" open><summary class="cursor-pointer text-amber-400 font-semibold">Allergens (UK 14)</summary><div id="manual-allergens" class="grid grid-cols-2 gap-1 pt-2"></div></details>
+            <details class="border border-slate-800 rounded-lg p-2"><summary class="cursor-pointer text-amber-400 font-semibold">May Contain (cross-contact)</summary><div id="manual-maycontain" class="grid grid-cols-2 gap-1 pt-2"></div></details>
+            <button type="button" onclick="addManualDishToMenu()" class="w-full p-2 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold"><i class="fa-solid fa-plus"></i> Add Manual Item to Selected Format</button>
+            <p class="text-[10px] text-slate-400">Manual items remain in this menu format only and do not update the Master Database.</p>
+          </div>
+        </div>
+
+        <!-- Selected Active Event Items List -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-xs font-semibold text-slate-300"><span id="active-format-name">Buffet Menu (A4)</span> Items (<span id="active-item-count">0</span>)</h3>
+            <button onclick="clearEventMenu()" class="text-[11px] text-rose-400 hover:underline">Clear This Format</button>
+          </div>
+          <div id="event-items-list" class="flex-1 overflow-y-auto space-y-2 pr-1">
+          </div>
+        </div>
+      </div>
+
+
+      <!-- TAB 2: DESIGN & STYLING & CONTEXTUAL CONTROLS -->
+      <div id="tab-design" class="tab-content hidden flex-1 flex flex-col overflow-y-auto p-4 gap-4">
+        <div>
+          <h2 class="text-sm font-semibold text-slate-200">Styling & Branding Studio</h2>
+          <p class="text-xs text-slate-400">Select a format below to reveal its specific customization controls</p>
+        </div>
+
+        <!-- Layout Sizing Mode -->
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
+          <label class="text-xs font-semibold text-gold-400 block">Type Of Menu Card/Tags</label>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button onclick="setLayout('a4')" id="fmt-btn-a4" class="p-2 border rounded-lg text-[11px] text-center transition bg-gold-500/10 border-gold-500 text-gold-400 font-medium">
+              <i class="fa-solid fa-file-lines block text-base mb-1"></i> Buffet Menu (A4)
+            </button>
+            <button onclick="setLayout('a4-live')" id="fmt-btn-a4-live" class="p-2 border border-slate-800 rounded-lg text-[11px] text-center text-slate-400 hover:border-slate-700 transition">
+              <i class="fa-solid fa-fire block text-base mb-1 text-orange-400"></i> Live Station
+            </button>
+            <button onclick="setLayout('half-a4')" id="fmt-btn-half-a4" class="p-2 border border-slate-800 rounded-lg text-[11px] text-center text-slate-400 hover:border-slate-700 transition">
+              <i class="fa-solid fa-columns block text-base mb-1"></i> Table Menu Card
+            </button>
+            <button onclick="setLayout('a8-grid')" id="fmt-btn-a8-grid" class="p-2 border border-slate-800 rounded-lg text-[11px] text-center text-slate-400 hover:border-slate-700 transition">
+              <i class="fa-solid fa-grip-fill block text-base mb-1"></i> Tags (A8)
+            </button>
+            <button onclick="setLayout('a6-grid')" id="fmt-btn-a6-grid" class="p-2 border border-slate-800 rounded-lg text-[11px] text-center text-slate-400 hover:border-slate-700 transition">
+              <i class="fa-solid fa-id-card block text-base mb-1"></i> Tags (A6)
+            </button>
+            <button onclick="setLayout('canape-grid')" id="fmt-btn-canape-grid" class="p-2 border border-slate-800 rounded-lg text-[11px] text-center text-slate-400 hover:border-slate-700 transition">
+              <i class="fa-solid fa-tag block text-base mb-1 text-emerald-400"></i> Canape Labels
+            </button>
+          </div>
+        </div>
+
+        <!-- CONTEXTUAL CONTROLS SECTION CONTAINER -->
+        <div id="contextual-format-controls" class="space-y-4">
+          <!-- Dynamically displayed controls per format selection -->
+        </div>
+
+         <!-- Font families, font sizes and eight themes are combined in the contextual Font panel. -->
+
+      </div>
+
+
+      <!-- TAB 3: PRINT & EXPORT STUDIO -->
+      <div id="tab-export" class="tab-content hidden flex-1 flex flex-col overflow-y-auto p-2 gap-2">
+        <div>
+          <h2 class="text-sm font-semibold text-slate-200">Print & Downloads</h2>
+          <p class="text-xs text-slate-400">Print or save the selected format as PDF</p>
+        </div>
+
+        <!-- Buffet Menu (A4) -->
+        <div class="bg-slate-950 px-2 py-2 rounded-lg border border-slate-800 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-gold-400"><i class="fa-solid fa-file-lines"></i> Buffet Menu (A4)</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1 pt-0">
+            <button onclick="setLayout('a4'); downloadPDF()" class="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-rose-400 rounded-lg font-semibold text-[11px] transition border border-slate-800 flex items-center justify-center gap-1.5"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+            <button onclick="setLayout('a4'); triggerPrint()" class="px-2 py-1 bg-gold-500 hover:bg-gold-400 text-slate-950 rounded-lg font-semibold text-[11px] transition flex items-center justify-center gap-1.5 shadow"><i class="fa-solid fa-print"></i> Print</button>
+          </div>
+        </div>
+
+        <!-- Live Station -->
+        <div class="bg-slate-950 px-2 py-2 rounded-lg border border-slate-800 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-gold-400"><i class="fa-solid fa-fire text-orange-400"></i> Live Station Menu Board (A4)</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1 pt-0">
+             <button onclick="setLayout('a4-live'); downloadPDF()" class="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-rose-400 rounded-lg font-semibold text-[11px] transition border border-slate-800 flex items-center justify-center gap-1.5"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+            <button onclick="setLayout('a4-live'); triggerPrint()" class="px-2 py-1 bg-gold-500 hover:bg-gold-400 text-slate-950 rounded-lg font-semibold text-[11px] transition flex items-center justify-center gap-1.5 shadow"><i class="fa-solid fa-print"></i> Print</button>
+          </div>
+        </div>
+
+        <!-- Table Menu Card -->
+        <div class="bg-slate-950 px-2 py-2 rounded-lg border border-slate-800 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-gold-400"><i class="fa-solid fa-columns"></i> Table Menu Card (Includes Back Page)</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1 pt-0">
+            <button onclick="setLayout('half-a4'); downloadPDF()" class="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-rose-400 rounded-lg font-semibold text-[11px] transition border border-slate-800 flex items-center justify-center gap-1.5"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+            <button onclick="setLayout('half-a4'); triggerPrint()" class="px-2 py-1 bg-gold-500 hover:bg-gold-400 text-slate-950 rounded-lg font-semibold text-[11px] transition flex items-center justify-center gap-1.5 shadow"><i class="fa-solid fa-print"></i> Print</button>
+          </div>
+        </div>
+
+        <!-- Canape Labels -->
+        <div class="bg-slate-950 px-2 py-2 rounded-lg border border-slate-800 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-gold-400"><i class="fa-solid fa-tag text-emerald-400"></i> Canape Labels (9.5 x 6.7cm)</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1 pt-0">
+             <button onclick="setLayout('canape-grid'); downloadPDF()" class="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-rose-400 rounded-lg font-semibold text-[11px] transition border border-slate-800 flex items-center justify-center gap-1.5"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+            <button onclick="setLayout('canape-grid'); triggerPrint()" class="px-2 py-1 bg-gold-500 hover:bg-gold-400 text-slate-950 rounded-lg font-semibold text-[11px] transition flex items-center justify-center gap-1.5 shadow"><i class="fa-solid fa-print"></i> Print</button>
+          </div>
+        </div>
+
+        <!-- A8 Food Labels -->
+        <div class="bg-slate-950 px-2 py-2 rounded-lg border border-slate-800 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-gold-400"><i class="fa-solid fa-grip-fill"></i> A8 Food Labels</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1 pt-0">
+             <button onclick="setLayout('a8-grid'); downloadPDF()" class="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-rose-400 rounded-lg font-semibold text-[11px] transition border border-slate-800 flex items-center justify-center gap-1.5"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+            <button onclick="setLayout('a8-grid'); triggerPrint()" class="px-2 py-1 bg-gold-500 hover:bg-gold-400 text-slate-950 rounded-lg font-semibold text-[11px] transition flex items-center justify-center gap-1.5 shadow"><i class="fa-solid fa-print"></i> Print</button>
+          </div>
+        </div>
+
+        <!-- Tags (A6) -->
+        <div class="bg-slate-950 px-2 py-2 rounded-lg border border-slate-800 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-gold-400"><i class="fa-solid fa-id-card"></i> Tags (A6)</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1 pt-0">
+             <button onclick="setLayout('a6-grid'); downloadPDF()" class="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-rose-400 rounded-lg font-semibold text-[11px] transition border border-slate-800 flex items-center justify-center gap-1.5"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+            <button onclick="setLayout('a6-grid'); triggerPrint()" class="px-2 py-1 bg-gold-500 hover:bg-gold-400 text-slate-950 rounded-lg font-semibold text-[11px] transition flex items-center justify-center gap-1.5 shadow"><i class="fa-solid fa-print"></i> Print</button>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+
+    <!-- VENUE REGISTRY: LOCAL DATABASE -->
+    <section id="tab-venues" class="tab-content hidden flex-1 bg-slate-950 overflow-y-auto p-5 no-print" style="min-width:0">
+      <h2 class="text-lg font-bold text-gold-400 mb-3">Venue Database</h2>
+      <p class="text-xs text-slate-400 mb-3">Stored locally in this browser. Import/Export for backup or transfer. This data is not synced with Google Sheets.</p>
+      <div class="flex gap-2 flex-wrap mb-3">
+        <label class="px-3 py-2 rounded bg-slate-800 text-xs cursor-pointer">Import Excel/CSV<input type="file" class="hidden" accept=".xlsx,.xls,.csv" onchange="importVenues(event)"></label>
+        <button onclick="exportVenues()" class="px-3 py-2 rounded bg-slate-800 text-xs">Export Venues</button>
+        <button onclick="resetVenueForm()" class="px-3 py-2 rounded bg-slate-800 text-xs">New Venue</button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3 text-xs">
+        <label>Venue Name<input id="venue-name" class="block w-full p-2 rounded bg-slate-900 border border-slate-700" placeholder="Venue name"></label>
+        <label>Hall Name<input id="venue-hall" class="block w-full p-2 rounded bg-slate-900 border border-slate-700" placeholder="Hall name"></label>
+        <label>Location<input id="venue-location" class="block w-full p-2 rounded bg-slate-900 border border-slate-700" placeholder="Location"></label>
+      </div>
+      <button onclick="saveVenue()" class="bg-gold-500 text-slate-950 px-4 py-2 rounded font-semibold text-xs mb-4">Save Venue</button>
+      <input id="venue-search" oninput="renderVenueDB()" placeholder="Search venues..." class="block w-full p-2 rounded bg-slate-900 border border-slate-700 mb-3 text-xs">
+      <div class="overflow-auto"><table class="w-full text-xs text-left"><thead><tr><th class="p-2">Venue</th><th class="p-2">Hall</th><th class="p-2">Location</th><th class="p-2">Actions</th></tr></thead><tbody id="venue-table-body"></tbody></table></div>
+    </section>
+
+    <!-- TAB 4: FULL-PAGE MASTER DATABASE REGISTRY -->
+    <div id="tab-master" class="tab-content hidden flex-1 flex flex-col bg-slate-950 p-6 overflow-hidden z-10">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-database text-gold-400"></i> Master Dish & Allergen Registry
+          </h2>
+          <p class="text-xs text-slate-400">Read-only by default. Searching and viewing require no password; changes and Excel export require authentication. Excel/CSV import is unrestricted.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="requestMasterAuthorization('add', () => openDishModal())" class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition flex items-center gap-1.5 shadow-lg">
+            <i class="fa-solid fa-plus"></i> Add New Dish
+          </button>
+          <button onclick="switchTab('builder')" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition">
+            <i class="fa-solid fa-arrow-left"></i> Back to Builder
+          </button>
+        </div>
+      </div>
+
+      <!-- Excel Controls Bar -->
+      <div class="grid grid-cols-3 gap-3 bg-slate-900 p-3.5 rounded-xl border border-slate-800 mb-4 shrink-0">
+        <button onclick="document.getElementById('master-import-file').click()" class="flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium transition">
+          <i class="fa-solid fa-file-excel text-emerald-400 text-sm"></i> Import Excel / CSV
+        </button>
+        <input id="master-import-file" type="file" accept=".xlsx, .xls, .csv" class="hidden" onchange="importExcel(event)">
+        <button onclick="requestMasterAuthorization('export', () => exportExcel())" class="flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium transition">
+          <i class="fa-solid fa-file-export text-gold-400 text-sm"></i> Export Excel Data
+        </button>
+        <div class="flex gap-2">
+          <select id="db-cat-filter" onchange="renderMasterDB()" class="w-1/2 bg-slate-950 border border-slate-800 text-xs rounded-lg p-2 text-slate-200">
+            <option value="">All Categories</option>
+          </select>
+          <input type="text" id="db-search" oninput="renderMasterDB()" placeholder="Search records..." class="w-1/2 bg-slate-950 border border-slate-800 text-xs rounded-lg p-2 text-slate-100">
+        </div>
+      </div>
+
+      <!-- Full-Page Interactive Data Table -->
+      <div class="flex-1 overflow-auto border border-slate-800 rounded-xl bg-slate-900 shadow-2xl">
+        <table class="w-full text-left text-xs text-slate-300 table-fixed">
+          <thead class="bg-slate-950 text-gold-400 uppercase font-mono text-[10px] sticky top-0 border-b border-slate-800 z-10">
+            <tr>
+              <th class="p-3 w-[12%]">Category</th>
+               <th class="p-3 w-[12%]">Sub-Category</th>
+               <th class="p-3 w-[22%]">Item Name</th>
+               <th class="p-3 w-[18%]">Description</th>
+               <th class="p-3 w-[15%]">Allergens</th>
+               <th class="p-3 w-[14%]">May Contain</th>
+               <th class="p-3 w-[7%] text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="master-table-body" class="divide-y divide-slate-800/60">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- RIGHT SIDE: LIVE INTERACTIVE PREVIEW CANVAS -->
+    <main id="preview-main-panel" class="flex-1 bg-slate-950 flex flex-col overflow-hidden relative">
+
+      <!-- Preview Top Toolbar -->
+      <div class="no-print bg-slate-900 border-b border-slate-800 px-4 py-2 flex items-center justify-between shrink-0 text-xs">
+        <div class="flex items-center gap-3">
+          <span class="text-slate-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-eye text-gold-400"></i> Live Canvas Preview (Fully Editable):
+          </span>
+          <span id="preview-format-label" class="bg-slate-800 px-2 py-0.5 rounded text-gold-400 font-mono font-semibold">
+            Buffet Menu (A4) (210 x 297mm)
+          </span>
+        </div>
+
+        <!-- Zoom Controls -->
+        <div class="flex items-center gap-2">
+          <button onclick="adjustZoom(-0.1)" class="p-1 px-2 bg-slate-800 hover:bg-slate-700 rounded text-slate-300"><i class="fa-solid fa-minus"></i></button>
+          <span id="zoom-level-text" class="font-mono text-slate-400 w-12 text-center">75%</span>
+          <button onclick="adjustZoom(0.1)" class="p-1 px-2 bg-slate-800 hover:bg-slate-700 rounded text-slate-300"><i class="fa-solid fa-plus"></i></button>
+          <button onclick="resetZoom()" class="p-1 px-2 bg-slate-800 hover:bg-slate-700 rounded text-slate-400 text-[10px]">Fit Screen</button>
+        </div>
+      </div>
+
+      <!-- Scrollable Preview Area -->
+      <div id="preview-scroll-area" class="flex-1 overflow-auto p-8 flex flex-col items-center bg-slate-950 relative gap-8">
+        <div id="print-canvas-wrapper" class="preview-scale-wrapper shadow-2xl flex flex-col gap-8">
+          <div id="paper-render-target" class="flex flex-col gap-8"></div>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <!-- MODAL: MASTER PASSWORD AUTHENTICATION -->
+  <div id="auth-modal" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm p-6 space-y-4 shadow-2xl">
+      <div class="text-center">
+        <div class="w-10 h-10 rounded-full bg-gold-500/10 text-gold-400 mx-auto flex items-center justify-center mb-2">
+          <i class="fa-solid fa-lock text-lg"></i>
+        </div>
+        <h3 class="text-sm font-bold text-white">Master User Authentication</h3>
+        <p id="master-auth-description" class="text-xs text-slate-400 mt-1">Enter your local edit passphrase. This is not server-side access control.</p>
+      </div>
+      <div>
+        <input type="password" id="master-pwd-input" placeholder="Local edit passphrase (8+ characters)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-center text-white focus:outline-none focus:border-gold-500">
+      </div>
+      <div class="flex gap-2 pt-2">
+        <button onclick="cancelMasterAuthorization()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-slate-300">Cancel</button>
+        <button onclick="verifyMasterPassword()" class="flex-1 py-2 bg-gold-500 hover:bg-gold-400 rounded-lg text-xs font-semibold text-slate-950">Authenticate</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- MODAL: ADD / EDIT DISH IN MASTER DB -->
+  <div id="dish-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="px-5 py-3.5 border-b border-slate-800 flex justify-between items-center bg-slate-900">
+        <h3 id="modal-title" class="text-sm font-semibold text-slate-100 flex items-center gap-2">
+          <i class="fa-solid fa-utensils text-gold-400"></i> Add Dish to Master Database
+        </h3>
+        <button onclick="closeDishModal()" class="text-slate-400 hover:text-white text-base"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="p-5 overflow-y-auto space-y-3 text-xs">
+        <input type="hidden" id="modal-dish-id">
+
+        <div>
+          <label class="block text-slate-400 mb-1 font-medium">Dish Name *</label>
+          <input type="text" id="modal-name" placeholder="e.g. Pan-Seared Wild Sea Bass" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 focus:outline-none focus:border-gold-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+             <label class="block text-slate-400 mb-1 font-medium">Category / Course *</label>
+            <input type="text" id="modal-category" placeholder="e.g. Canapés, Starters" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 focus:outline-none focus:border-gold-500">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1 font-medium font-mono text-[10px]">Price / Supplement (Optional)</label>
+            <input type="text" id="modal-price" placeholder="e.g. £14.50" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 focus:outline-none focus:border-gold-500">
+          </div>
+        </div>
+
+        <div>
+           <label class="block text-slate-400 mb-1 font-medium">Sub-Category</label>
+           <input type="text" id="modal-subcategory" placeholder="e.g. Vegetarian, Hot Canapés" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 focus:outline-none focus:border-gold-500">
+         </div>
+         <div>
+           <label class="block text-slate-400 mb-1 font-medium">Culinary Description</label>
+          <textarea id="modal-desc" rows="2" placeholder="Rich description for menu stationery..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 focus:outline-none focus:border-gold-500"></textarea>
+        </div>
+
+        <!-- EU/UK 14 Standard Allergens -->
+        <div>
+          <label class="block text-slate-400 mb-1.5 font-medium text-gold-400">Allergen Declarations</label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-slate-950 p-3 rounded-xl border border-slate-800 max-h-32 overflow-y-auto">
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Gluten" class="modal-allergen rounded border-slate-800"> Gluten</label>
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Dairy" class="modal-allergen rounded border-slate-800"> Dairy</label>
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Eggs" class="modal-allergen rounded border-slate-800"> Eggs</label>
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Nuts" class="modal-allergen rounded border-slate-800"> Tree Nuts</label>
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Peanuts" class="modal-allergen rounded border-slate-800"> Peanuts</label>
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Fish" class="modal-allergen rounded border-slate-800"> Fish</label>
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Crustaceans" class="modal-allergen rounded border-slate-800"> Crustaceans</label>
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Molluscs" class="modal-allergen rounded border-slate-800"> Molluscs</label>
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Soy" class="modal-allergen rounded border-slate-800"> Soy</label>
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Mustard" class="modal-allergen rounded border-slate-800"> Mustard</label>
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Sesame" class="modal-allergen rounded border-slate-800"> Sesame</label>
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Celery" class="modal-allergen rounded border-slate-800"> Celery</label>
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Lupin" class="modal-allergen rounded border-slate-800"> Lupin</label>
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Sulphites" class="modal-allergen rounded border-slate-800"> Sulphites</label>
+          </div>
+        </div>
+
+        <!-- May Contain Section -->
+        <div>
+          <label class="block text-slate-400 mb-1.5 font-medium text-amber-400">May Contain (Cross-Contamination)</label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-slate-950 p-3 rounded-xl border border-slate-800 max-h-28 overflow-y-auto">
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Gluten" class="modal-contain rounded border-slate-800"> Gluten</label>
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Dairy" class="modal-contain rounded border-slate-800"> Dairy</label>
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Nuts" class="modal-contain rounded border-slate-800"> Nuts</label>
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Peanuts" class="modal-contain rounded border-slate-800"> Peanuts</label>
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Sesame" class="modal-contain rounded border-slate-800"> Sesame</label>
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Soya" class="modal-contain rounded border-slate-800"> Soya</label>
+            <label class="flex items-center gap-2 text-slate-300 cursor-pointer"><input type="checkbox" value="Sulphites" class="modal-contain rounded border-slate-800"> Sulphites</label>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="px-5 py-3 border-t border-slate-800 bg-slate-950 flex justify-end gap-2">
+        <button onclick="closeDishModal()" class="px-3 py-1.5 rounded-lg border border-slate-800 text-slate-300 text-xs hover:bg-slate-800">Cancel</button>
+        <button onclick="saveDishModal()" class="px-4 py-1.5 rounded-lg bg-gold-500 hover:bg-gold-400 text-slate-950 font-semibold text-xs">Save Dish to Database</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="startup-logos" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4 no-print">
+    <div class="bg-slate-900 text-white rounded-xl border border-amber-600 p-6 max-w-lg w-full space-y-4 shadow-2xl">
+      <h2 class="font-bold text-xl">First-time Application Setup</h2>
+      <div id="initial-db-prompt" class="hidden rounded border border-slate-600 p-3 space-y-2"><p class="text-sm">Would you like to import your Master Dish & Allergen Database now? (Optional; import later in Master Database.)</p><label class="text-sm block">Import Excel/CSV<input type="file" accept=".xlsx,.xls,.csv" onchange="importExcel(event)" class="block mt-2 w-full"></label></div>
+      <p class="text-sm text-slate-300">Logos are shared by every menu format. Previously saved logos will be reused. You can skip either upload.</p>
+      <label class="block text-sm">Company Logo<input class="block mt-2 w-full" type="file" accept="image/*" onchange="handleLogoUpload(event)"></label>
+      <label class="block text-sm">Bride / Groom Image or Logo<input class="block mt-2 w-full" type="file" accept="image/*" onchange="handleCoupleLogoUpload(event)"></label>
+      <button onclick="closeStartupLogos()" class="bg-[#a39161] text-[#2c2a2a] font-bold rounded px-5 py-2">Continue to Application</button>
+    </div>
+  </div>
+  <style>
+   body.app-light,body.app-light #sidebar-controls,body.app-light #preview-main-panel {background:#f5f3ed!important;color:#2c2a2a!important}
+   body.app-light .bg-slate-900,body.app-light .bg-slate-950 {background:#eee9df!important}
+   body.app-light .text-slate-100,body.app-light .text-slate-200,body.app-light .text-white {color:#2c2a2a!important}
+   body.app-light .text-slate-300,body.app-light .text-slate-400,body.app-light .text-slate-500 {color:#514a3c!important}
+   body.app-light .text-gold-400,body.app-light .text-gold-500 {color:#655126!important}
+   body.app-light .border-slate-800,body.app-light .border-slate-700 {border-color:#b6aa94!important}
+   body.app-light .bg-slate-800 {background:#ddd5c7!important}
+   body.app-light .hover\:bg-slate-700:hover {background:#d0c5b3!important}
+
+   body.app-light input,body.app-light select {color:#2c2a2a!important}
+   .paper-a6-grid {display:grid!important;grid-template-columns:repeat(2,103mm)!important;grid-template-rows:repeat(2,146.5mm)!important;gap:2mm!important;padding:1mm!important;align-content:center;justify-content:center}
+   .paper-a6-single {width:103mm!important;height:146.5mm!important}
+   @media print {body.app-light .print-sheet {color:inherit!important}}
+  </style>
+  <!-- APPLICATION STATE & LOGIC -->
+  <script>
+    const ragasaanLogoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 90" width="100%">
+      <g transform="translate(15, 8)">
+        <circle cx="38" cy="38" r="36" fill="#a3864c"/>
+        <path d="M30 20 C30 20 23 27 23 38 C23 49 30 56 30 56 M30 38 L48 38" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+      </g>
+      <text x="96" y="44" font-family="Playfair Display, serif" font-size="32" font-weight="bold" font-style="italic" fill="#ca8a04" letter-spacing="1">ragasaan</text>
+      <text x="98" y="65" font-family="Montserrat, sans-serif" font-size="9" font-weight="600" fill="#854d0e" letter-spacing="3.8">LOCATE &bull; DESIGN &bull; INSPIRE</text>
+      <line x1="96" y1="74" x2="325" y2="74" stroke="#ca8a04" stroke-width="1.5"/>
+    </svg>`;
+
+    const defaultMasterDB = [
+      {
+        id: 'db-1', category: 'Canapés', name: 'Seared Duck Breast & Black Cherry Crostini',
+        desc: 'Pan-roasted duck breast with spiced cherry compote on toasted brioche.',
+        allergens: ['Gluten', 'Sulphites'], mayContain: ['Nuts'], price: ''
+      },
+      {
+        id: 'db-2', category: 'Starters', name: 'Heritage Tomato & Burrata Tartine',
+        desc: 'Organic heirloom tomatoes, creamy Pugliese burrata, basil pesto, and aged balsamic glaze.',
+        allergens: ['Gluten', 'Dairy', 'Nuts', 'Sulphites'], mayContain: ['Sesame'], price: ''
+      },
+      {
+        id: 'db-3', category: 'Mains', name: 'Fillet of Beef Wellington',
+        desc: 'Prime British beef fillet wrapped in mushroom duxelles, prosciutto, and golden puff pastry.',
+        allergens: ['Gluten', 'Dairy', 'Eggs', 'Sulphites', 'Celery'], mayContain: ['Nuts'], price: ''
+      },
+      {
+        id: 'db-4', category: 'Live Station', name: 'Live Teppanyaki Stir-Fry Station',
+        desc: 'Fresh wok-tossed egg noodles, Asian market greens, sweet chili teriyaki glaze.',
+        allergens: ['Gluten', 'Soy', 'Sesame'], mayContain: ['Peanuts'], price: ''
+      }
+    ];
+
+    function readStoredMasterDB() { try { return JSON.parse(localStorage.getItem('wedding_master_db')); } catch (_) { return null; } }
+    let state = {
+      zoom: 0.75,
+      layout: 'a4',
+      masterDB: readStoredMasterDB() || defaultMasterDB,
+      undoStack: [],
+      event: {
+        title: 'Charlotte & Alexander',
+        date: 'Saturday, September 18, 2027',
+        venue: 'The Grand Orangery, Cotswolds',
+        items: []
+      },
+      design: {
+        titleFont: 'font-serif',
+        bodyFont: 'font-cormorant',
+        textColor: '#2c2a2a',
+        accentColor: '#a39161',
+        bgColor: '#ffffff',
+        // Granular Font Sizes per Content Element
+        titleFontSize: 10,
+        dishNameFontSize: 10,
+        descFontSize: 10,
+        allergenFontSize: 10,
+        logoUrl: '',
+        a4LogoWidth: 160,
+        halfLogoWidth: 280,
+        canapeLogoWidth: 80,
+        coupleLogoUrl: '',
+        coupleLogoWidth: 100,
+        borderStyle: 'double',
+        borderWidth: 4,
+        borderColor: '#a39161',
+        halfTitleTop: 40,
+        halfVenueBottom: 120,
+        liveTitle: 'Live Station',
+        logoWidth: 110,
+        coupleOffsetX: 0,
+        coupleOffsetY: 0,
+        showCoupleLogo: true,
+        borderOutsetCm: 0.2,
+        halfBackLeftImageUrl: '',
+        halfBackRightImageUrl: '',
+        showHalfBackLeftImage: false,
+        showHalfBackRightImage: false,
+        halfBackLeftImageWidth: 170,
+        halfBackRightImageWidth: 170,
+        halfBackLeftImageShade: 'none',
+        halfBackRightImageShade: 'none',
+        halfBackLeftOffsetX: 0,
+        halfBackLeftOffsetY: 0,
+        halfBackRightOffsetX: 0,
+        halfBackRightOffsetY: 0
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      setupFormatState();
+
+      renderMasterDB();
+      updateCategoryFilters();
+      populateBuilderDropdown();
+      renderActiveMenuItems();
+      renderContextualControls();
+      renderPreview();
+      renderVenueDB(); populateVenueOptions(); syncDatePicker();
+      if(!localStorage.getItem('ragasaan_initial_setup_v1')) {showStartupLogos();document.getElementById('initial-db-prompt')?.classList.remove('hidden');}
+    });
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('text-gold-400', 'bg-slate-800', 'font-semibold', 'shadow');
+        el.classList.add('text-slate-400');
+      });
+
+      const activeTabEl = document.getElementById(`tab-${tabId}`);
+      if(activeTabEl) activeTabEl.classList.remove('hidden');
+
+      const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+      if(activeBtn) {
+        activeBtn.classList.add('text-gold-400', 'bg-slate-800', 'font-semibold', 'shadow');
+        activeBtn.classList.remove('text-slate-400');
+      }
+
+      const previewMain = document.getElementById('preview-main-panel');
+      const sidebar = document.getElementById('sidebar-controls');
+      const master = document.getElementById('tab-master');
+      // Only Print & Format Studio has a narrow sidebar. Other tabs retain their original widths.
+      sidebar.classList.toggle('print-format-compact', tabId === 'export');
+      sidebar.classList.toggle('hidden', tabId === 'master' || tabId === 'venues');
+      master.classList.toggle('master-preview-split', tabId === 'master');
+      previewMain.classList.toggle('hidden', tabId === 'master' || tabId === 'venues');
+      if (tabId === 'master') renderMasterDB();
+      else if (tabId === 'venues') renderVenueDB();
+      else renderPreview();
+    }
+
+    // Database browsing and searching are unrestricted. Each write/import/export
+    // operation requires a fresh authorisation; authorisation does not persist.
+    let pendingMasterAction = null;
+    function requestMasterAuthorization(label, callback) {
+      pendingMasterAction = typeof callback === 'function' ? callback : null;
+      const heading = document.querySelector('#auth-modal h3');
+      if (heading) heading.textContent = 'Authorise ' + label.charAt(0).toUpperCase() + label.slice(1);
+      document.getElementById('master-pwd-input').value = '';
+      updateLocalAuthPrompt();
+      document.getElementById('auth-modal').classList.remove('hidden');
+      document.getElementById('master-pwd-input').focus();
+    }
+    function cancelMasterAuthorization() {
+      pendingMasterAction = null;
+      document.getElementById('auth-modal').classList.add('hidden');
+      document.getElementById('master-pwd-input').value = '';
+    }
+    // GitHub Pages is a static host. This local passphrase is only a convenience
+    // guard against accidental editing in this browser, NOT real authentication.
+    const LOCAL_EDIT_KEY = 'ragasaan_web_local_edit_passphrase_v1';
+    async function hashLocalPassphrase(passphrase, salt) {
+      const bytes = new TextEncoder().encode(salt + ':' + passphrase);
+      const digest = await crypto.subtle.digest('SHA-256', bytes);
+      return Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2,'0')).join('');
+    }
+    function updateLocalAuthPrompt() {
+      const configured = !!localStorage.getItem(LOCAL_EDIT_KEY);
+      const hint = document.getElementById('master-auth-description');
+      if (hint) hint.textContent = configured
+        ? 'Enter the passphrase configured in this browser. This is not server-side security.'
+        : 'First use: choose a local edit passphrase (8+ characters). It only applies in this browser.';
+    }
+    async function verifyMasterPassword() {
+      const field = document.getElementById('master-pwd-input');
+      const passphrase = field.value;
+      let record = null;
+      try { record = JSON.parse(localStorage.getItem(LOCAL_EDIT_KEY) || 'null'); } catch (_) {}
+      if (!record) {
+        if (passphrase.length < 8) { alert('Choose a passphrase of at least 8 characters.'); return; }
+        const salt = Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2,'0')).join('');
+        const hash = await hashLocalPassphrase(passphrase, salt);
+        try { localStorage.setItem(LOCAL_EDIT_KEY, JSON.stringify({salt,hash})); }
+        catch (e) { alert('Could not save the passphrase in this browser: ' + e.message); return; }
+      } else {
+        if (!record.salt || !record.hash || await hashLocalPassphrase(passphrase, record.salt) !== record.hash) {
+          field.value = '';
+          alert('Incorrect local passphrase.');
+          return;
+        }
+      }
+      const action = pendingMasterAction;
+      cancelMasterAuthorization();
+      if (action) action();
+    }
+
+    function adjustZoom(delta) {
+      state.zoom = Math.max(0.3, Math.min(1.5, state.zoom + delta));
+      document.getElementById('zoom-level-text').textContent = `${Math.round(state.zoom * 100)}%`;
+      document.getElementById('print-canvas-wrapper').style.transform = `scale(${state.zoom})`;
+    }
+
+    function resetZoom() {
+      state.zoom = 0.75;
+      document.getElementById('zoom-level-text').textContent = '75%';
+      document.getElementById('print-canvas-wrapper').style.transform = 'scale(0.75)';
+    }
+
+    const MENU_FORMATS = ['a4', 'a4-live', 'half-a4', 'a8-grid', 'a6-grid', 'canape-grid'];
+    const MENU_NAMES = {
+      a4: 'Buffet Menu (A4)', 'a4-live': 'Live Station Menu Board (A4)', 'half-a4': 'Table Menu Card',
+      'a8-grid': 'Tags (A8)', 'a6-grid': 'Tags (A6)', 'canape-grid': 'Canape Labels'
+    };
+    function esc(value) {
+      return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
+    }
+    function setupFormatState() {
+      const template = {...state.design};
+      // Each dimension receives its own settings, not merely a shared A4 width slider.
+      state.designs = Object.fromEntries(MENU_FORMATS.map(fmt => [fmt, {
+        ...template, titleFontSize:10, dishNameFontSize:10, descFontSize:10, allergenFontSize:10,
+        logoWidth: 110, menuHeading:'Menu',
+        coupleLogoWidth: 100, borderOutsetCm:0.2, coupleOffsetX:0, coupleOffsetY:0, showDescription:false,
+        showHalfBackLeftImage:false, showHalfBackRightImage:false,
+        halfBackLeftImageWidth:170, halfBackRightImageWidth:170,
+        halfBackLeftImageShade:'none', halfBackRightImageShade:'none',
+        halfBackLeftImageUrl:'', halfBackRightImageUrl:'',
+        halfBackLeftOffsetX:0, halfBackLeftOffsetY:0,
+        halfBackRightOffsetX:0, halfBackRightOffsetY:0
+      }]));
+      state.formatMenus = Object.fromEntries(MENU_FORMATS.map(fmt => [fmt, []]));
+      state.design = state.designs[state.layout];
+      state.event.items = state.formatMenus[state.layout];
+      try {
+        const saved = JSON.parse(localStorage.getItem('ragasaan_style_v3')||'{}');
+        MENU_FORMATS.forEach(fmt=> {
+          if(saved.designs?.[fmt]) Object.assign(state.designs[fmt],saved.designs[fmt]);
+          const cfg = state.designs[fmt];
+          cfg.bgColor='#ffffff';
+          if(!cfg.menuHeading) cfg.menuHeading='Menu';
+          if(!cfg.noticeMessage || cfg.noticeMessage==='Please speak to the event manager regarding allergen requirements and cross-contact.') cfg.noticeMessage='Red text identifies declared allergens; amber text indicates possible cross-contact (may contain). Please speak to event staff about allergies before eating. Colours supplement, not replace, written allergen information.';
+          cfg.logoWidth=Math.max(100,Number(cfg.logoWidth)||100);
+          cfg.coupleLogoWidth=Math.max(100,Number(cfg.coupleLogoWidth)||100);
+          cfg.borderOutsetCm=Math.max(.2,Math.min(.5,Number(cfg.borderOutsetCm)||.2));
+          // migrate old single-image back-page settings if present
+          if (!cfg.halfBackLeftImageUrl && cfg.halfBackImageUrl) cfg.halfBackLeftImageUrl = cfg.halfBackImageUrl;
+          if (!cfg.halfBackRightImageUrl && cfg.halfBackImageUrl) cfg.halfBackRightImageUrl = cfg.halfBackImageUrl;
+          cfg.showHalfBackLeftImage = typeof cfg.showHalfBackLeftImage === 'boolean' ? cfg.showHalfBackLeftImage : !!cfg.showHalfBackImage;
+          cfg.showHalfBackRightImage = typeof cfg.showHalfBackRightImage === 'boolean' ? cfg.showHalfBackRightImage : !!cfg.showHalfBackImage;
+          cfg.halfBackLeftImageWidth = Math.max(80,Number(cfg.halfBackLeftImageWidth || cfg.halfBackImageWidth)||170);
+          cfg.halfBackRightImageWidth = Math.max(80,Number(cfg.halfBackRightImageWidth || cfg.halfBackImageWidth)||170);
+          cfg.halfBackLeftImageShade = cfg.halfBackLeftImageShade || cfg.halfBackImageShade || 'none';
+          cfg.halfBackRightImageShade = cfg.halfBackRightImageShade || cfg.halfBackImageShade || 'none';
+          cfg.halfBackLeftOffsetX = Number(cfg.halfBackLeftOffsetX)||0;
+          cfg.halfBackLeftOffsetY = Number(cfg.halfBackLeftOffsetY)||0;
+          cfg.halfBackRightOffsetX = Number(cfg.halfBackRightOffsetX)||0;
+          cfg.halfBackRightOffsetY = Number(cfg.halfBackRightOffsetY)||0;
+        });
+        state.sharedCompanyLogo=saved.companyLogo||'';
+        state.sharedCoupleLogo=saved.coupleLogo||'';
+        state.appTheme=saved.appTheme||'dark';
+        if(saved.event) Object.assign(state.event,{title:saved.event.title||state.event.title,date:saved.event.date||state.event.date,venue:saved.event.venue||state.event.venue});
+      } catch(e){console.warn('Saved style unavailable',e);}
+      applySharedLogos(); applyAppTheme(state.appTheme||'dark');
+      state.design=state.designs[state.layout];
+      syncFormatLabels();
+    }
+    function applySharedLogos() {
+      MENU_FORMATS.forEach(fmt=>{state.designs[fmt].logoUrl=state.sharedCompanyLogo||'';state.designs[fmt].coupleLogoUrl=state.sharedCoupleLogo||'';});
+    }
+    function saveStyle() {
+      try {localStorage.setItem('ragasaan_style_v3',JSON.stringify({designs:state.designs,companyLogo:state.sharedCompanyLogo||'',coupleLogo:state.sharedCoupleLogo||'',appTheme:state.appTheme||'dark',event:{title:state.event.title,date:state.event.date,venue:state.event.venue}}));}
+      catch(e){console.warn('Storage full; consider smaller logo images',e);}
+    }
+    function applyAppTheme(theme) {
+      state.appTheme=theme;
+      document.body.classList.toggle('app-light',theme==='light');
+      const headerTheme=document.getElementById('header-app-theme');
+      if(headerTheme) headerTheme.value=theme;
+      saveStyle();
+    }
+    function showStartupLogos() { document.getElementById('startup-logos')?.classList.remove('hidden'); }
+    function closeStartupLogos() { document.getElementById('startup-logos')?.classList.add('hidden'); localStorage.setItem('ragasaan_initial_setup_v1','1'); saveStyle(); }
+    function syncFormatLabels() {
+      const label = document.getElementById('preview-format-label');
+      const formatName = MENU_NAMES[state.layout] || state.layout;
+      if(label) label.textContent = `${formatName} — ${state.layout==='a8-grid'?'10 tags / portrait A4':state.layout==='a6-grid'?'4 tags / A4':'210 × 297 mm'}`;
+      const addFormat = document.getElementById('builder-format-select');
+      if(addFormat) addFormat.value = state.layout;
+      const activeName = document.getElementById('active-format-name');
+      if(activeName) activeName.textContent = formatName;
+    }
+    function setLayout(fmt) {
+      if (!MENU_FORMATS.includes(fmt)) return;
+      state.layout = fmt;
+      state.design = state.designs[fmt];
+      state.event.items = state.formatMenus[fmt];
+      MENU_FORMATS.forEach(f => {
+        const btn = document.getElementById(`fmt-btn-${f}`);
+        if (btn) btn.className = f===fmt
+          ? 'p-2 border rounded-lg text-[11px] text-center transition bg-gold-500/10 border-gold-500 text-gold-400 font-medium'
+          : 'p-2 border border-slate-800 rounded-lg text-[11px] text-center text-slate-400 hover:border-slate-700 transition';
+      });
+      syncFormatLabels();
+      renderActiveMenuItems();
+      renderContextualControls();
+      renderPreview();
+    }
+
+
+    // RENDER CONTEXTUAL CONTROLS DYNAMICALLY BASED ON SELECTED FORMAT
+    function renderContextualControls() {
+      const container = document.getElementById('contextual-format-controls');
+      if(!container) return;
+      const d = state.design;
+      const fontChoice = (which) => [
+        ['font-serif', 'Playfair Display'], ['font-cormorant', 'Cormorant Garamond'],
+        ['font-script', 'Great Vibes'], ['font-montserrat','Montserrat'], ['font-sans','Inter']
+      ].map(([v,n]) => `<option value="${v}" ${d[which]===v?'selected':''}>${n}</option>`).join('');
+      const fontSlider = (prop, label, max=72) => `
+        <label class="text-slate-400 flex items-center justify-between gap-2">${label}
+          <input aria-label="${label}" type="number" min="10" max="${max}" step="1" value="${d[prop]}" class="w-20 rounded bg-slate-900 border border-slate-700 px-2 py-1 text-white"
+            oninput="if(this.value==='')return; state.design.${prop}=Math.max(10,Math.min(${max},Number(this.value)||10));renderPreview()">
+        </label>`;
+      const compactNumber = (prop,label,min,max,step=1) => `<label class="text-slate-400 flex items-center justify-between gap-2 py-1">${label}
+        <input aria-label="${label}" type="number" min="${min}" max="${max}" step="${step}" value="${Number(d[prop])||0}" class="w-20 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white text-right"
+          oninput="if(this.value==='')return;state.design.${prop}=Math.max(${min},Math.min(${max},Number(this.value)));renderPreview()"></label>`;
+      const shadeOptions = key => [
+        ['none','None'],['gold','Gold Tint'],['rose','Rose Tint'],['burgundy','Burgundy'],['emerald','Emerald'],
+        ['navy','Navy'],['sepia','Sepia'],['charcoal','Charcoal'],['terracotta','Terracotta'],['plum','Plum'],['teal','Teal']
+      ].map(([v,n])=>`<option value="${v}" ${d[key]===v?'selected':''}>${n}</option>`).join('');
+      const themeOpts = [
+        ['Dark Luxury','#1e293b','#d97706','#ffffff'], ['Classic Gold','#000000','#c5a059','#ffffff'],
+        ['Botanical Emerald','#1b4332','#d4af37','#f8f9fa'],
+        ['Royal Burgundy','#581c31','#c5a059','#fffaf5'], ['Blush & Rose','#713f46','#be7186','#fff4f4'],
+        ['Midnight Blue','#162542','#85a0c8','#f8fbff'], ['Terracotta','#713f2d','#c9734a','#fff7ed'],
+        ['Modern Minimal','#111827','#64748b','#ffffff'], ['Classic Black','#000000','#000000','#ffffff']
+      ];
+      const themes = themeOpts.map(([name,text,accent,bg]) => `<button type="button" onclick="setThemePalette('${text}','${accent}','${bg}')" class="text-left bg-slate-900 border border-slate-700 hover:border-gold-500 px-2 py-2 rounded text-[11px] text-slate-200">
+        <span class="inline-block w-3 h-3 rounded-full align-middle mr-1" style="background:${accent};border:1px solid #ccc"></span>${name}</button>`).join('');
+      const halfBackShadeOptions = [
+        ['none','None'], ['gold','Gold Tint'], ['rose','Rose Tint'], ['burgundy','Burgundy'], ['emerald','Emerald'],
+        ['navy','Navy'], ['sepia','Sepia'], ['charcoal','Charcoal'], ['terracotta','Terracotta'], ['plum','Plum'], ['teal','Teal']
+      ].map(([v,n])=>`<option value="${v}" ${d.halfBackImageShade===v?'selected':''}>${n}</option>`).join('');
+      const showWedding = ['a4','a4-live','half-a4','a6-grid'].includes(state.layout);
+      const expanded = [...container.querySelectorAll('details[data-compact]')].filter(el=>el.open).map(el=>el.dataset.compact);
+      container.innerHTML = `
+        <details data-compact="font" open class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-3 text-xs">
+          <summary class="font-semibold text-gold-400 cursor-pointer mb-2">Font & Colour Themes</summary>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="text-slate-400">Title Font<select onchange="state.design.titleFont=this.value;renderPreview()" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded p-2 text-white">${fontChoice('titleFont')}</select></label>
+            <label class="text-slate-400">Body Text Font<select onchange="state.design.bodyFont=this.value;renderPreview()" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded p-2 text-white">${fontChoice('bodyFont')}</select></label>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            ${fontSlider('titleFontSize','Title Size')}
+            ${fontSlider('dishNameFontSize','Dish Name Size')}
+            ${fontSlider('descFontSize','Description Size')}
+            ${fontSlider('allergenFontSize','Allergen Text Size')}
+          </div>
+          <label class="block text-slate-400"><input type="checkbox" ${d.showDescription===true?'checked':''} onchange="state.design.showDescription=this.checked;renderPreview()"> Show menu descriptions on this format</label>
+          <div class="border-t border-slate-800 pt-3">
+            <label class="block text-slate-400 mb-2">Preset Color Themes (8)</label>
+            <div class="grid grid-cols-2 gap-2">${themes}</div>
+          </div>
+        </details>
+        <details data-compact="borders" class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-3 text-xs">
+          <summary class="font-semibold text-gold-400 cursor-pointer mb-2">Borders</summary>
+          <p class="text-[10px] text-slate-400">Independent ${MENU_NAMES[state.layout]} border settings. Outset controls frame spacing from the A4 sheet edge.</p>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="text-slate-400">Style<select onchange="state.design.borderStyle=this.value;renderPreview()" class="w-full mt-1 p-1.5 rounded bg-slate-900 border border-slate-700 text-white">
+              ${['double','solid','dashed','triple','none'].map(v=>`<option ${d.borderStyle===v?'selected':''} value="${v}">${v}</option>`).join('')}
+            </select></label>
+            <label class="text-slate-400">Width (mm)<input type="number" min="0.2" max="5" step="0.2" value="${d.borderWidth}" oninput="state.design.borderWidth=Math.max(.2,Math.min(5,Number(this.value)||.2));renderPreview()" class="w-full mt-1 p-1.5 rounded bg-slate-900 border border-slate-700 text-white"></label>
+            <label class="text-slate-400">Border Color<input type="color" value="${d.borderColor}" oninput="state.design.borderColor=this.value;renderPreview()" class="w-full mt-1 h-8 rounded"></label>
+            <label class="text-slate-400">Outset from edge (cm)<input type="number" min="0.2" max="0.5" step="0.05" value="${d.borderOutsetCm}" oninput="state.design.borderOutsetCm=Math.max(.2,Math.min(.5,Number(this.value)||.2));renderPreview()" class="w-full mt-1 p-1.5 rounded bg-slate-900 border border-slate-700 text-white"></label>
+          </div>
+        </details>
+        <details data-compact="logos" class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-3 text-xs">
+          <summary class="font-semibold text-gold-400 cursor-pointer mb-2">Logo Position — ${MENU_NAMES[state.layout]}</summary>
+          ${compactNumber('logoWidth','Company Logo Width (px)',100,400)}
+          <label class="block text-slate-400">Replace Company Logo<input type="file" accept="image/*" onchange="handleLogoUpload(event)" class="w-full mt-1 text-xs file:bg-slate-800 file:text-white file:border-0 file:px-2 file:py-1 file:rounded"></label>
+          ${showWedding ? `<div class="border-t border-slate-800 pt-2 space-y-2">
+              <label class="block text-slate-400">Bride / Groom Image or Logo<input type="file" accept="image/*" onchange="handleCoupleLogoUpload(event)" class="w-full mt-1 text-xs file:bg-slate-800 file:text-white file:border-0 file:px-2 file:py-1 file:rounded"></label>
+              <label class="block text-slate-400"><input type="checkbox" ${d.showCoupleLogo?'checked':''} onchange="state.design.showCoupleLogo=this.checked;renderPreview()"> Display Logo</label>
+              ${compactNumber('coupleLogoWidth','Bride/Groom Logo Width (px)',100,400)}
+              ${compactNumber('coupleOffsetX','Horizontal position (px)',-120,120)}
+              ${compactNumber('coupleOffsetY','Vertical position (px)',-100,100)}
+            </div>` : ''}
+        </details>
+        ${state.layout==='a4-live'?`<div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs">
+          <label class="font-semibold text-gold-400 block mb-2">Live Station Title (editable)</label>
+          <input type="text" value="${esc(d.liveTitle)}" oninput="state.design.liveTitle=this.value;renderPreview()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white">
+        </div>`:''}
+        ${state.layout==='half-a4'?`<details data-compact="table-images" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs space-y-3">
+          <summary class="font-semibold text-gold-400 cursor-pointer mb-2">Table Menu Card — Image Position</summary>
+          <label class="block text-slate-400">Title top: ${d.halfTitleTop}px<input type="range" min="0" max="150" value="${d.halfTitleTop}" oninput="state.design.halfTitleTop=Number(this.value);renderContextualControls();renderPreview()" class="w-full"></label>
+          <label class="block text-slate-400">Venue bottom: ${d.halfVenueBottom}px<input type="range" min="0" max="450" value="${d.halfVenueBottom}" oninput="state.design.halfVenueBottom=Number(this.value);renderContextualControls();renderPreview()" class="w-full"></label>
+          <div class="border-t border-slate-800 pt-2 grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="space-y-2 rounded-lg border border-slate-800 p-2">
+              <label class="font-semibold text-gold-400 block">Back Page Left Side Image</label>
+              <label class="block text-slate-400">Upload image<input type="file" accept="image/*" onchange="handleHalfBackImageUpload(event,'left')" class="w-full mt-1 text-xs file:bg-slate-800 file:text-white file:border-0 file:px-2 file:py-1 file:rounded"></label>
+              <label class="block text-slate-400"><input type="checkbox" ${d.showHalfBackLeftImage?'checked':''} onchange="state.design.showHalfBackLeftImage=this.checked;renderPreview()"> Show left-side image</label>
+              <label class="block text-slate-400">Left image shade<select onchange="state.design.halfBackLeftImageShade=this.value;renderPreview()" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded p-2 text-white">${shadeOptions('halfBackLeftImageShade')}</select></label>
+              ${compactNumber('halfBackLeftImageWidth','Left Image Width (px)',80,260)}
+              ${compactNumber('halfBackLeftOffsetX','Left X Position (px)',-180,180)}
+              ${compactNumber('halfBackLeftOffsetY','Left Y Position (px)',-180,180)}
+            </div>
+            <div class="space-y-2 rounded-lg border border-slate-800 p-2">
+              <label class="font-semibold text-gold-400 block">Back Page Right Side Image</label>
+              <label class="block text-slate-400">Upload image<input type="file" accept="image/*" onchange="handleHalfBackImageUpload(event,'right')" class="w-full mt-1 text-xs file:bg-slate-800 file:text-white file:border-0 file:px-2 file:py-1 file:rounded"></label>
+              <label class="block text-slate-400"><input type="checkbox" ${d.showHalfBackRightImage?'checked':''} onchange="state.design.showHalfBackRightImage=this.checked;renderPreview()"> Show right-side image</label>
+              <label class="block text-slate-400">Right image shade<select onchange="state.design.halfBackRightImageShade=this.value;renderPreview()" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded p-2 text-white">${shadeOptions('halfBackRightImageShade')}</select></label>
+              ${compactNumber('halfBackRightImageWidth','Right Image Width (px)',80,260)}
+              ${compactNumber('halfBackRightOffsetX','Right X Position (px)',-180,180)}
+              ${compactNumber('halfBackRightOffsetY','Right Y Position (px)',-180,180)}
+            </div>
+          </div>
+          <button type="button" onclick="resetHalfBackImagePositions()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded text-slate-100 font-semibold">Reset Both Image Positions</button>
+          <p class="text-[11px] text-slate-400">Tip: you can also drag each back-page image directly in the live preview.</p>
+        </details>`:''}
+        ${state.layout==='a8-grid'?`<p class="text-[11px] text-amber-400 p-2">A8 tags: 10 per portrait A4 (2 × 5) with 2mm gaps, at full A8 dimensions and thin double borders. Allergens and May Contain are included.</p>`:''}
+        ${state.layout==='a6-grid'?`<p class="text-[11px] text-amber-400 p-2">Four A6-position tags per A4 sheet. Any cut clearance reduces the tag area slightly below full ISO A6.</p>`:''}
+      `;
+      if(expanded.length) container.querySelectorAll('details[data-compact]').forEach(el=>el.open=expanded.includes(el.dataset.compact));
+    }
+
+
+    function setThemePalette(textColor, accentColor, bgColor) {
+      state.design.textColor = textColor;
+      state.design.accentColor = accentColor;
+      // Background stays white irrespective of selected preset.
+      state.design.bgColor = '#ffffff';
+      state.design.borderColor = accentColor;
+      renderPreview();
+    }
+
+    function handleLogoUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = evt => { state.sharedCompanyLogo=evt.target.result; applySharedLogos();saveStyle();renderPreview(); };
+      reader.readAsDataURL(file);
+    }
+
+    function handleCoupleLogoUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = evt => { state.sharedCoupleLogo=evt.target.result;applySharedLogos();saveStyle();renderPreview(); };
+      reader.readAsDataURL(file);
+    }
+
+    function handleHalfBackImageUpload(e, side='left') {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = evt => {
+        const prefix = side === 'right' ? 'halfBackRight' : 'halfBackLeft';
+        state.design[`${prefix}ImageUrl`] = evt.target.result;
+        state.design[`show${prefix.charAt(0).toUpperCase()+prefix.slice(1)}Image`] = true;
+        saveStyle();
+        renderContextualControls();
+        renderPreview();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function resetHalfBackImagePositions() {
+      for (const side of ['Left','Right']) {
+        state.design[`halfBack${side}OffsetX`] = 0;
+        state.design[`halfBack${side}OffsetY`] = 0;
+      }
+      saveStyle(); renderContextualControls(); renderPreview();
+    }
+
+    function startHalfBackDrag(event, side='left') {
+      if (state.layout !== 'half-a4') return;
+      const prefix = side === 'right' ? 'halfBackRight' : 'halfBackLeft';
+      state._halfBackDrag = {
+        side,
+        startX: event.clientX,
+        startY: event.clientY,
+        origX: Number(state.design[`${prefix}OffsetX`]) || 0,
+        origY: Number(state.design[`${prefix}OffsetY`]) || 0
+      };
+      window.addEventListener('pointermove', onHalfBackDragMove);
+      window.addEventListener('pointerup', stopHalfBackDrag);
+      event.preventDefault();
+    }
+    function onHalfBackDragMove(event) {
+      const drag = state._halfBackDrag;
+      if (!drag) return;
+      const prefix = drag.side === 'right' ? 'halfBackRight' : 'halfBackLeft';
+      state.design[`${prefix}OffsetX`] = Math.max(-180, Math.min(180, Math.round(drag.origX + (event.clientX - drag.startX))));
+      state.design[`${prefix}OffsetY`] = Math.max(-180, Math.min(180, Math.round(drag.origY + (event.clientY - drag.startY))));
+      renderPreview();
+    }
+    function stopHalfBackDrag() {
+      if (!state._halfBackDrag) return;
+      state._halfBackDrag = null;
+      window.removeEventListener('pointermove', onHalfBackDragMove);
+      window.removeEventListener('pointerup', stopHalfBackDrag);
+      saveStyle();
+      renderContextualControls();
+      renderPreview();
+    }
+
+    function pushUndoState(actionDescription, previousData) {
+      state.undoStack.push({ desc: actionDescription, data: JSON.parse(JSON.stringify(previousData)) });
+      document.getElementById('undo-btn').disabled = false;
+    }
+
+    function triggerUndo() {
+      if (state.undoStack.length === 0) return;
+      const lastAction = state.undoStack.pop();
+      state.masterDB = lastAction.data;
+      saveMasterDBToStorage();
+      renderMasterDB();
+      updateCategoryFilters();
+      populateBuilderDropdown();
+      renderPreview();
+      if (state.undoStack.length === 0) document.getElementById('undo-btn').disabled = true;
+    }
+
+    function saveMasterDBToStorage() { try { localStorage.setItem('wedding_master_db', JSON.stringify(state.masterDB)); } catch(_) {} }
+
+    function updateCategoryFilters() {
+      const categories = [...new Set(state.masterDB.map(i => i.category || 'Mains'))].sort();
+      const select1 = document.getElementById('builder-cat-filter');
+      const select2 = document.getElementById('db-cat-filter');
+      if(select1) {
+        select1.innerHTML = '<option value="">All Categories</option>';
+        categories.forEach(cat => select1.appendChild(new Option(cat, cat)));
+      }
+      if(select2) {
+        select2.innerHTML = '<option value="">All Categories</option>';
+        categories.forEach(cat => select2.appendChild(new Option(cat, cat)));
+      }
+    }
+
+    function renderMasterDB() {
+      const search = (document.getElementById('db-search')?.value || '').toLowerCase();
+      const catFilter = document.getElementById('db-cat-filter')?.value || '';
+      const tbody = document.getElementById('master-table-body');
+      if(!tbody) return;
+      tbody.innerHTML = '';
+
+      const filtered = state.masterDB.filter(item => {
+        const matchesCat = !catFilter || item.category === catFilter;
+        const matchesSearch = !search || item.name.toLowerCase().includes(search) || (item.subcategory||'').toLowerCase().includes(search) || (item.desc||'').toLowerCase().includes(search) || (item.allergens||[]).join(',').toLowerCase().includes(search);
+        return matchesCat && matchesSearch;
+      });
+
+      filtered.forEach(item => {
+        const allergensStr = (item.allergens || []).join(', ');
+        const mayContainStr = (item.mayContain || []).join(', ');
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-800/50 transition";
+        tr.innerHTML = `
+          <td class="p-3 font-bold text-gold-400 database-item-wrap">${esc(item.category)}</td>
+          <td class="p-3 database-item-wrap">${esc(item.subcategory || '')}</td>
+          <td class="p-3 font-semibold text-white database-item-wrap">${esc(item.name)}</td>
+          <td class="p-3 text-slate-400 database-item-wrap text-[11px] leading-relaxed">${esc(item.desc || '')}</td>
+          <td class="p-3 text-amber-300 font-mono text-[11px] database-item-wrap">${esc(allergensStr || 'None')}</td>
+          <td class="p-3 text-orange-400 font-mono text-[11px] database-item-wrap">${esc(mayContainStr || 'None')}</td>
+          <td class="p-3 text-center space-x-1">
+            <button onclick="requestMasterAuthorization('edit', () => editDish('${item.id}'))" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-gold-400 rounded text-xs"><i class="fa-solid fa-pen"></i></button>
+            <button onclick="requestMasterAuthorization('delete', () => deleteDish('${item.id}'))" class="px-2 py-1 bg-slate-800 hover:bg-rose-900/50 text-rose-400 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openDishModal(editId = null) {
+      document.getElementById('dish-modal').classList.remove('hidden');
+      const formId = document.getElementById('modal-dish-id');
+      if (editId) {
+        const dish = state.masterDB.find(d => d.id === editId);
+        if (!dish) return;
+        document.getElementById('modal-title').innerText = "Edit Master Dish";
+        formId.value = dish.id;
+        document.getElementById('modal-name').value = dish.name;
+        document.getElementById('modal-category').value = dish.category;
+        document.getElementById('modal-price').value = dish.price || '';
+        document.getElementById('modal-subcategory').value = dish.subcategory || '';
+        document.getElementById('modal-desc').value = dish.desc || '';
+        document.querySelectorAll('.modal-allergen').forEach(cb => cb.checked = (dish.allergens || []).includes(cb.value));
+        document.querySelectorAll('.modal-contain').forEach(cb => cb.checked = (dish.mayContain || []).includes(cb.value));
+      } else {
+        document.getElementById('modal-title').innerText = "Add Dish to Master Database";
+        formId.value = '';
+        document.getElementById('modal-name').value = '';
+        document.getElementById('modal-category').value = '';
+        document.getElementById('modal-desc').value = '';
+        document.getElementById('modal-price').value = '';
+        document.getElementById('modal-subcategory').value = '';
+        document.querySelectorAll('.modal-allergen').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.modal-contain').forEach(cb => cb.checked = false);
+      }
+    }
+
+    function closeDishModal() { document.getElementById('dish-modal').classList.add('hidden'); }
+
+    function saveDishModal() {
+      const id = document.getElementById('modal-dish-id').value;
+      const name = document.getElementById('modal-name').value.trim();
+      const category = document.getElementById('modal-category').value.trim() || 'Mains';
+      const subcategory = document.getElementById('modal-subcategory').value.trim();
+      const price = document.getElementById('modal-price').value.trim();
+      const desc = document.getElementById('modal-desc').value.trim();
+      if (!name) return alert("Enter dish name.");
+
+      const allergens = Array.from(document.querySelectorAll('.modal-allergen:checked')).map(c => c.value);
+      const mayContain = Array.from(document.querySelectorAll('.modal-contain:checked')).map(c => c.value);
+
+      pushUndoState("Modify/Add Dish", state.masterDB);
+
+      if (id) {
+        const idx = state.masterDB.findIndex(d => d.id === id);
+        if (idx !== -1) state.masterDB[idx] = { id, category, subcategory, name, desc, price, allergens, mayContain };
+      } else {
+        state.masterDB.push({ id: 'db-' + Date.now(), category, subcategory, name, desc, price, allergens, mayContain });
+      }
+
+      saveMasterDBToStorage();
+      renderMasterDB();
+      updateCategoryFilters();
+      populateBuilderDropdown();
+      closeDishModal();
+    }
+
+    function editDish(id) { openDishModal(id); }
+
+    function deleteDish(id) {
+      if (confirm("Delete this dish?")) {
+        pushUndoState("Delete Dish", state.masterDB);
+        state.masterDB = state.masterDB.filter(d => d.id !== id);
+        saveMasterDBToStorage();
+        renderMasterDB();
+        updateCategoryFilters();
+        populateBuilderDropdown();
+      }
+    }
+
+    function exportExcel() {
+      const ws = XLSX.utils.json_to_sheet(state.masterDB.map(i => ({
+        'Category': i.category, 'Sub-Category': i.subcategory || '', 'Item Name': i.name, 'Description': i.desc, 'Price': i.price,
+        'Allergens': (i.allergens || []).join(', '), 'May Contain': (i.mayContain || []).join(', ')
+      })));
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Master");
+      XLSX.writeFile(wb, "Ragasaan_Menu_Master.xlsx");
+    }
+
+    function importExcel(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = evt => {
+        const workbook = XLSX.read(new Uint8Array(evt.target.result), { type: 'array' });
+        const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+        if (json.length > 0) {
+          pushUndoState("Excel Import", state.masterDB);
+          state.masterDB = json.map((row, idx) => ({
+            id: 'imp-' + Date.now() + '-' + idx,
+            category: row.Category || row.CATEGORY || 'Mains',
+            subcategory: row['Sub-Category'] || row['Sub Category'] || row.Subcategory || row.subcategory || '',
+            name: row['Item Name'] || row.ItemName || row.Name || row.name || 'Unnamed',
+            desc: row.Description || row.description || '',
+            price: row.Price || row.price || '',
+            allergens: row.Allergens ? String(row.Allergens).split(',').map(s=>s.trim()) : [],
+            mayContain: row['May Contain'] ? String(row['May Contain']).split(',').map(s=>s.trim()) : []
+          }));
+          saveMasterDBToStorage();
+          renderMasterDB();
+          updateCategoryFilters();
+          populateBuilderDropdown();
+          alert("Excel imported successfully!");
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function populateBuilderDropdown(filteredList = null) {
+      const select = document.getElementById('builder-add-select');
+      if (!select) return;
+      select.innerHTML = '';
+      const list = filteredList || state.masterDB;
+      list.forEach(dish => {
+        select.appendChild(new Option(`${dish.name} (${dish.category})`, dish.id));
+      });
+    }
+
+    function filterBuilderDropdown() {
+      const cat = document.getElementById('builder-cat-filter').value;
+      const search = document.getElementById('builder-search-input').value.toLowerCase();
+      const filtered = state.masterDB.filter(dish => {
+        const matchesCat = !cat || dish.category === cat;
+        const matchesSearch = !search || dish.name.toLowerCase().includes(search) || (dish.subcategory || '').toLowerCase().includes(search) || (dish.desc || '').toLowerCase().includes(search);
+        return matchesCat && matchesSearch;
+      });
+      populateBuilderDropdown(filtered);
+    }
+
+    const MANUAL_ALLERGENS = ['Celery','Cereals containing gluten','Crustaceans','Eggs','Fish','Lupin','Milk','Molluscs','Mustard','Tree nuts','Peanuts','Sesame','Soya','Sulphites'];
+    function initManualAllergens() {
+      for(const id of ['manual-allergens','manual-maycontain']) {
+        const root=document.getElementById(id);
+        if(root && !root.children.length) root.innerHTML=MANUAL_ALLERGENS.map(a=>`<label class="flex gap-1 items-center text-slate-300"><input type="checkbox" value="${esc(a)}"> ${esc(a)}</label>`).join('');
+      }
+    }
+    function toggleAddMode(mode) {
+      const manual=mode==='manual';
+      document.getElementById('master-add-controls').classList.toggle('hidden',manual);
+      document.getElementById('manual-add-controls').classList.toggle('hidden',!manual);
+      for(const [id,active] of [['add-mode-manual',manual],['add-mode-master',!manual]]){
+        const el=document.getElementById(id);
+        el.className='flex-1 p-2 '+(active?'bg-amber-600 text-slate-950 font-semibold':'bg-slate-800 text-slate-200');
+      }
+      if(manual) initManualAllergens();
+    }
+    function addManualDishToMenu() {
+      const get=id=>document.getElementById(id).value.trim();
+      const name=get('manual-name');
+      if(!name){alert('Please enter a dish name.');document.getElementById('manual-name').focus();return;}
+      const checks=id=>[...document.querySelectorAll('#'+id+' input:checked')].map(el=>el.value);
+      const dish={id:'manual-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),name,
+        category:get('manual-category')||'Other',subcategory:get('manual-subcategory'),desc:get('manual-description'),
+        allergens:checks('manual-allergens'),mayContain:checks('manual-maycontain'),price:'',manual:true};
+      state.formatMenus[state.layout].push(dish);
+      state.event.items=state.formatMenus[state.layout];
+      renderActiveMenuItems();renderPreview();
+      const feedback=document.getElementById('manual-add-feedback');
+      if(feedback){feedback.textContent='✓ '+name+' added to '+(MENU_NAMES[state.layout]||'the selected menu');feedback.classList.remove('hidden');}
+      for(const id of ['manual-name','manual-description','manual-subcategory']) document.getElementById(id).value='';
+      document.querySelectorAll('#manual-allergens input:checked,#manual-maycontain input:checked').forEach(el=>el.checked=false);
+    }
+    function addSelectedDishToMenu() {
+      const id = document.getElementById('builder-add-select').value;
+      const dish = state.masterDB.find(d => d.id === id);
+      if (!dish) return alert("Please select a dish.");
+      state.event.items.push({ ...JSON.parse(JSON.stringify(dish)) });
+      renderActiveMenuItems();
+      renderPreview();
+    }
+
+    function renderActiveMenuItems() {
+      const container = document.getElementById('event-items-list');
+      document.getElementById('active-item-count').textContent = state.event.items.length;
+      container.innerHTML = '';
+      state.event.items.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = "bg-slate-950 border border-slate-800 p-2 rounded flex justify-between items-center text-xs";
+        div.innerHTML = `<span class="database-item-wrap"><b>${esc(item.category)}${item.subcategory?' / '+esc(item.subcategory):''}:</b> ${esc(item.name)}</span> <button onclick="state.event.items.splice(${idx},1); renderActiveMenuItems(); renderPreview();" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-xmark"></i></button>`;
+        container.appendChild(div);
+      });
+    }
+
+    function clearEventMenu() { state.formatMenus[state.layout] = []; state.event.items = state.formatMenus[state.layout]; renderActiveMenuItems(); renderPreview(); }
+
+    // Physical A4 preview, with isolated data and styles for every menu dimension.
+    function renderPreview() {
+      const target = document.getElementById('paper-render-target');
+      if (!target || !state.designs) return;
+      syncFormatLabels();
+      const d = state.design;
+      const fmt = state.layout;
+      const items = state.formatMenus[fmt];
+      target.replaceChildren();
+      const escText = esc;
+      const titleFamily = ({'font-sans':'Inter, sans-serif','font-serif':'Playfair Display, serif','font-cormorant':'Cormorant Garamond, serif','font-montserrat':'Montserrat, sans-serif','font-script':'Great Vibes, cursive'})[d.titleFont] || 'Playfair Display, serif';
+      const bodyFamily = ({'font-sans':'Inter, sans-serif','font-serif':'Playfair Display, serif',
+        'font-cormorant':'Cormorant Garamond, serif','font-montserrat':'Montserrat, sans-serif',
+        'font-script':'Great Vibes, cursive'})[d.bodyFont] || 'Cormorant Garamond, serif';
+      const brand = (maxWidth = d.logoWidth) => d.logoUrl
+        ? `<img src="${d.logoUrl}" alt="Company Logo" style="display:block;height:auto;width:${maxWidth}px;max-width:100%;object-fit:contain;margin:auto">`
+        : `<div style="width:${maxWidth}px;max-width:100%;margin:auto">${ragasaanLogoSvg}</div>`;
+      const wedding = () => d.showCoupleLogo && d.coupleLogoUrl
+        ? `<img src="${d.coupleLogoUrl}" alt="Bride/Groom Logo" style="display:block;width:${d.coupleLogoWidth}px;max-width:100%;height:auto;object-fit:contain;margin:${12+Math.max(0,Number(d.coupleOffsetY)||0)}px auto ${18+Math.max(0,-Number(d.coupleOffsetY)||0)}px;transform:translateX(${d.coupleOffsetX}px)">` : '';
+      const halfBackShadeFilters = {
+        none:'', gold:'sepia(.15) saturate(1.25) brightness(1.02)', rose:'sepia(.1) saturate(1.18) hue-rotate(-15deg)', burgundy:'sepia(.22) saturate(1.55) hue-rotate(-35deg)',
+        emerald:'sepia(.18) saturate(1.4) hue-rotate(45deg)', navy:'sepia(.18) saturate(1.2) hue-rotate(165deg)', sepia:'sepia(.65) saturate(1.05)',
+        charcoal:'grayscale(.25) contrast(1.03)', terracotta:'sepia(.35) saturate(1.45) hue-rotate(-12deg)', plum:'sepia(.25) saturate(1.35) hue-rotate(245deg)', teal:'sepia(.18) saturate(1.3) hue-rotate(120deg)'
+      };
+      const halfBackShadeOverlays = {
+        none:'transparent', gold:'rgba(163,145,97,.24)', rose:'rgba(190,110,130,.22)', burgundy:'rgba(109,22,43,.24)', emerald:'rgba(30,92,70,.22)',
+        navy:'rgba(34,60,108,.22)', sepia:'rgba(122,85,45,.18)', charcoal:'rgba(44,42,42,.15)', terracotta:'rgba(176,94,52,.22)', plum:'rgba(100,58,109,.22)', teal:'rgba(42,128,128,.2)'
+      };
+      const halfBackCenterImage = (side='left') => {
+        const isRight = side === 'right';
+        const show = isRight ? d.showHalfBackRightImage : d.showHalfBackLeftImage;
+        const url = isRight ? d.halfBackRightImageUrl : d.halfBackLeftImageUrl;
+        const shade = (isRight ? d.halfBackRightImageShade : d.halfBackLeftImageShade) || 'none';
+        const width = isRight ? d.halfBackRightImageWidth : d.halfBackLeftImageWidth;
+        const offsetX = isRight ? d.halfBackRightOffsetX : d.halfBackLeftOffsetX;
+        const offsetY = isRight ? d.halfBackRightOffsetY : d.halfBackLeftOffsetY;
+        if (!show || !url) return '';
+        return `<div style="display:flex;justify-content:center;align-items:center;height:100%;min-height:120mm;padding:8mm 0;overflow:hidden"><div style="position:relative;display:inline-block;max-width:100%;transform:translate(${offsetX}px, ${offsetY}px);cursor:grab;touch-action:none" onpointerdown="startHalfBackDrag(event, '${side}')"><img src="${url}" alt="Back page optional image ${side}" style="display:block;width:${width}px;max-width:100%;height:auto;max-height:160mm;object-fit:contain;filter:${halfBackShadeFilters[shade]||''};opacity:.92"><div aria-hidden="true" style="position:absolute;inset:0;background:${halfBackShadeOverlays[shade]||'transparent'};mix-blend-mode:multiply;pointer-events:none;border-radius:2px"></div></div></div>`;
+      };
+      const halfBackFooter = () => `<div class="menu-body-font text-center" style="padding-top:8px;${font(d.allergenFontSize)}"><h2 contenteditable="true" data-preview-text="noticeTitle" class="font-bold mb-2" style="color:${d.accentColor}">${escText(d.noticeTitle ?? 'ALLERGENS NOTICE')}</h2>
+            <p contenteditable="true" data-preview-text="noticeMessage">${escText(d.noticeMessage ?? 'Red text identifies declared allergens; amber text indicates possible cross-contact (may contain). Please speak to event staff about allergies before eating. Colours supplement, not replace, written allergen information.')}</p>
+            <div style="margin-top:12px">${brand()}</div></div>`;
+      const allergies = (item,idx) => {
+        const a=(item.allergens||[]).join(', ');
+        const m=(item.mayContain||[]).join(', ');
+        return `<span aria-label="Declared allergens" title="Declared allergens" contenteditable="true" oninput="editAllergenValues(${idx},'allergens',this.innerText)" style="color:#a3290a">${escText(a || '—')}</span>${m?`<span style="padding:0 5px;color:#555">•</span><span aria-label="May contain" title="May contain (cross-contact)" contenteditable="true" oninput="editAllergenValues(${idx},'mayContain',this.innerText)" style="color:#b7791f">${escText(m)}</span>`:''}`;
+      };
+      const font = (px) => `font-size:${Math.max(10,Number(px)||10)}px;`;
+      const frame = () => {
+        if (d.borderStyle==='none') return '';
+        const border = d.borderStyle==='triple' ? 'double' : d.borderStyle;
+        const width = d.borderStyle==='triple'?Math.max(2,Number(d.borderWidth)||2):Math.max(.2,Number(d.borderWidth)||2);
+        const inset = Math.max(.2,Math.min(.5,Number(d.borderOutsetCm)||.2));
+        return `<div class="frame-overlay" style="inset:${inset}cm;border:${width}mm ${border} ${d.borderColor};${d.borderStyle==='triple'?`outline:1px solid ${d.borderColor};outline-offset:2mm;`:''}"></div>`;
+      };
+      const page = (cls='paper-a4', extra='') => {
+        const p=document.createElement('div');
+        p.className=`${cls} print-sheet shadow-2xl ${d.titleFont} ${extra}`;
+        p.style.cssText=`background:#ffffff;color:${d.textColor};--body-family:${bodyFamily};--title-family:${titleFamily};--label-border:${d.borderColor};font-family:${titleFamily};`;
+        return p;
+      };
+      const itemBlock = (item, idx, factor=1) => `
+        <div class="menu-body-font text-center space-y-1" style="overflow-wrap:anywhere;">
+          <h4 contenteditable="true" oninput="updateActiveItem(${idx},'name',this.innerText)" onblur="finishCanvasItemEdit(${idx})" class="font-bold leading-tight" style="color:${d.textColor};${font(d.dishNameFontSize*factor)}">${escText(item.name)}</h4>
+          ${d.showDescription && item.desc?`<p contenteditable="true" oninput="updateActiveItem(${idx},'desc',this.innerText)" class="leading-snug" style="${font(d.descFontSize*factor)}">${escText(item.desc)}</p>`:''}
+          <div class="leading-tight" style="${font(d.allergenFontSize*factor)}">${allergies(item,idx)}</div>
+        </div>`;
+      const bodyHeader = () => `<div class="text-center" style="border-bottom:1px solid ${d.accentColor}44;padding-bottom:12px">
+          <h1 contenteditable="true" oninput="state.event.title=this.innerText; document.getElementById('cfg-couple').value=this.innerText" class="font-bold tracking-wide" style="font-family:${titleFamily};color:${d.accentColor};${font(d.titleFontSize)}">${escText(state.event.title)}</h1>
+          ${wedding()}
+          <p contenteditable="true" class="menu-body-font tracking-wide" oninput="state.event.venue=this.innerText;document.getElementById('cfg-venue').value=this.innerText" style="${font(d.descFontSize)}">${escText(state.event.venue)}</p>
+          <p contenteditable="true" class="menu-body-font" oninput="state.event.date=this.innerText;syncDatePicker()" style="${font(d.descFontSize)}">${escText(state.event.date)}</p>
+        </div>`;
+      const visibleItems = items.map((item,idx)=>({item,idx})).filter(({item})=>item && String(item.name||'').trim());
+      const collection = () => visibleItems.length ? visibleItems.map(({item,idx}) => `
+          <section class="menu-body-font text-center space-y-1" style="margin-bottom:14px;min-width:0">
+            ${(String(item.category||'').trim()||String(item.subcategory||'').trim()) ? `<div class="menu-category-editor" style="font-size:${Math.max(10,Number(d.dishNameFontSize))}px;color:${d.accentColor};display:flex;justify-content:center;gap:4px;align-items:center;flex-wrap:wrap">
+              ${item.category?`<span contenteditable="true" title="Edit category" onblur="updateCanvasClassification(${idx},'category',this.innerText)" class="font-semibold uppercase tracking-wider" style="overflow-wrap:anywhere">${escText(item.category)}</span><button type="button" class="no-print canvas-remove-class" title="Remove category" onclick="updateCanvasClassification(${idx},'category','')" style="font-size:10px;color:#a3290a">×</button>`:''}
+              ${item.category&&item.subcategory?`<span> / </span>`:''}
+              ${item.subcategory?`<span contenteditable="true" title="Edit sub-category" onblur="updateCanvasClassification(${idx},'subcategory',this.innerText)" class="tracking-wide" style="overflow-wrap:anywhere">${escText(item.subcategory)}</span><button type="button" class="no-print canvas-remove-class" title="Remove sub-category" onclick="updateCanvasClassification(${idx},'subcategory','')" style="font-size:10px;color:#a3290a">×</button>`:''}
+            </div>` : ''}
+            ${itemBlock(item,idx)}
+          </section>`).join('') : `<p contenteditable="true" data-preview-text="emptyMenuMessage" class="text-center menu-body-font" style="font-size:10px">${escText(d.emptyMenuMessage ?? 'Add menu items in Event Menu Builder')}</p>`;
+      // Table Menu Card: group by course, never display sub-category in this format.
+      const tableCardCollection = () => {
+        const order=['Starter','Main Course','Dessert'];
+        const groups=new Map(order.map(course=>[course,[]]));
+        const normalize = raw => {
+          const value=String(raw ?? '').trim();
+          const v=value.toLowerCase();
+          // Only match precise default/legacy names. User-entered names must never be remapped.
+          if (['starter','starters','appetizer','appetizers','appetiser','appetisers'].includes(v)) return 'Starter';
+          if (['main','mains','main course','main courses'].includes(v)) return 'Main Course';
+          if (['dessert','desserts'].includes(v)) return 'Dessert';
+          return value;
+        };
+        visibleItems.forEach(({item,idx})=>{
+          const course=normalize(item.category);
+          if(!groups.has(course)) groups.set(course,[]);
+          groups.get(course).push({item,idx});
+        });
+        return [...groups.entries()].filter(([,entries])=>entries.length).map(([course,entries])=>`
+          <section class="menu-body-font text-center" style="margin-bottom:15px;min-width:0">
+            ${course?`<h3 contenteditable="true" data-course-original="${escText(course)}" class="font-semibold uppercase tracking-wider" style="color:${d.accentColor};${font(d.dishNameFontSize)};margin-bottom:7px">${escText(course)}</h3>`:''}
+            ${entries.map(({item,idx})=>`<div style="margin-bottom:9px">${itemBlock(item,idx)}</div>`).join('')}
+          </section>`).join('') || `<p contenteditable="true" data-preview-text="emptyMenuMessage" class="text-center menu-body-font" style="font-size:10px">${escText(d.emptyMenuMessage ?? 'Add menu items in Event Menu Builder')}</p>`;
+      };
+      // Format headings sit immediately below the date divider; the dish content
+      // retains its independent vertically-centred area between heading and logo.
+      const formatHeading = (label, editable=false) => `<h2 ${editable?'contenteditable="true" onblur="state.design.'+(editable==='buffet'?'menuHeading':'liveTitle')+'=this.innerText.trim();saveStyle()"':''} class="font-bold uppercase tracking-widest text-center" style="font-family:${titleFamily};color:${d.accentColor};${font(d.titleFontSize)};padding-top:3px;margin:0;line-height:1.15;flex-shrink:0">${escText(label)}</h2>`;
+      if(fmt==='a4') {
+        const p=page(); p.style.padding=`${Math.max(2.5,Number(d.borderOutsetCm)+.5)}cm`; p.style.paddingTop=`${Math.max(0.8, Number(d.borderOutsetCm)+Number(d.borderWidth||1)/10+0.2)}cm`;
+        p.classList.add('flex','flex-col','justify-between');
+        p.innerHTML=`${frame()}${bodyHeader()}${formatHeading(d.menuHeading||'Menu','buffet')}<div class="menu-body-font" style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:8px 0">${tableCardCollection()}</div><div class="text-center" style="padding-top:12px">${brand()}</div>`;
+        target.append(p);
+      } else if(fmt==='a4-live') {
+        (items.length?items:[null]).forEach((item,i) => {
+          const p=page(); p.style.padding=`${Math.max(2.5,Number(d.borderOutsetCm)+.5)}cm`; p.style.paddingTop=`${Math.max(0.8, Number(d.borderOutsetCm)+Number(d.borderWidth||1)/10+0.2)}cm`;
+          p.classList.add('flex','flex-col','justify-between');
+          p.innerHTML=`${frame()}${bodyHeader()}${formatHeading(d.liveTitle,true)}
+            <div class="menu-body-font text-center" style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;overflow:hidden">
+              ${item?itemBlock(item,i,1.5):`<p contenteditable="true" data-preview-text="emptyLiveMessage">${escText(d.emptyLiveMessage ?? 'Add menu items for Live Station')}</p>`}
+            </div><div>${brand()}</div>`;
+          target.append(p);
+        });
+      } else if(fmt==='half-a4') {
+        const p=page('paper-half-a4','flex flex-col'); p.style.padding=`${Math.max(2.3,Number(d.borderOutsetCm)+.25)}cm`; p.style.paddingTop=`${Math.max(0.8, Number(d.borderOutsetCm)+Number(d.borderWidth||1)/10+0.2)}cm`;
+        const left=`<div class="text-center flex flex-col justify-between" style="min-width:0;border-right:1px solid ${d.accentColor}55;padding:0 12px 0 0">
+          <div style="padding-top:${Math.min(Number(d.halfTitleTop)||0, 10)}px"><h1 contenteditable="true" oninput="state.event.title=this.innerText" style="color:${d.accentColor};${font(d.titleFontSize)}" class="font-bold">${escText(state.event.title)}</h1>${wedding()}</div>
+          <div class="menu-body-font" style="margin-bottom:${d.halfVenueBottom}px;${font(d.descFontSize)}">
+            <p contenteditable="true" oninput="state.event.venue=this.innerText">${escText(state.event.venue)}</p>
+            <p contenteditable="true" oninput="state.event.date=this.innerText">${escText(state.event.date)}</p></div>
+          <div>${brand()}</div></div>`;
+        const right=`<div class="menu-body-font flex flex-col justify-between" style="min-width:0;padding:0 12px 0;overflow:hidden"><div style="overflow:hidden;max-height:207mm"><h2 contenteditable="true" data-preview-text="tableMenuHeading" class="font-bold text-center uppercase tracking-widest" style="font-family:${titleFamily};color:${d.accentColor};${font(d.titleFontSize)};margin-bottom:6px;line-height:1.15">${escText(d.tableMenuHeading ?? 'Menu')}</h2>${tableCardCollection()}</div><div>${brand()}</div></div>`;
+        p.innerHTML=`${frame()}<div style="height:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px">${left}${right}</div>`;
+        target.append(p);
+        const back=page('paper-half-a4','page-break'); back.style.padding=p.style.padding; back.style.paddingTop=p.style.paddingTop;
+        const leftHasImage = d.showHalfBackLeftImage && d.halfBackLeftImageUrl;
+        const rightHasImage = d.showHalfBackRightImage && d.halfBackRightImageUrl;
+        const leftBackPanel = `<div style="display:flex;flex-direction:column;min-width:0;height:100%;${leftHasImage?'justify-content:space-between':'justify-content:flex-end'}">${halfBackCenterImage('left')}${halfBackFooter()}</div>`;
+        const rightBackPanel = `<div style="display:flex;flex-direction:column;min-width:0;height:100%;${rightHasImage?'justify-content:space-between':'justify-content:flex-end'}">${halfBackCenterImage('right')}<div style="padding-top:10px;text-align:center">${brand()}</div></div>`;
+        back.innerHTML=`${frame()}<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;height:100%"><div style="padding-right:8px;border-right:1px solid ${d.accentColor}55">${leftBackPanel}</div><div style="padding-left:8px">${rightBackPanel}</div></div>`;
+        target.append(back);
+      } else if(fmt==='a8-grid'||fmt==='a6-grid'||fmt==='canape-grid') {
+        const perPage=fmt==='a8-grid'?10:fmt==='a6-grid'?4:8;
+        const pageClass=fmt==='a8-grid'?'paper-a8-grid':fmt==='a6-grid'?'paper-a6-grid':'paper-canape-grid';
+        const cardClass=fmt==='a8-grid'?'paper-a8-single':fmt==='a6-grid'?'paper-a6-single':'paper-canape-single';
+        const n=Math.max(1,Math.ceil(visibleItems.length/perPage));
+        for(let j=0;j<n;j++) {
+          const sheet=page(pageClass,j?'page-break':'');
+          // Framing border is per-sheet; cutting borders remain on each individual label.
+          // A sheet-wide frame would cut across labels and the 20mm cutting gutters.
+          // Individual label frames are used for small-format stationery instead.
+          sheet.innerHTML='';
+          for(let k=0;k<perPage;k++) {
+            const record=visibleItems[j*perPage+k];
+            if(!record) continue; // Skip unused slots without drawing ghost labels.
+            const {item,idx:i}=record;
+            const label=document.createElement('div');
+            label.className=`${cardClass} menu-body-font flex flex-col justify-between text-center`;
+            label.style.cssText=`background:#ffffff;color:${d.textColor};--body-family:${bodyFamily};--label-border:${d.borderColor};${d.borderStyle==='none'?'border:none;':''}`;
+            // Small-format outset is scaled to label geometry, so no frame crosses cut gutters.
+            const labelInset = fmt==='a8-grid' ? 0.7 : Math.max(2,Math.min(5,Number(d.borderOutsetCm)*10));
+            const miniFrame = d.borderStyle==='none'?'':`<div aria-hidden="true" style="position:absolute;pointer-events:none;inset:${labelInset}mm;border:1px ${d.borderStyle==='triple'?'double':d.borderStyle} ${d.borderColor};opacity:.45"></div>`;
+            {
+              const logoTop = fmt==='a6-grid'?wedding():brand(d.logoWidth);
+              const logoBottom = fmt==='a6-grid'?brand():'';
+              label.innerHTML=`${miniFrame}<div>${logoTop}</div><div class="menu-body-font" style="min-width:0;overflow-wrap:anywhere;word-break:break-word;white-space:normal;max-height:100%;overflow:hidden">
+                ${itemBlock(item,i)}
+              </div><div>${logoBottom}</div>`;
+            }
+            sheet.append(label);
+          }
+          target.append(sheet);
+        }
+      }
+      saveStyle();
+      // Keep zoom aligned with new pages without scaling print or Word exports.
+      document.getElementById('print-canvas-wrapper').style.transform=`scale(${state.zoom})`;
+    }
+    // All static/format-specific preview strings are editable and saved per format.
+    // Do not re-render during typing: it would move the cursor out of the field.
+    const previewTextKeys = new Set(['noticeTitle','noticeMessage','tableMenuHeading','emptyMenuMessage','emptyLiveMessage']);
+    document.addEventListener('input', function(event) {
+      const node=event.target.closest?.('[data-preview-text]');
+      if(!node || !document.getElementById('paper-render-target')?.contains(node)) return;
+      const key=node.dataset.previewText;
+      if(previewTextKeys.has(key) && state.design) {state.design[key]=node.innerText;saveStyle();}
+    });
+    document.addEventListener('focusout', function(event) {
+      const node=event.target.closest?.('[data-preview-text],[data-course-original]');
+      if(!node || !document.getElementById('paper-render-target')?.contains(node)) return;
+      if(node.hasAttribute('data-course-original')) {
+        const former=node.dataset.courseOriginal, replacement=node.innerText.trim();
+        if(former!==replacement) {
+          // Persist the edited heading in each dish's own category, including a cleared title.
+          const canonical=value=>{
+            const v=String(value??'').trim().toLowerCase();
+            if(['starter','starters','appetizer','appetizers','appetiser','appetisers'].includes(v))return 'Starter';
+            if(['main','mains','main course','main courses'].includes(v))return 'Main Course';
+            if(['dessert','desserts'].includes(v))return 'Dessert';
+            return String(value??'').trim();
+          };
+          state.event.items.forEach(item=>{
+            if(canonical(item.category)===former) item.category=replacement;
+          });
+          renderActiveMenuItems();renderPreview();
+        }
+      } else {
+        saveStyle();
+        // Sync repeated content (e.g. notices on repeated output pages) after edit.
+        renderPreview();
+      }
+    });
+
+    function updateCanvasClassification(index, key, value) {
+      if (!['category','subcategory'].includes(key) || !state.event.items[index]) return;
+      const normalized = String(value || '').trim();
+      if (state.event.items[index][key] !== normalized) {
+        state.event.items[index][key] = normalized;
+        renderActiveMenuItems();
+        renderPreview();
+      }
+    }
+
+    function updateActiveItem(idx,key,value) {
+      if(state.event.items[idx]) state.event.items[idx][key]=value;
+    }
+    function finishCanvasItemEdit(idx) {
+      const item=state.event.items[idx];
+      if (!item) return;
+      if (!String(item.name||'').trim()) state.event.items.splice(idx,1);
+      renderActiveMenuItems();
+      renderPreview();
+    }
+
+    // Helper to parse edited single-line allergen string back into item object
+    function parseItemAllergens(itemIdx, text) {
+      if(!state.event.items[itemIdx]) return;
+      let allergens = [];
+      let mayContain = [];
+      
+      if (/May Contain:/i.test(text)) {
+        let parts = text.split(/May Contain:/i);
+        let allPart = parts[0].replace(/Allergens:/gi, '').replace(/\|\s*$/, '').trim();
+        let mayPart = (parts[1]||'').trim();
+        if(allPart) allergens = allPart.split(',').map(s=>s.trim()).filter(Boolean);
+        if(mayPart) mayContain = mayPart.split(',').map(s=>s.trim()).filter(Boolean);
+      } else {
+        let allPart = text.replace(/Allergens:/gi, '').replace(/\|\s*$/, '').trim();
+        if(allPart) allergens = allPart.split(',').map(s=>s.trim()).filter(Boolean);
+      }
+      
+      state.event.items[itemIdx].allergens = allergens;
+      state.event.items[itemIdx].mayContain = mayContain;
+    }
+
+    function setEventDate(value) {
+      if(!value) return;
+      const [y,m,d]=value.split('-').map(Number);
+      if(!y||!m||!d) return;
+      state.event.date=new Intl.DateTimeFormat('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date(y,m-1,d));
+      saveStyle();renderPreview();
+    }
+    function syncDatePicker() {
+      const field=document.getElementById('cfg-date');if(!field)return;
+      const parsed=new Date(state.event.date);
+      if(!Number.isNaN(parsed.getTime())) field.value=`${parsed.getFullYear()}-${String(parsed.getMonth()+1).padStart(2,'0')}-${String(parsed.getDate()).padStart(2,'0')}`;
+    }
+    function editAllergenValues(idx,key,value) {
+      const item=state.formatMenus[state.layout]?.[idx]; if(!item)return;
+      item[key]=value.trim()==='—'?[]:value.split(',').map(x=>x.trim()).filter(Boolean);
+    }
+    // Browser-only backup/restore. This does not upload anything to GitHub.
+    function downloadWebBackup() {
+      saveStyle();
+      const keys = ['wedding_master_db', 'ragasaan_style_v3', 'ragasaan_venues_v1', 'ragasaan_initial_setup_v1'];
+      const data = {format:'ragasaan-web-backup-v1',createdAt:new Date().toISOString(),storage:{}};
+      for (const key of keys) data.storage[key] = localStorage.getItem(key);
+      const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'Ragasaan_Menu_Backup_' + new Date().toISOString().slice(0,10) + '.json';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 3000);
+    }
+    async function restoreWebBackup(event) {
+      const file = event.target.files && event.target.files[0];
+      event.target.value = '';
+      if (!file) return;
+      try {
+        const data = JSON.parse(await file.text());
+        if (data.format !== 'ragasaan-web-backup-v1' || !data.storage || typeof data.storage !== 'object') throw Error('Unrecognised backup format');
+        const allowed = ['wedding_master_db','ragasaan_style_v3','ragasaan_venues_v1','ragasaan_initial_setup_v1'];
+        for (const key of allowed) {
+          const value = data.storage[key];
+          if (value != null && typeof value !== 'string') throw Error('Invalid backup entry: '+key);
+          if (value != null && key !== 'ragasaan_initial_setup_v1') JSON.parse(value);
+        }
+        if (!confirm('Restore this backup? It will replace the current browser database, venues and styling.')) return;
+        for (const key of allowed) {
+          if (data.storage[key] == null) localStorage.removeItem(key);
+          else localStorage.setItem(key,data.storage[key]);
+        }
+        alert('Backup restored. The page will reload to apply your data.');
+        location.reload();
+      } catch (err) { alert('Restore failed: ' + err.message); }
+    }
+
+    const VENUE_DB_KEY='ragasaan_venues_v1';
+    let editingVenueId=null;
+    function loadVenues(){try{const v=JSON.parse(localStorage.getItem(VENUE_DB_KEY)||'[]');return Array.isArray(v)?v:[]}catch(_){return []}}
+    function writeVenues(venues){try{localStorage.setItem(VENUE_DB_KEY,JSON.stringify(venues));populateVenueOptions();renderVenueDB();}catch(err){alert('Could not save venue data locally: '+err.message)}}
+    function resetVenueForm(){editingVenueId=null;['name','hall','location'].forEach(k=>{const e=document.getElementById('venue-'+k);if(e)e.value='';});}
+    function saveVenue(){
+      const name=document.getElementById('venue-name').value.trim();
+      const hall=document.getElementById('venue-hall').value.trim();
+      const location=document.getElementById('venue-location').value.trim();
+      if(!name){alert('Venue Name is required.');return;}
+      if(!editingVenueId && !confirm('Add this venue to the Venue Database?'))return;
+      const rows=loadVenues(),id=editingVenueId||'venue-'+Date.now();
+      const idx=rows.findIndex(v=>v.id===id),data={id,name,hall,location};
+      if(idx>=0)rows[idx]=data;else rows.push(data);
+      writeVenues(rows);resetVenueForm();
+    }
+    function editVenue(id){const row=loadVenues().find(v=>v.id===id);if(!row)return;editingVenueId=id;['name','hall','location'].forEach(k=>document.getElementById('venue-'+k).value=row[k]||'');}
+    function deleteVenue(id){if(confirm('Delete this venue?'))writeVenues(loadVenues().filter(v=>v.id!==id));}
+    function applyVenueSelection(id){const v=loadVenues().find(x=>x.id===id);if(!v)return;state.event.venue=[v.name,v.hall,v.location].filter(Boolean).join(' • ');document.getElementById('cfg-venue').value=state.event.venue;saveStyle();renderPreview();}
+    function populateVenueOptions(){const field=document.getElementById('builder-venue-select');if(!field)return;const previous=field.value;field.replaceChildren(new Option('Select venue...',''));loadVenues().forEach(v=>field.add(new Option([v.name,v.hall].filter(Boolean).join(' – '),v.id)));field.value=previous;}
+    function renderVenueDB(){const target=document.getElementById('venue-table-body');if(!target)return;const q=(document.getElementById('venue-search')?.value||'').toLowerCase();target.replaceChildren();loadVenues().filter(v=>[v.name,v.hall,v.location].join(' ').toLowerCase().includes(q)).forEach(v=>{
+      const tr=document.createElement('tr');tr.className='border-t border-slate-700';
+      [v.name,v.hall,v.location].forEach(val=>{const td=document.createElement('td');td.className='p-2';td.textContent=val||'';tr.append(td)});
+      const actions=document.createElement('td');actions.className='p-2 whitespace-nowrap';
+      const edit=document.createElement('button');edit.textContent='Edit';edit.className='mr-3 text-gold-400';edit.onclick=()=>editVenue(v.id);
+      const select=document.createElement('button');select.textContent='Use';select.className='mr-3 text-emerald-400';select.onclick=()=>{applyVenueSelection(v.id);switchTab('builder')};
+      const del=document.createElement('button');del.textContent='Delete';del.className='text-rose-400';del.onclick=()=>deleteVenue(v.id);
+      actions.append(edit,select,del);tr.append(actions);target.append(tr);
+    });}
+    function exportVenues(){if(!window.XLSX){alert('Excel library unavailable. Connect to the internet and reload.');return;}const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(loadVenues().map(({name,hall,location})=>({'Venue Name':name,'Hall Name':hall,'Location':location}))), 'Venues');XLSX.writeFile(wb,'Venue_Database.xlsx');}
+    function importVenues(event){const file=event.target.files?.[0];if(!file)return;if(!window.XLSX){alert('Excel import library unavailable.');return;}file.arrayBuffer().then(buf=>{const wb=XLSX.read(buf,{type:'array'});const data=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);const existing=loadVenues();data.forEach((r,i)=>{const name=String(r['Venue Name']||r.Venue||r.name||'').trim();if(!name)return;const hall=String(r['Hall Name']||r.Hall||r.hall||'').trim(),location=String(r.Location||r.location||'').trim();const match=existing.findIndex(v=>v.name.toLowerCase()===name.toLowerCase()&&v.hall.toLowerCase()===hall.toLowerCase());const row={id:match>=0?existing[match].id:'venue-'+Date.now()+'-'+i,name,hall,location};if(match>=0)existing[match]=row;else existing.push(row)});writeVenues(existing);alert('Venue import complete.');}).catch(err=>alert('Venue import failed: '+err.message));event.target.value='';}
+
+    function safeFilename(text) {
+      return String(text||'Menu').replace(/[^a-z0-9_-]/gi,'_').replace(/_+/g,'_').slice(0,65);
+    }
+    function saveBlob(blob, filename) {
+      const link=document.createElement('a');
+      const url=URL.createObjectURL(blob);
+      link.href=url;link.download=filename;document.body.append(link);link.click();link.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),60000);
+    }
+    function createWordParagraphs(format) {
+      const lib=window.docx;
+      const items=state.formatMenus[format];
+      const d=state.designs[format];
+      const {Paragraph,TextRun,ImageRun,Table,TableRow,TableCell,WidthType,HeightRule,AlignmentType,BorderStyle,PageBreak}=lib;
+      const twips=mm=>Math.round(mm*56.6929134);
+      const rgb = value => (value||'#000000').replace('#','');
+      const bColor=rgb(d.borderColor);
+      const pt=px=>Math.max(7.5,Number(px)*.75);
+      const P=(text, size=d.descFontSize,opts={})=>new Paragraph({
+        alignment:opts.align||AlignmentType.CENTER,
+        spacing:{after:opts.after ?? 100,before:opts.before??0},
+        children:[new TextRun({text:String(text ?? ''),font:opts.font||'Calibri',size:Math.round(pt(size)*2),
+          bold:!!opts.bold,color:opts.color||rgb(d.textColor)})],
+        pageBreakBefore:!!opts.newPage
+      });
+      const image=(logo,width)=>{
+        if(!logo || !logo.startsWith('data:image/')) return [];
+        try {
+          const parts=logo.split(',');const binary=atob(parts[1]);
+          const bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));
+          const mime=parts[0].match(/data:image\/(png|jpeg|jpg|gif)/i)?.[1]||'png';
+          return [new Paragraph({alignment:AlignmentType.CENTER,children:[new ImageRun({
+            data:bytes,type:mime==='jpg'?'jpeg':mime,transformation:{width:Math.min(width,250),height:Math.round(Math.min(width,250)*.45)}
+          })],spacing:{after:70}})];
+        } catch(err) { return []; }
+      };
+      const logoImage=()=>image(d.logoUrl,d.logoWidth);
+      const brideImage=()=>d.showCoupleLogo?image(d.coupleLogoUrl,d.coupleLogoWidth):[];
+      const itemContents=(item)=>[
+        P(item.name,d.dishNameFontSize,{bold:true,after:65}),
+        ...(d.showDescription===true && item.desc?[P(item.desc,d.descFontSize,{after:65})]:[]),
+        P('Allergens: '+((item.allergens||[]).join(', ')||'None declared'),d.allergenFontSize,{color:rgb(d.accentColor),after:30}),
+        ...((item.mayContain||[]).length?[P('May Contain: '+item.mayContain.join(', '),d.allergenFontSize,{after:85})]:[])
+      ];
+      const headings=()=>[P(state.event.title,d.titleFontSize,{bold:true,color:rgb(d.accentColor),after:100}),
+        ...brideImage(),P(state.event.venue,d.descFontSize),P(state.event.date,d.descFontSize,{after:250})];
+      const wordBorder={style:BorderStyle.DOUBLE,size:4,color:bColor};
+      const labelCell=(item,width,height)=>new TableCell({
+        width:{size:twips(width),type:WidthType.DXA},
+        borders:{top:wordBorder,bottom:wordBorder,left:wordBorder,right:wordBorder},
+        children:item?[...((format==='a6-grid')?brideImage():logoImage()),...itemContents(item),...(format==='a6-grid'?logoImage():[])]:[P('',10)]
+      });
+      const spacerCell=()=>new TableCell({width:{size:twips(format==='a8-grid'?20:5),type:WidthType.DXA},children:[P(' ',10)]});
+      let pages=[];
+      if(format==='a4') {
+        pages=[[...headings(),...items.flatMap(item=>itemContents(item)),...logoImage()]];
+      } else if(format==='a4-live') {
+        pages=(items.length?items:[null]).map(item=>[
+          ...headings(),P(d.liveTitle,d.titleFontSize,{bold:true,color:rgb(d.accentColor),after:180}),
+          ...(item?itemContents(item):[]),...logoImage()
+        ]);
+      } else if(format==='half-a4') {
+        // Editable two-column Word table with back-page allergen notice.
+        const left=[...headings(),...logoImage()];
+        const right=items.length?items.flatMap(item=>itemContents(item)):[P('No menu items selected',10)];
+        const twoCols=new Table({width:{size:twips(175),type:WidthType.DXA},
+          rows:[new TableRow({children:[new TableCell({width:{size:twips(85),type:WidthType.DXA},children:left}),
+            new TableCell({width:{size:twips(85),type:WidthType.DXA},children:right})]})]});
+        pages=[[twoCols],[P('ALLERGENS NOTICE',d.titleFontSize,{bold:true}),
+          P('Please speak to the event manager regarding allergen requirements and cross-contact.',d.descFontSize),
+          P('Gluten, Milk, Eggs, Nuts, Peanuts, Fish, Crustaceans, Molluscs, Soya, Mustard, Sesame, Celery, Lupin, Sulphites',d.allergenFontSize),...logoImage()]];
+      } else if(format==='a6-grid') {
+        pages=(items.length?items:[null]).map(item=>[
+          new Table({rows:[new TableRow({height:{value:twips(148.5),rule:HeightRule.ATLEAST},
+            children:[labelCell(item,105,148.5)]})]})
+        ]);
+      } else {
+        const col= format==='a8-grid'?74:95;
+        const height=format==='a8-grid'?52.5:67;
+        const gap=format==='a8-grid'?20:5;
+        pages=[];
+        const perPage=8;
+        for(let start=0;start<Math.max(items.length,1);start+=perPage) {
+          const content=[];
+          for(let row=0;row<4;row++) {
+            const a=items[start+row*2],b=items[start+row*2+1];
+            content.push(new Table({width:{size:twips(col*2+gap),type:WidthType.DXA},
+              rows:[new TableRow({height:{value:twips(height),rule:HeightRule.ATLEAST},children:[
+                labelCell(a,col,height),spacerCell(),labelCell(b,col,height)
+              ]})]}));
+            if(row<3) content.push(new Paragraph({spacing:{after:twips(gap)},children:[]}));
+          }
+          pages.push(content);
+        }
+      }
+      // Each page is a separate Word section with physical A4 paper dimensions.
+      const sections=pages.map((children,index)=>({
+        properties:{page:{size:{width:twips(210),height:twips(297)},margin:{
+          top:twips(format==='a8-grid'?13.5:format==='canape-grid'?7:format==='a6-grid'?45:20),
+          bottom:twips(format==='a8-grid'?13.5:format==='canape-grid'?7:format==='a6-grid'?45:20),
+          left:twips(format==='a8-grid'?21:format==='canape-grid'?7.5:format==='a6-grid'?52.5:17.5),
+          right:twips(format==='a8-grid'?21:format==='canape-grid'?7.5:format==='a6-grid'?52.5:17.5)
+        }},type:index===0?'nextPage':'nextPage'},children
+      }));
+      return sections;
+    }
+    async function exportFormatWord(format) {
+      if (!MENU_FORMATS.includes(format)) return;
+      if (!window.docx?.Document || !window.docx?.Packer || typeof window.html2canvas !== 'function') {
+        alert('Preview-matching Word export needs the DOCX and canvas libraries. Please connect to the internet, reload, and retry. No mismatched Word file was generated.');
+        return;
+      }
+      const filename=`${safeFilename(state.event.title)}_${safeFilename(MENU_NAMES[format])}`;
+      const previous=state.layout;
+      const wrapper=document.getElementById('print-canvas-wrapper');
+      const oldTransform=wrapper.style.transform;
+      try {
+        if (format!==previous) setLayout(format);
+        wrapper.style.transform='none';
+        await document.fonts?.ready;
+        const pages=[...document.querySelectorAll('#paper-render-target > .print-sheet')];
+        const sections=[];
+        for (const source of pages) {
+          // Render source in millimetre-accurate canvas coordinates, independent of preview zoom.
+          const isLandscape=format==='a8-grid';
+          const pw=isLandscape?297:210, ph=isLandscape?210:297;
+          const canvas=await html2canvas(source,{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false,
+            width:Math.round(pw*96/25.4),height:Math.round(ph*96/25.4),windowWidth:1400});
+          const data=canvas.toDataURL('image/png');
+          const bytes=Uint8Array.from(atob(data.split(',')[1]),c=>c.charCodeAt(0));
+          // 96 dpi bitmap displayed at a slightly inset A4 size to avoid Word's invisible trailing page.
+          const image=new window.docx.ImageRun({data:bytes,type:'png',transformation:{width:isLandscape?1087:769,height:isLandscape?769:1087}});
+          sections.push({properties:{page:{size:{width:isLandscape?16838:11906,height:isLandscape?11906:16838,
+            orientation:isLandscape?'landscape':'portrait'},margin:{top:0,bottom:0,left:0,right:0}}},
+            children:[new window.docx.Paragraph({spacing:{before:0,after:0,line:240},children:[image]})]});
+        }
+        if (!sections.length) throw Error('No printable pages were generated');
+        const doc=new window.docx.Document({sections});
+        saveBlob(await window.docx.Packer.toBlob(doc),filename+'.docx');
+      } catch(err) {
+        console.error('Word export',err);
+        alert('Word could not preserve this layout, so no fallback file was created. Use Print → Save as PDF instead.');
+      } finally {if(format!==previous) setLayout(previous); wrapper.style.transform=oldTransform;}
+    }
+
+    function triggerPrint() {
+      // The old application referenced this function without defining it.
+      // Remove preview zoom for the print media and invoke the native print dialog.
+      renderPreview();
+      window.requestAnimationFrame(() => window.requestAnimationFrame(() => window.print()));
+    }
+
+    function downloadPDF() {
+      // Native print pipeline preserves actual A4 layout and avoids html2canvas freezing.
+      // Select "Save as PDF" as the destination in your browser print dialog.
+      window.print();
+    }
+
+  </script>
+</body>
+</html>
