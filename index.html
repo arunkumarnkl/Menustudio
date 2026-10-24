@@ -1399,6 +1399,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     </span>
   </div>
 
+  <div id="github-db-status" role="status" class="no-print bg-slate-800 text-slate-200 px-4 py-1 text-xs">Loading GitHub allergen database...</div>
+
   <!-- Main App Workspace -->
   <div class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
 
@@ -1950,7 +1952,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       }
     };
 
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       setupFormatState();
 
       renderMasterDB();
@@ -1960,7 +1962,9 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       renderContextualControls();
       renderPreview();
       renderVenueDB(); populateVenueOptions(); syncDatePicker();
-      if(!localStorage.getItem('ragasaan_initial_setup_v1')) {showStartupLogos();document.getElementById('initial-db-prompt')?.classList.remove('hidden');}
+      // Start fetching the GitHub master as soon as the UI exists. No Excel upload prompt.
+      await loadGitHubDatabases();
+      if(!localStorage.getItem('ragasaan_initial_setup_v1')) {showStartupLogos();}
     });
 
     function switchTab(tabId) {
@@ -2373,6 +2377,53 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       populateBuilderDropdown();
       renderPreview();
       if (state.undoStack.length === 0) document.getElementById('undo-btn').disabled = true;
+    }
+
+    // Static GitHub Pages hosting: this file is public and read-only.
+    // Edits in the UI change browser-local records only, and are replaced on the next visit.
+    async function loadGitHubDatabases() {
+      const status = document.getElementById('github-db-status');
+      const notify = msg => { if(status) status.textContent=msg; };
+      try {
+        const response = await fetch('./database/allergens.json', {cache:'no-store'});
+        if(!response.ok) throw Error('HTTP '+response.status);
+        const rows = await response.json();
+        if(!Array.isArray(rows) || !rows.length) throw Error('No allergen records found');
+        const valid = rows.every(r => r && typeof r.name==='string' && Array.isArray(r.allergens) && Array.isArray(r.mayContain));
+        if(!valid) throw Error('Invalid allergen database format');
+        state.masterDB = rows;
+        localStorage.setItem('wedding_master_db', JSON.stringify(rows));
+        renderMasterDB(); updateCategoryFilters(); populateBuilderDropdown();
+        notify('GitHub master loaded: '+rows.length+' dishes. Local master edits are temporary until the repository file is updated.');
+        // Venue file is a one-time initial seed, preserving locally edited venues afterwards.
+        if(!localStorage.getItem('ragasaan_github_venues_seeded_v1')) {
+          try {
+            const vr = await fetch('./database/venues.json', {cache:'no-store'});
+            if(vr.ok) {
+              const locations = await vr.json();
+              if(Array.isArray(locations)) {
+                const existing = loadVenues();
+                const known = new Set(existing.map(v=>(v.name+'|'+v.hall).toLowerCase()));
+                for(const v of locations) {
+                  if(!v || !v.name)continue;
+                  const key=(v.name+'|'+(v.hall||'')).toLowerCase();
+                  if(!known.has(key)){existing.push(v);known.add(key);}
+                }
+                writeVenues(existing);
+                localStorage.setItem('ragasaan_github_venues_seeded_v1','1');
+              }
+            }
+          } catch(error) {console.warn('Venue seeding unavailable',error);}
+        }
+      } catch(error) {
+        // The previous successfully fetched database is retained in localStorage.
+        notify('WARNING: Cannot refresh allergen database from GitHub ('+error.message+'). Showing locally cached records. Verify allergen information before use.');
+        console.warn('GitHub allergen load failed',error);
+        if(!localStorage.getItem('wedding_master_db')) {
+          state.masterDB=[];
+          renderMasterDB();updateCategoryFilters();populateBuilderDropdown();
+        }
+      }
     }
 
     function saveMasterDBToStorage() { try { localStorage.setItem('wedding_master_db', JSON.stringify(state.masterDB)); } catch(_) {} }
