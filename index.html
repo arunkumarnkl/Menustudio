@@ -1341,6 +1341,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       #paper-render-target > .print-sheet:last-child { break-after:auto;page-break-after:auto; }
     }
   </style>
+<script src="./github-sync-config.js"></script>
 </head>
 <body class="h-full flex flex-col font-sans antialiased text-slate-100 bg-slate-950 overflow-hidden">
 
@@ -1648,12 +1649,13 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <h2 class="text-lg font-bold text-white flex items-center gap-2">
             <i class="fa-solid fa-database text-gold-400"></i> Master Dish & Allergen Registry
           </h2>
-          <p class="text-xs text-slate-400">Read-only by default. Searching and viewing require no password; changes and Excel export require authentication. Excel/CSV import is unrestricted.</p>
+          <p class="text-xs text-slate-400">Read-only by default. Searching and viewing require no password; local edits require browser authentication; publishing requires secure GitHub admin authentication. Excel/CSV import is local until published.</p>
         </div>
         <div class="flex items-center gap-2">
           <button onclick="requestMasterAuthorization('add', () => openDishModal())" class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition flex items-center gap-1.5 shadow-lg">
             <i class="fa-solid fa-plus"></i> Add New Dish
           </button>
+          <button id="github-save-button" onclick="publishMasterToGitHub()" class="px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-semibold" title="Publish local master database changes to GitHub">Save to GitHub</button>
           <button onclick="switchTab('builder')" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition">
             <i class="fa-solid fa-arrow-left"></i> Back to Builder
           </button>
@@ -1963,7 +1965,9 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       renderPreview();
       renderVenueDB(); populateVenueOptions(); syncDatePicker();
       // Start fetching the GitHub master as soon as the UI exists. No Excel upload prompt.
-      await loadGitHubDatabases();
+      await Promise.all([loadGitHubDatabases(), loadGitHubCompanyLogo()]);
+      // The first-run dialog remains available for the optional Bride/Groom logo.
+      // Do not require the company logo upload once the GitHub logo has loaded.
       if(!localStorage.getItem('ragasaan_initial_setup_v1')) {showStartupLogos();}
     });
 
@@ -2122,6 +2126,40 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       state.design=state.designs[state.layout];
       syncFormatLabels();
     }
+    // GitHub Pages serves a centrally managed public company logo.
+    // Latest published version is loaded on each website visit, like allergens.json.
+    // Manual logo upload still works locally until the next page reload.
+    async function loadGitHubCompanyLogo() {
+      const logoPath = './assets/company-logo.png';
+      const versioned = logoPath + '?v=' + Date.now();
+      try {
+        const response = await fetch(versioned, {cache:'no-store'});
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const type = response.headers.get('content-type') || '';
+        if (!type.startsWith('image/')) throw new Error('File is not an image');
+        const blob = await response.blob();
+        if (blob.size < 1) throw new Error('Logo file is empty');
+        // A same-origin PNG data URL also works with the existing print/export pipeline.
+        const logo = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = () => reject(reader.error || Error('Cannot read company logo'));
+          reader.readAsDataURL(blob);
+        });
+        state.sharedCompanyLogo = logo;
+        applySharedLogos();
+        renderPreview();
+        // Avoid persisting this downloaded logo as a giant settings payload.
+        // It will be downloaded again on the next visit.
+        console.info('Company logo loaded from GitHub: ' + logoPath);
+        return true;
+      } catch (error) {
+        console.warn('GitHub company logo unavailable; using existing local/fallback logo:', error.message);
+        // Existing locally selected logo or built-in Ragasaan SVG continues to work.
+        return false;
+      }
+    }
+
     function applySharedLogos() {
       MENU_FORMATS.forEach(fmt=>{state.designs[fmt].logoUrl=state.sharedCompanyLogo||'';state.designs[fmt].coupleLogoUrl=state.sharedCoupleLogo||'';});
     }
@@ -2392,9 +2430,18 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         const valid = rows.every(r => r && typeof r.name==='string' && Array.isArray(r.allergens) && Array.isArray(r.mayContain));
         if(!valid) throw Error('Invalid allergen database format');
         state.masterDB = rows;
+        // Obtain the current Git blob SHA from the protected Worker to prevent stale overwrites.
+        githubMasterRevision = null;
+        const syncEndpoint = (window.RAGASAAN_SYNC_ENDPOINT || '').replace(/\/$/, '');
+        if (syncEndpoint && /^https:\/\//.test(syncEndpoint)) {
+          try {
+            const versionResponse = await fetch(syncEndpoint+'/version', {cache:'no-store'});
+            if (versionResponse.ok) githubMasterRevision = (await versionResponse.json()).sha || null;
+          } catch(e) { console.warn('Publishing revision unavailable',e); }
+        }
         localStorage.setItem('wedding_master_db', JSON.stringify(rows));
         renderMasterDB(); updateCategoryFilters(); populateBuilderDropdown();
-        notify('GitHub master loaded: '+rows.length+' dishes. Local master edits are temporary until the repository file is updated.');
+        notify('GitHub master loaded: '+rows.length+' dishes. Use Admin Save to GitHub to publish master changes.');
         // Venue file is a one-time initial seed, preserving locally edited venues afterwards.
         if(!localStorage.getItem('ragasaan_github_venues_seeded_v1')) {
           try {
@@ -2424,6 +2471,33 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           renderMasterDB();updateCategoryFilters();populateBuilderDropdown();
         }
       }
+    }
+
+    // Configure your Cloudflare Worker URL in github-sync-config.js (no secrets in public files).
+    let githubMasterRevision = null;
+    async function publishMasterToGitHub() {
+      const endpoint = (window.RAGASAAN_SYNC_ENDPOINT || '').replace(/\/$/, '');
+      if (!endpoint || !/^https:\/\//.test(endpoint)) {
+        alert('Configure the HTTPS Cloudflare Worker URL in github-sync-config.js first. See GITHUB_SYNC_SETUP.md.'); return;
+      }
+      if (!githubMasterRevision) { alert('Could not verify the GitHub database revision. Refresh and try again.'); return; }
+      const password = prompt('Enter the GitHub publishing admin password (not your local browser passphrase):');
+      if (password === null) return;
+      if (!password) { alert('Admin password required.'); return; }
+      if (!confirm('Publish all '+state.masterDB.length+' current master records to GitHub? This replaces the repository master database.')) return;
+      const button = document.getElementById('github-save-button');
+      button.disabled = true; button.textContent = 'Publishing...';
+      try {
+        const res = await fetch(endpoint + '/publish', {
+          method:'POST', headers:{'Content-Type':'application/json','X-Admin-Password':password},
+          body:JSON.stringify({records:state.masterDB,expectedSha:githubMasterRevision})
+        });
+        const result = await res.json().catch(()=>({error:'Unexpected server response'}));
+        if (!res.ok) throw Error(result.error || 'HTTP '+res.status);
+        githubMasterRevision = result.sha;
+        alert('Published '+result.count+' dishes to GitHub. Other devices will receive the changes on their next visit.');
+      } catch(error) { alert('GitHub publish failed: '+error.message+'\nLocal edits are still in this browser.'); }
+      finally {button.disabled=false;button.textContent='Save to GitHub';}
     }
 
     function saveMasterDBToStorage() { try { localStorage.setItem('wedding_master_db', JSON.stringify(state.masterDB)); } catch(_) {} }
