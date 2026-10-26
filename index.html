@@ -1966,9 +1966,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       renderVenueDB(); populateVenueOptions(); syncDatePicker();
       // Start fetching the GitHub master as soon as the UI exists. No Excel upload prompt.
       await Promise.all([loadGitHubDatabases(), loadGitHubCompanyLogo()]);
-      // The first-run dialog remains available for the optional Bride/Groom logo.
-      // Do not require the company logo upload once the GitHub logo has loaded.
-      if(!localStorage.getItem('ragasaan_initial_setup_v1')) {showStartupLogos();}
+      // Company logo is loaded automatically from GitHub. No startup upload dialog.
+      // Optional logo changes remain available in the application's controls.
     });
 
     function switchTab(tabId) {
