@@ -1,22 +1,30 @@
+# Secrets and private runtime credentials
+.streamlit/secrets.toml
+**/secrets.toml
+*.pem
+*.p12
+*.key
+.env
+.env.*
+
+# Do not commit arbitrary JSON credentials; allow only app database JSON.
+*.json
+!database/
+!database/*.json
+
+# Temporary / generated files
 .venv/
 venv/
 __pycache__/
+.pytest_cache/
 *.pyc
+*.xlsx
+*.xls
+*.csv
 *.sqlite
-*.sqlite3
 *.db
-*.db-journal
-*.db-wal
-*.db-shm
-.env
-.env.*
-!.env.example
-secrets.*
-*.pem
-*.key
-*.p12
-*.pfx
+*.zip
+*.log
 backups/
-*_Backup_*.json
-.DS_Store
-Thumbs.db
+backup/
+private/

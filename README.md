@@ -1,73 +1,29 @@
-# Allergen Database & Menu Generator — Web Edition
+# Allergen Database & Menu Generator — GitHub AutoDB Edition
 
-A GitHub Pages–deployable version of the existing HTML/JavaScript menu generator.
-No Python, PySide6, Streamlit, Node build step, or SQLite server is required.
+**Master allergen database:** Automatically fetched from `database/allergens.json` whenever the website loads. Local master edits are temporary and overwritten at next successful site load. A clear warning is displayed if GitHub cannot be reached; previously cached data is used when available.
 
-## Features retained
-- Existing HTML interface, menu formats, live previews, editing and print controls
-- Master dish/allergen registry, venue registry, manual menu items
-- Excel/CSV import and export (requires the third-party XLSX CDN to load)
-- Design settings, logos, colour themes, border and image controls
-- Local browser storage, plus **Backup JSON / Restore JSON** controls
+**Venue database:** `database/venues.json` seeds browser-local venues on first use. Later venue edits are kept locally.
 
-## Deploy to GitHub Pages
-1. Create a GitHub repository, ideally **private** for source-code management.
-2. Upload the **contents of this folder**, including `index.html`, `.nojekyll`, and `.github/workflows/deploy-pages.yml` (not the ZIP itself).
-3. Commit to the `main` branch.
-4. In **Settings → Pages**, set **Source: GitHub Actions**.
-5. Open **Actions** and wait for the `Deploy Menu Generator to GitHub Pages` workflow to finish.
-6. Open the published URL shown in Settings → Pages, usually
-   `https://YOUR-USERNAME.github.io/YOUR-REPOSITORY/`.
+## Company logo hosted on GitHub
+1. In your repository, create the `assets` folder (e.g. with `assets/README.md` via **Add file → Create new file**).
+2. Upload your **actual company logo** named exactly `company-logo.png` into `assets`.
+3. Replace `index.html` with the new version in this package, and commit.
+4. On each subsequent visit, the site automatically fetches `assets/company-logo.png` and uses it on all menu formats that show the company logo. You can still upload a temporary replacement from the app; refreshing the page re-applies the GitHub logo.
+5. To permanently change the company logo, replace the PNG in GitHub and commit the change.
 
-The published Pages URL is normally publicly accessible, even if repository visibility is restricted (depending on GitHub plan/settings). Do not assume this is a private employee portal.
+**Note:** The real logo image is not in this download because it has not been supplied. Until it is uploaded, the existing built-in logo or browser-local logo is used.
 
-## Local testing
-Run `python -m http.server 8000` in this folder, then visit
-`http://localhost:8000`. No extra Python packages are needed.
-You can also open `index.html` directly, but HTTP testing is preferable.
+## Update the live site
+1. Extract this ZIP. In the GitHub repository root, replace `index.html`.
+2. Create a `database` folder. Upload `allergens.json` and `venues.json` into it.
+3. Commit all three files to `main`. The existing GitHub Pages publishing configuration will deploy them.
+4. Reload the Pages website. You should see the status bar displaying the dish count.
 
-## Storage and data migration
-GitHub Pages hosts static files only. Dish records, venue records, design settings and
-uploaded images remain in the **localStorage of the browser and origin**.
-They are **not** synced to GitHub, between devices, or between browsers.
+## Updating the central Master Database
+Replace `database/allergens.json` in GitHub and commit. On the next visit the site fetches the new version. The browser UI cannot permanently edit GitHub files. A browser-local passphrase is not real authorisation; GitHub write permissions control permanent updates. This is a **public static** database; do not publish confidential information.
 
-Use the top **Backup JSON / Restore JSON** controls to migrate between deployments
-of this Web Edition. To move from the old desktop HTML, export the Master Database
-and Venue Database using their existing Excel export options, then import them
-in the web version. The old app's local styling and logo state does not automatically
-transfer between origins; you may need to re-upload logos and adjust styling.
+## Important allergen quality note
+This JSON was generated from `master allergen 2027.xlsx`. Fields with irregular text and `tbc` were left as provided rather than guessing allergen values. **Verify each dish's allergens against an authoritative kitchen recipe/allergen matrix before service**. No automatic conversion of ambiguous entries should be relied upon for food safety.
 
-The JSON backup may contain names, event details, and embedded logo/image data.
-Keep backup files private. Browser storage can be cleared by the user or browser;
-take regular backups. Large images can exceed browser storage quotas.
-
-## Security — important
-- **No real user authentication is provided by GitHub Pages.**
-- The original hard-coded HTML password was removed. On the first protected
-  edit/export action, users configure a browser-local passphrase. Its hash is
-  stored locally; this is a **UI safeguard only**, not access control.
-- Anyone who can open the published URL can use their own copy of the app,
-  and can inspect or modify its JavaScript. They cannot see another user's
-  browser-local records merely by visiting the site.
-- Never commit real event data, private venue records, credentials, API keys,
-  or database backups to the repository.
-- For central, multi-user storage and real roles/login, a separate authenticated
-  backend and managed database are required (e.g., Supabase with RLS or a
-  hosted Python API + PostgreSQL). GitHub Pages alone cannot provide these.
-
-## Online dependencies
-Some icon fonts, Google Fonts, Excel import/export, and PDF libraries load
-from public CDNs. The page requires internet access for those libraries.
-Check browser print/PDF layouts on your target printer before production use.
-
-## Not part of this deployment
-The PySide6 desktop code, SQLite database, and desktop bridge are **not** deployed.
-They are not needed for the GitHub Pages edition.
-
-## Troubleshooting
-- Blank page: check browser developer console and reload with internet access.
-- Excel controls unavailable: ensure CDN scripts are reachable.
-- Old data missing: browser storage is per origin; import Excel or restore JSON.
-- Pages 404: verify `index.html` is at repo root and Pages uses GitHub Actions.
-- Styles look wrong: ensure `index.html` uploaded completely and no content was
-  copied into GitHub's Markdown editor.
+## Storage/printing
+Browser-local design settings, menu choices, logos and venues remain local. JSON backup/restore is available. Some HTML/CDN dependencies require internet access. Test browser printing before service.
