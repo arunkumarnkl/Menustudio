@@ -6,10 +6,11 @@
 'use strict';
 const API='https://ragasaan-security-api.arunkumarnkl.workers.dev';
 const FMT=['a4','a4-live','half-a4','a8-grid','foldtags-grid','a6-grid','canape-grid'];
+const CLIENT_PRINT_FORMATS=['a4','a6-grid','a4-live','half-a4'];
 const FN={'a4':'Buffet A4','a4-live':'Live Station','half-a4':'Table Menu Card','a8-grid':'A8 Tags','foldtags-grid':'FoldTags','a6-grid':'A6 Tags','canape-grid':'Canapé Labels'};
 const PRESETS=[{"id":"executive-ivory","name":"Executive Ivory","kind":"professional","titleFont":"font-serif","bodyFont":"font-sans","textColor":"#24272d","accentColor":"#8b7551","borderColor":"#b5a78b","borderStyle":"solid","borderWidth":0.7,"frameMotif":"fine-line","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10,"weightGroup":"bold"},{"id":"midnight-premier","name":"Midnight Premier","kind":"professional","titleFont":"font-montserrat","bodyFont":"font-sans","textColor":"#18243a","accentColor":"#2d5172","borderColor":"#456982","borderStyle":"double","borderWidth":1.1,"frameMotif":"art-deco","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10,"weightGroup":"bold"},{"id":"modern-minimal","name":"Modern Minimal","kind":"professional","titleFont":"font-sans","bodyFont":"font-sans","textColor":"#111827","accentColor":"#475569","borderColor":"#64748b","borderStyle":"solid","borderWidth":0.3,"frameMotif":"none","titleFontSize":19,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10,"weightGroup":"bold"},{"id":"heritage-burgundy","name":"Heritage Burgundy","kind":"professional","titleFont":"font-serif","bodyFont":"font-cormorant","textColor":"#38252b","accentColor":"#70283c","borderColor":"#a47483","borderStyle":"double","borderWidth":1,"frameMotif":"corner-flourish","titleFontSize":22,"dishNameFontSize":14,"descFontSize":11,"allergenFontSize":10,"weightGroup":"bold"},{"id":"botanical-emerald","name":"Botanical Emerald","kind":"professional","titleFont":"font-cormorant","bodyFont":"font-sans","textColor":"#20392e","accentColor":"#33755e","borderColor":"#7d9e8d","borderStyle":"solid","borderWidth":0.8,"frameMotif":"botanical","titleFontSize":21,"dishNameFontSize":14,"descFontSize":11,"allergenFontSize":10,"weightGroup":"bold"},{"id":"slate-gold","name":"Slate & Gold","kind":"professional","titleFont":"font-montserrat","bodyFont":"font-sans","textColor":"#202835","accentColor":"#987637","borderColor":"#aa904f","borderStyle":"double","borderWidth":1.2,"frameMotif":"art-deco","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10,"weightGroup":"bold"},{"id":"romantic-blush","name":"Romantic Blush","kind":"wedding","titleFont":"font-script","bodyFont":"font-cormorant","textColor":"#573d47","accentColor":"#b67789","borderColor":"#cfa5b0","borderStyle":"double","borderWidth":0.9,"frameMotif":"corner-flourish","titleFontSize":25,"dishNameFontSize":14,"descFontSize":12,"allergenFontSize":10,"weightGroup":"mild"},{"id":"royal-wedding","name":"Royal Wedding","kind":"wedding","titleFont":"font-serif","bodyFont":"font-cormorant","textColor":"#2c2532","accentColor":"#a07b35","borderColor":"#beaa76","borderStyle":"double","borderWidth":1.3,"frameMotif":"art-deco","titleFontSize":23,"dishNameFontSize":14,"descFontSize":12,"allergenFontSize":10,"weightGroup":"mild"},{"id":"garden-ceremony","name":"Garden Ceremony","kind":"wedding","titleFont":"font-script","bodyFont":"font-cormorant","textColor":"#2e4736","accentColor":"#698868","borderColor":"#92aa8e","borderStyle":"solid","borderWidth":0.9,"frameMotif":"botanical","titleFontSize":25,"dishNameFontSize":14,"descFontSize":12,"allergenFontSize":10,"weightGroup":"mild"},{"id":"monarch-navy","name":"Monarch Navy","kind":"professional","weightGroup":"bold","titleFont":"font-montserrat","bodyFont":"font-serif","textColor":"#f1f5f9","accentColor":"#0f3563","borderColor":"#284b73","borderStyle":"double","borderWidth":1,"frameMotif":"art-deco","titleFontSize":24,"dishNameFontSize":14,"descFontSize":11,"allergenFontSize":10},{"id":"crimson-gala","name":"Crimson Gala","kind":"wedding","weightGroup":"bold","titleFont":"font-serif","bodyFont":"font-cormorant","textColor":"#562a32","accentColor":"#9d283b","borderColor":"#b95b69","borderStyle":"double","borderWidth":1,"frameMotif":"corner-flourish","titleFontSize":24,"dishNameFontSize":14,"descFontSize":11,"allergenFontSize":10},{"id":"copper-regency","name":"Copper Regency","kind":"wedding","weightGroup":"bold","titleFont":"font-serif","bodyFont":"font-cormorant","textColor":"#4b3027","accentColor":"#a24d30","borderColor":"#b88f78","borderStyle":"double","borderWidth":1,"frameMotif":"corner-flourish","titleFontSize":24,"dishNameFontSize":14,"descFontSize":11,"allergenFontSize":10},{"id":"golden-celebration","name":"Golden Celebration","kind":"wedding","weightGroup":"bold","titleFont":"font-script","bodyFont":"font-cormorant","textColor":"#533c1d","accentColor":"#a57a19","borderColor":"#c9af63","borderStyle":"double","borderWidth":1,"frameMotif":"art-deco","titleFontSize":24,"dishNameFontSize":14,"descFontSize":11,"allergenFontSize":10},{"id":"linen-serif","name":"Linen Serif","kind":"professional","weightGroup":"mild","titleFont":"font-serif","bodyFont":"font-sans","textColor":"#333335","accentColor":"#8a847f","borderColor":"#cabfb1","borderStyle":"solid","borderWidth":0.6,"frameMotif":"fine-line","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10},{"id":"sage-elegance","name":"Sage Elegance","kind":"wedding","weightGroup":"mild","titleFont":"font-cormorant","bodyFont":"font-cormorant","textColor":"#364c40","accentColor":"#78927e","borderColor":"#a9bbaa","borderStyle":"solid","borderWidth":0.6,"frameMotif":"botanical","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10},{"id":"powder-blue","name":"Powder Blue","kind":"professional","weightGroup":"mild","titleFont":"font-sans","bodyFont":"font-sans","textColor":"#304156","accentColor":"#718ea4","borderColor":"#afc1d0","borderStyle":"solid","borderWidth":0.6,"frameMotif":"fine-line","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10},{"id":"blush-linen","name":"Blush Linen","kind":"wedding","weightGroup":"mild","titleFont":"font-script","bodyFont":"font-cormorant","textColor":"#62464d","accentColor":"#bf9ca5","borderColor":"#d2b9be","borderStyle":"solid","borderWidth":0.6,"frameMotif":"corner-flourish","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10},{"id":"soft-pearl","name":"Soft Pearl","kind":"professional","weightGroup":"mild","titleFont":"font-cormorant","bodyFont":"font-sans","textColor":"#4c5158","accentColor":"#87929b","borderColor":"#c8ced3","borderStyle":"solid","borderWidth":0.6,"frameMotif":"fine-line","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10},{"id":"almond-garden","name":"Almond Garden","kind":"wedding","weightGroup":"mild","titleFont":"font-cormorant","bodyFont":"font-sans","textColor":"#514e3e","accentColor":"#a59d75","borderColor":"#cbc5a5","borderStyle":"double","borderWidth":0.6,"frameMotif":"botanical","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10},{"id":"lavender-mist","name":"Lavender Mist","kind":"wedding","weightGroup":"mild","titleFont":"font-serif","bodyFont":"font-cormorant","textColor":"#534f65","accentColor":"#8b86a8","borderColor":"#bdb8d0","borderStyle":"solid","borderWidth":0.6,"frameMotif":"corner-flourish","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10}];
 const SAFE=['titleFont','bodyFont','textColor','accentColor','bgColor','borderColor','borderStyle','borderWidth','borderOutsetCm','titleFontSize','dishNameFontSize','descFontSize','allergenFontSize','frameMotif'];
-const s={token:null, user:null,cloudEvent:null, events:[], planners:[], activeTheme:'', clientToken:null, clientEvent:null, clientDesign:{designs:{}},clientFmt:'half-a4',themes:[...PRESETS], pendingChanges:false};
+const s={token:null, user:null,cloudEvent:null, events:[], planners:[], activeTheme:'', clientToken:null, clientEvent:null, clientDesign:{designs:{}},clientFmt:'half-a4',clientAllowed:[...CLIENT_PRINT_FORMATS],themes:[...PRESETS], pendingChanges:false};
 const $=id=>document.getElementById(id);
 const e=x=>String(x??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const escAttr=e;
@@ -26,6 +27,89 @@ async function call(path,method='GET',body,auth=true){
     throw Error(json.error||`HTTP ${res.status}`);}
   return json;
 }
+// Guest feedback QR is an Admin-managed global print asset; not part of an event snapshot.
+async function fetchFeedbackQR(){
+  try{
+    const result=await call('/public/feedback-qr','GET',undefined,false);
+    window.ragaFeedbackQrData=typeof result.image==='string'&&/^data:image\/(png|jpeg|webp);base64,/.test(result.image)?result.image:'';
+    const img=$('rs-feedback-image');if(img){img.hidden=!window.ragaFeedbackQrData;if(window.ragaFeedbackQrData)img.src=window.ragaFeedbackQrData;else img.removeAttribute('src');}
+    const status=$('rs-feedback-status');if(status)status.textContent=window.ragaFeedbackQrData?'Official feedback QR published.':'No feedback QR is published.';
+    if(typeof window.renderPreview==='function' && !document.body.classList.contains('ragasaan-locked'))window.renderPreview();
+    if(s.clientEvent)renderClientPreview();
+  }catch(err){const el=$('rs-feedback-status');if(el)el.textContent='Could not load QR: '+err.message;}
+}
+async function publishFeedbackQR(remove=false){
+  if(s.user?.role!=='admin')return;
+  const status=$('rs-feedback-status');
+  let image='';
+  if(!remove){
+    const f=$('rs-feedback-upload')?.files?.[0];
+    if(!f){if(status)status.textContent='Select a QR image before publishing.';return;}
+    if(!['image/png','image/jpeg','image/webp'].includes(f.type)||f.size>150000){if(status)status.textContent='Use PNG/JPG/WebP up to 150 KB.';return;}
+    image=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result||''));reader.onerror=()=>reject(Error('Could not read image'));reader.readAsDataURL(f);});
+  }else if(!confirm('Remove the published feedback QR from all menu cards?'))return;
+  try{
+    if(status)status.textContent=remove?'Removing published QR…':'Publishing QR…';
+    await call('/admin/feedback-qr','PUT',{image});
+    if($('rs-feedback-upload'))$('rs-feedback-upload').value='';
+    await fetchFeedbackQR();
+    if(status)status.textContent=remove?'Official QR removed from all menu cards.':'Official QR published for all menu cards.';
+  }catch(err){if(status)status.textContent='QR update failed: '+err.message;}
+}
+const CHOICE_NAMES={serviceModes:'Service types',mealSessions:'Meal sessions',menuCategories:'Menu categories',printFormats:'Menu / tag formats'};
+const CHOICE_LABELS={'a4':'Buffet Menu A4','a4-live':'Live Station A4','half-a4':'Table Menu Card','a8-grid':'A8 Tags','foldtags-grid':'FoldTags','a6-grid':'A6 Tags','canape-grid':'Canapé Labels'};
+let loadedChoiceOptions=null;
+async function fetchCompanyLogo(){
+ try{const r=await call('/public/company-logo','GET',undefined,false);
+   const image=typeof r.image==='string'&&/^data:image\/(png|jpeg|webp);base64,/.test(r.image)?r.image:'';
+   window.ragaPublishedCompanyLogo=image;
+   if(image)window.ragaSetPublishedCompanyLogo?.(image);
+   const img=$('rs-company-image');if(img){img.hidden=!image;if(image)img.src=image;else img.removeAttribute('src');}
+   const info=$('rs-company-status');if(info)info.textContent=image?'Published company logo is active.':'No published logo; using existing GitHub logo.';
+ }catch(err){if($('rs-company-status'))$('rs-company-status').textContent='Could not load company logo: '+err.message;}
+}
+async function publishCompanyLogo(remove=false){if(s.user?.role!=='admin')return;
+ let image='';if(!remove){const file=$('rs-company-upload')?.files?.[0];if(!file)return msg('Select company logo first.','error');
+ if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>150000)return msg('Use PNG/JPG/WebP up to 150 KB.','error');
+ image=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=()=>reject(Error('Cannot read logo'));reader.readAsDataURL(file);});}
+ else if(!confirm('Remove D1 company logo and return to the GitHub logo?'))return;
+ try{await call('/admin/company-logo','PUT',{image});if($('rs-company-upload'))$('rs-company-upload').value='';
+ if(!image)window.ragaClearPublishedCompanyLogo?.();await fetchCompanyLogo();msg(image?'Company logo published.':'GitHub company logo restored.');}
+ catch(err){msg(err.message,'error');}
+}
+async function loadChoiceOptions(){if(!s.user)return;
+ try{const r=await call('/settings/choices');const out={};
+ for(const [key,all] of Object.entries(r.available||{})){const configured=r.settings?.[key];const enabled=Array.isArray(configured?.enabled)?all.filter(v=>configured.enabled.includes(v)):all.slice();
+ out[key]={enabled:enabled.length?enabled:all.slice(),default:enabled.includes(configured?.default)?configured.default:(all[0]||'')};}
+ loadedChoiceOptions={all:r.available,settings:out};window.ragaAdminChoices=out;
+ document.dispatchEvent(new CustomEvent('ragasaan:admin-choices'));renderChoiceOptions();if(s.user?.role==='admin')loadAdminClientFormats();
+ }catch(err){if($('rs-choices-status'))$('rs-choices-status').textContent='Cannot load settings: '+err.message;}
+}
+async function loadAdminClientFormats(){if(s.user?.role!=='admin')return;
+ try{const r=await call('/admin/client-formats');const root=$('rs-client-format-choices');if(!root)return;
+ const chosen=new Set(r.formats||[]);
+ root.innerHTML=CLIENT_PRINT_FORMATS.map(id=>`<label style="display:inline-block;margin:8px"><input type="checkbox" data-client-format="${e(id)}" value="${e(id)}" ${chosen.has(id)?'checked':''}> ${e(FN[id]||id)}</label>`).join('');
+ }catch(err){msg('Cannot load client format settings: '+err.message,'error');}
+}
+async function saveAdminClientFormats(){if(s.user?.role!=='admin')return;
+ const formats=[...document.querySelectorAll('[data-client-format]:checked')].map(el=>el.value);
+ if(!formats.length)return msg('Choose at least one client print format.','error');
+ try{await call('/admin/client-formats','PUT',{formats});msg('Permitted client design formats updated for all client links.');await loadAdminClientFormats();}
+ catch(err){msg(err.message,'error');}
+}
+function renderChoiceOptions(){const el=$('rs-choices-editor');if(!el||!loadedChoiceOptions)return;
+ const {all,settings}=loadedChoiceOptions;
+ el.innerHTML=Object.keys(all).map(key=>`<fieldset class="raga-list-item"><legend><b>${e(CHOICE_NAMES[key]||key)}</b></legend><div style="display:flex;flex-wrap:wrap;gap:5px">${all[key].map(v=>`<label style="font-size:12px;margin:5px"><input type="checkbox" data-choice-key="${e(key)}" value="${e(v)}" ${settings[key].enabled.includes(v)?'checked':''}> ${e(CHOICE_LABELS[v]||v)}</label>`).join('')}</div><label>Default choice<select class="raga-input" data-choice-default="${e(key)}">${all[key].map(v=>`<option value="${e(v)}" ${settings[key].default===v?'selected':''}>${e(CHOICE_LABELS[v]||v)}</option>`).join('')}</select></label></fieldset>`).join('');
+}
+async function saveChoiceOptions(){if(s.user?.role!=='admin'||!loadedChoiceOptions)return;const values={};
+ for(const [key,all] of Object.entries(loadedChoiceOptions.all)){
+ const enabled=[...document.querySelectorAll(`[data-choice-key="${key}"]:checked`)].map(c=>c.value);
+ const selected=document.querySelector(`[data-choice-default="${key}"]`)?.value;
+ if(!enabled.length||!enabled.includes(selected))return msg('Every section needs at least one enabled option and an enabled default. Check '+CHOICE_NAMES[key]+'.','error');
+ values[key]={enabled:all.filter(v=>enabled.includes(v)),default:selected};}
+ try{await call('/settings/choices','PUT',{settings:values});msg('Shared choices and defaults saved in Cloudflare D1.');await loadChoiceOptions();}
+ catch(err){msg(err.message,'error');}
+}
 function gateStatus(){const label=$('rs-user-info');if(label)label.textContent=s.user?`${s.user.name} · ${s.user.role==='admin'?'Administrator':'Event Planner'}`:'Not signed in';}
 async function login(evt){evt?.preventDefault();onLoginError('Signing in…');try{
  const result=await call('/login','POST',{email:$('rs-email').value.trim(),password:$('rs-password').value},false);
@@ -37,12 +121,12 @@ async function login(evt){evt?.preventDefault();onLoginError('Signing in…');tr
 }
 async function logout(){try{if(s.token)await call('/logout','POST',{},true)}catch(_){}finally{s.token=null;s.user=null;s.cloudEvent=null;sessionStorage.removeItem('raga_session');document.body.classList.add('ragasaan-locked');onLoginError('Signed out.');}}
 function showAuthenticated(){gateStatus();
-  const venueButton=$('tab-btn-venues');if(venueButton)venueButton.hidden=s.user?.role!=='admin';
+  const venueButton=$('tab-btn-venues');if(venueButton)venueButton.hidden=true; // Managed through Admin Settings
   const venueTab=$('tab-venues');if(venueTab&&s.user?.role!=='admin')venueTab.hidden=true;
 document.querySelectorAll('[data-rs-admin]').forEach(n=>n.hidden=s.user?.role!=='admin');
   document.querySelectorAll('[data-rs-staff]').forEach(n=>n.hidden=!s.user);
   const banner=$('rs-security-banner');if(banner)banner.textContent='Cloud events are shared through D1. Browser backups remain local. GitHub master publishing uses separate Admin authentication.';
-  renderThemeGallery();refreshCloudList().catch(x=>msg(x.message,'error'));
+  renderThemeGallery();refreshCloudList().catch(x=>msg(x.message,'error'));loadChoiceOptions();
   // Existing local master UI is not an authorization boundary; publication is still checked by the separate GitHub Worker.
   {const master=$('tab-master');if(master)master.querySelectorAll('button[onclick*="requestMasterAuthorization"], #github-save-button').forEach(b=>b.hidden=s.user?.role!=='admin');}
 }
@@ -60,11 +144,20 @@ async function refreshCloudList(){if(!s.user)return;
  drawSelected();
  if(s.user.role==='admin')await refreshPlanners();
 }
-async function refreshPlanners(){const r=await call('/users/planners');s.planners=r.planners||[];const sel=$('rs-event-planner');
+async function refreshPlanners(){
+ const [plannersResult,accountsResult]=await Promise.all([call('/users/planners'),call('/users')]);
+ s.planners=plannersResult.planners||[];
+ const sel=$('rs-event-planner');
  if(sel){sel.innerHTML='<option value="">Not yet assigned</option>'+s.planners.filter(p=>p.active).map(x=>`<option value="${e(x.id)}">${e(x.display_name)} · ${e(x.email)}</option>`).join('');if(s.cloudEvent)sel.value=s.cloudEvent.plannerUserId||'';}
- const root=$('rs-planner-list');if(root)root.innerHTML=s.planners.map(p=>`<div class="raga-list-item"><strong>${e(p.display_name)}</strong><div class="raga-small">${e(p.email)} · ${p.active?'Active':'Inactive'}</div>${p.active?`<button data-deactivate="${e(p.id)}" class="raga-btn danger">Deactivate</button>`:''}</div>`).join('');
- root?.querySelectorAll('[data-deactivate]').forEach(b=>b.onclick=async()=>{if(!confirm('Deactivate this planner and revoke their sessions?'))return;try{await call('/users/planners/'+b.dataset.deactivate+'/deactivate','POST',{});await refreshPlanners();}catch(x) {msg(x.message,'error');}});
+ const root=$('rs-planner-list');if(!root)return;
+ const users=accountsResult.users||[];
+ root.innerHTML=users.map(u=>`<div class="raga-list-item"><strong>${e(u.display_name)}</strong><span class="raga-pill">${e(u.role)} · ${u.active?'Active':'Disabled'}</span><div class="raga-small">${e(u.email)}</div><div class="raga-actions"><button type="button" class="raga-btn" data-user-edit="${e(u.id)}">Edit profile</button><button type="button" class="raga-btn" data-user-reset="${e(u.id)}">Reset password</button>${u.id!==s.user.id?`<button type="button" class="raga-btn ${u.active?'danger':''}" data-user-active="${e(u.id)}">${u.active?'Disable':'Reactivate'}</button>`:''}</div></div>`).join('');
+ const byId=id=>users.find(x=>x.id===id);
+ root.querySelectorAll('[data-user-edit]').forEach(b=>b.onclick=async()=>{const u=byId(b.dataset.userEdit);if(!u)return;const name=prompt('Display name',u.display_name);if(name===null)return;const email=prompt('Login email',u.email);if(email===null)return;const role=u.id===s.user.id?u.role:(prompt('Role: admin or planner',u.role)||'');if(!['admin','planner'].includes(role))return msg('Use admin or planner','error');try{await call('/users/'+u.id+'/profile','PUT',{name,email,role});msg('Profile updated. Changed roles require a fresh login.');await refreshPlanners();}catch(err){msg(err.message,'error');}});
+ root.querySelectorAll('[data-user-reset]').forEach(b=>b.onclick=async()=>{const u=byId(b.dataset.userReset);if(!u)return;const password=prompt('New password for '+u.email+' (minimum 8 characters). Existing sessions will be revoked.');if(password===null)return;if(password.length<8)return msg('Password must contain at least 8 characters.','error');if(!confirm('Reset password and revoke all sessions for '+u.email+'?'))return;try{await call('/users/'+u.id+'/password','PUT',{password});msg('Password reset. Share securely and ask the user to sign in again.');if(u.id===s.user.id){await logout();}else await refreshPlanners();}catch(err){msg(err.message,'error');}});
+ root.querySelectorAll('[data-user-active]').forEach(b=>b.onclick=async()=>{const u=byId(b.dataset.userActive);if(!u)return;const action=u.active?'deactivate':'reactivate';if(!confirm(action+' '+u.email+'?'))return;try{await call('/users/'+u.id+'/'+action,'POST',{});msg('User '+action+'d.');await refreshPlanners();}catch(err){msg(err.message,'error');}});
 }
+
 function selectCloud(id){s.cloudEvent=s.events.find(x=>x.id===id)||null;drawSelected();}
 function drawSelected(){const el=$('rs-cloud-selected');if(!el)return;
  const x=s.cloudEvent;
@@ -213,15 +306,18 @@ function initClient(){const fragment=location.hash.match(/(?:^#|&)client=([a-f0-
  s.clientToken=fragment[1];$('ragasaan-auth-root').classList.add('raga-client-on');$('rs-login-form').hidden=true;$('rs-client-panel').hidden=false;openClient().catch(err=>{$('rs-client-panel').innerHTML=`<div class="raga-login-card"><h2>Client link unavailable</h2><p>${e(err.message)}</p></div>`;});return true;
 }
 async function openClient(){const result=await call('/client/view','POST',{token:s.clientToken},false);s.clientEvent=result.event;
+ s.clientAllowed=CLIENT_PRINT_FORMATS.filter(f=>Array.isArray(result.clientFormats)?result.clientFormats.includes(f):true);
+ if(!s.clientAllowed.length)throw Error('Client design access is disabled for this event.');
+ s.clientFmt=s.clientAllowed.includes('half-a4')?'half-a4':s.clientAllowed[0];
  s.clientDesign={themeId:'executive-ivory',designs:{},coupleTitle:'',brideName:'',groomName:'',welcomeMessage:'',coupleLogo:'',coupleLogoWidth:110};
- const root=$('rs-client-panel');root.innerHTML=`<div class="raga-client-shell"><section class="raga-client-side"><h2>Ragasaan Client Design</h2><p class="raga-muted">${e(result.event.name)} · ${e(result.event.eventDate||'')}<br>${e(result.event.venue||'')} · Link expires ${new Date(result.expiresAt).toLocaleString()}</p><div class="raga-rule"></div><h3 class="raga-section-title">1. Select a theme</h3><div class="raga-client-themes" id="rs-client-themes"></div><div class="raga-rule"></div><h3 class="raga-section-title">2. Design format &amp; type</h3><select id="rs-client-fmt" class="raga-input" onchange="ragaClientChangeFormat(this.value)">${FMT.map(f=>`<option value="${f}" ${f==='half-a4'?'selected':''}>${e(FN[f])}</option>`).join('')}</select><div id="rs-client-controls"></div><div class="raga-rule"></div><h3 class="raga-section-title">3. Table Menu Card personalization</h3><p class="raga-help">These fields apply to the Table Menu Card only; event dishes, allergens and other formats remain unchanged.</p><div class="raga-client-form-grid"><label>Bride name<input class="raga-input" maxlength="100" id="rs-bride" oninput="ragaClientDetail('brideName',this.value)"></label><label>Groom name<input class="raga-input" maxlength="100" id="rs-groom" oninput="ragaClientDetail('groomName',this.value)"></label></div><label>Couple display title<input class="raga-input" id="rs-couple-title" maxlength="220" placeholder="${escAttr(result.event.name)}" oninput="ragaClientDetail('coupleTitle',this.value)"></label><label>Welcome message (Table Menu Card only)<textarea class="raga-input" rows="3" maxlength="450" id="rs-welcome" oninput="ragaClientDetail('welcomeMessage',this.value)"></textarea></label><label>Couple monogram / image (PNG, JPG, WebP; max 240 KB)<input type="file" class="raga-input" accept="image/png,image/jpeg,image/webp" onchange="ragaClientLogo(event)"></label><label>Couple logo width (px)<input type="number" class="raga-input" min="30" max="220" value="110" onchange="ragaClientDetail('coupleLogoWidth',Number(this.value))"></label><div class="raga-rule"></div><button id="rs-submit-design" class="raga-btn primary" onclick="ragaSubmitClientDesign()">Submit Design to Event Planner</button><p id="rs-client-notice" class="raga-alert" role="status"></p><p class="raga-help">Submitting saves design choices in Cloudflare D1. The Event Planner must review them. You cannot edit dishes or allergens here.</p></section><section class="raga-client-preview"><div class="raga-client-preview-head"><div><b id="rs-client-preview-title">Table Menu Card</b><p>Read-only design preview · supplied event menu</p></div><span class="raga-pill">Live preview</span></div><div id="rs-client-paper" class="raga-client-paper"></div><p class="raga-help">Preview is illustrative; final print geometry is checked by the Event Planner in Menu Studio.</p></section></div>`;
+ const root=$('rs-client-panel');root.innerHTML=`<div class="raga-client-shell"><section class="raga-client-side"><h2>Ragasaan Client Design</h2><p class="raga-muted">${e(result.event.name)} · ${e(result.event.eventDate||'')}<br>${e(result.event.venue||'')} · Link expires ${new Date(result.expiresAt).toLocaleString()}</p><div class="raga-rule"></div><h3 class="raga-section-title">1. Select a theme</h3><div class="raga-client-themes" id="rs-client-themes"></div><div class="raga-rule"></div><h3 class="raga-section-title">2. Design format &amp; type</h3><select id="rs-client-fmt" class="raga-input" onchange="ragaClientChangeFormat(this.value)">${s.clientAllowed.map(f=>`<option value="${f}" ${f===s.clientFmt?'selected':''}>${e(FN[f])}</option>`).join('')}</select><div id="rs-client-controls"></div><div class="raga-rule"></div><h3 class="raga-section-title">3. Table Menu Card personalization</h3><p class="raga-help">These fields apply to the Table Menu Card only; event dishes, allergens and other formats remain unchanged.</p><div class="raga-client-form-grid"><label>Bride name<input class="raga-input" maxlength="100" id="rs-bride" oninput="ragaClientDetail('brideName',this.value)"></label><label>Groom name<input class="raga-input" maxlength="100" id="rs-groom" oninput="ragaClientDetail('groomName',this.value)"></label></div><label>Couple display title<input class="raga-input" id="rs-couple-title" maxlength="220" placeholder="${escAttr(result.event.name)}" oninput="ragaClientDetail('coupleTitle',this.value)"></label><label>Welcome message (Table Menu Card only)<textarea class="raga-input" rows="3" maxlength="450" id="rs-welcome" oninput="ragaClientDetail('welcomeMessage',this.value)"></textarea></label><label>Couple monogram / image (PNG, JPG, WebP; max 240 KB)<input type="file" class="raga-input" accept="image/png,image/jpeg,image/webp" onchange="ragaClientLogo(event)"></label><label>Couple logo width (px)<input type="number" class="raga-input" min="30" max="220" value="110" onchange="ragaClientDetail('coupleLogoWidth',Number(this.value))"></label><div class="raga-rule"></div><button id="rs-submit-design" class="raga-btn primary" onclick="ragaSubmitClientDesign()">Submit Design to Event Planner</button><p id="rs-client-notice" class="raga-alert" role="status"></p><p class="raga-help">Submitting saves design choices in Cloudflare D1. The Event Planner must review them. You cannot edit dishes or allergens here.</p></section><section class="raga-client-preview"><div class="raga-client-preview-head"><div><b id="rs-client-preview-title">Table Menu Card</b><p>Read-only design preview · supplied event menu</p></div><span class="raga-pill">Live preview</span></div><div id="rs-client-paper" class="raga-client-paper"></div><p class="raga-help">This is the actual Print Studio template at scaled A4 dimensions, using the event menu supplied by your Event Planner. The Event Planner checks final output before printing.</p></section></div>`;
  ragaSelectClientTheme('executive-ivory');
 }
 function selectClientTheme(id){const t=allThemes().find(x=>x.id===id);if(!t)return;
  s.clientDesign.themeId=id;
- for(const fmt of FMT)s.clientDesign.designs[fmt]={...styleFrom(t),bgColor:'#ffffff'};
+ for(const fmt of s.clientAllowed)s.clientDesign.designs[fmt]={...styleFrom(t),bgColor:'#ffffff'};
  $('rs-client-themes').innerHTML=allThemes().map(x=>themeCard(x,'client')).join('');renderClientControls();renderClientPreview();}
-function clientFormat(fmt){if(!FMT.includes(fmt))return;s.clientFmt=fmt;renderClientControls();renderClientPreview();}
+function clientFormat(fmt){if(!s.clientAllowed.includes(fmt))return;s.clientFmt=fmt;renderClientControls();renderClientPreview();}
 function detailClient(key,value){if(!['brideName','groomName','coupleTitle','welcomeMessage','coupleLogoWidth'].includes(key))return;
  if(key==='coupleLogoWidth')value=Math.max(30,Math.min(220,Number(value)||110));
  else value=String(value).slice(0,key==='welcomeMessage'?450:220);
@@ -236,17 +332,24 @@ function renderClientControls(){const root=$('rs-client-controls');if(!root)retu
  const number=(key,label,min,max,step=1)=>`<label>${label}<input class="raga-input" type="number" min="${min}" max="${max}" step="${step}" value="${e(d[key]??min)}" onchange="ragaClientStyle('${key}',this.value)"></label>`;
  root.innerHTML=`<div class="raga-client-form-grid">${select('titleFont','Title font',[['font-serif','Playfair Display'],['font-cormorant','Cormorant Garamond'],['font-script','Great Vibes'],['font-montserrat','Montserrat'],['font-sans','Inter']])}${select('bodyFont','Body font',[['font-serif','Playfair Display'],['font-cormorant','Cormorant Garamond'],['font-script','Great Vibes'],['font-montserrat','Montserrat'],['font-sans','Inter']])}${color('textColor','Text color')}${color('accentColor','Accent color')}${color('borderColor','Border color')}${select('borderStyle','Border style',['none','solid','double','dashed','dotted'].map(x=>[x,x]))}${number('borderWidth','Border width (mm)',0,5,.1)}${select('frameMotif','Decoration',[['none','None'],['fine-line','Fine line'],['art-deco','Art Deco'],['corner-flourish','Corner Flourish'],['botanical','Botanical']])}${number('titleFontSize','Title size (px)',10,72)}${number('dishNameFontSize','Dish font (px)',10,72)}${number('descFontSize','Description font (px)',10,72)}${number('allergenFontSize','Allergens font (px)',10,72)}</div>`;
 }
-function renderClientPreview(){const root=$('rs-client-paper');if(!root||!s.clientEvent)return;
- const d=s.clientDesign.designs[s.clientFmt]||{},ev=s.clientEvent,formatted=s.clientFmt;
- const family=x=>({'font-serif':'Playfair Display,serif','font-cormorant':'Cormorant Garamond,serif','font-script':'Great Vibes,cursive','font-montserrat':'Montserrat,sans-serif','font-sans':'Inter,sans-serif'})[x]||'serif';
- const color=d.textColor||'#25272d',accent=d.accentColor||'#8b7551';
- const border=d.borderStyle==='none'?'none':`${Math.max(1,Number(d.borderWidth)||.7)*2}px ${d.borderStyle||'solid'} ${d.borderColor||accent}`;
- const sample=ev.menu.filter(x=>!x.printFormats?.length||x.printFormats.includes(formatted)).slice(0,12);
- const rows=sample.length?sample.map(x=>`<div class="raga-paper-dish"><b style="font-size:${Math.min(22,Number(d.dishNameFontSize)||13)}px">${e(x.name)}</b>${x.desc?`<div class="raga-paper-desc">${e(x.desc)}</div>`:''}<small>${x.allergens?.length?`Allergens: ${e(x.allergens.join(', '))}`:''}${x.mayContain?.length?` · May contain: ${e(x.mayContain.join(', '))}`:''}</small></div>`).join(''):'<div class="raga-paper-dish">The Event Planner has not assigned dishes to this format.</div>';
- const name=formatted==='half-a4'?s.clientDesign.coupleTitle||[s.clientDesign.brideName,s.clientDesign.groomName].filter(Boolean).join(' & ')||ev.name:ev.name;
- const motif={'art-deco':'◇　✦　◇','corner-flourish':'❦　✦　❦','botanical':'❧　✦　❧','fine-line':'—　✦　—','none':''}[d.frameMotif||'none'];
- root.innerHTML=`<div class="raga-paper-inner" style="color:${color};border:${border};font-family:${family(d.bodyFont)}"><div style="color:${accent};text-align:center;font-size:19px;padding-bottom:8px">${motif}</div><h1 style="color:${accent};font-family:${family(d.titleFont)};font-size:${Math.min(36,Number(d.titleFontSize)||20)+8}px">${e(name)}</h1><div class="raga-paper-meta">${e(ev.eventDate||'')} · ${e(ev.venue||'')}</div>${formatted==='half-a4'&&s.clientDesign.coupleLogo?`<img alt="Couple monogram" src="${s.clientDesign.coupleLogo}" style="width:${Math.min(220,s.clientDesign.coupleLogoWidth||110)}px;height:auto;max-width:100%;margin:12px auto">`:''}${formatted==='half-a4'&&s.clientDesign.welcomeMessage?`<div class="raga-paper-welcome">${e(s.clientDesign.welcomeMessage)}</div>`:''}<h2 style="font:700 18px ${family(d.titleFont)};color:${accent};margin:14px 0">${e(FN[formatted])}</h2><div class="raga-paper-menu">${rows}</div><div class="raga-paper-footer">Ragasaan · Preview only · Event Planner verifies print layout</div></div>`;
- $('rs-client-preview-title').textContent=FN[formatted];
+function renderClientPreview(){
+ const root=$('rs-client-paper');if(!root||!s.clientEvent)return;
+ if(!s.clientAllowed.includes(s.clientFmt))return;
+ root.replaceChildren();root.classList.add('raga-client-paper--actual');
+ $('rs-client-preview-title').textContent=FN[s.clientFmt]+' · actual A4 print layout';
+ try {
+  const render=window.ragaRenderActualClientPages;
+  if(typeof render!=='function')throw Error('Print renderer is not available. Refresh the website.');
+  const pages=render(s.clientFmt,s.clientEvent,s.clientDesign,root);
+  if(!pages)throw Error('No printable pages could be generated.');
+  // Use the physical 210 x 297 mm layout; scale the whole sheet uniformly
+  // for the available browser width (never recompute different HTML).
+  const width=Math.max(230,root.parentElement?.clientWidth||650);
+  const scale=Math.min(1,(width-40)/794);
+  root.style.zoom=String(Math.max(.35,scale));
+  let note=$('rs-client-pages');if(!note){note=document.createElement('p');note.id='rs-client-pages';note.className='raga-help';root.parentElement.append(note);}
+  note.textContent=pages+' actual A4 '+(pages===1?'sheet':'sheets')+' · 210 × 297 mm · scaled '+Math.round(scale*100)+'% on screen';
+ }catch(err){root.classList.remove('raga-client-paper--actual');root.style.zoom='1';root.textContent='Print preview unavailable: '+err.message;}
 }
 async function clientLogo(evt){const file=evt.target.files?.[0];if(!file)return;
  if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>240_000){alert('Use PNG, JPG or WebP smaller than 240 KB.');return;}
@@ -263,6 +366,16 @@ function copyLink(){const x=$('rs-link-output').value;if(!x)return;try{navigator
 function attach(){
  // The form uses an inline fail-closed submit handler so missing JS cannot silently reload the page.
  $('rs-open-cloud')?.addEventListener('click',openCloud);
+ $('rs-open-admin-qr')?.addEventListener('click',()=>{openCloud();setTimeout(()=>document.getElementById('rs-admin-feedback-panel')?.scrollIntoView({block:'center',behavior:'smooth'}),30);});
+ $('rs-company-publish')?.addEventListener('click',()=>publishCompanyLogo(false));
+ $('rs-company-remove')?.addEventListener('click',()=>publishCompanyLogo(true));
+ $('rs-save-choices')?.addEventListener('click',saveChoiceOptions);
+ $('rs-manage-venues')?.addEventListener('click',()=>{if(s.user?.role==='admin'){closeCloud();window.switchTab?.('venues');}});
+ $('rs-manage-registry')?.addEventListener('click',()=>{if(s.user?.role==='admin'){closeCloud();window.switchTab?.('master');}});
+ $('rs-save-client-formats')?.addEventListener('click',saveAdminClientFormats);
+ $('rs-feedback-save')?.addEventListener('click',()=>publishFeedbackQR(false));
+ $('rs-feedback-remove')?.addEventListener('click',()=>publishFeedbackQR(true));
+
  $('rs-close-cloud')?.addEventListener('click',closeCloud);
  $('rs-logout')?.addEventListener('click',logout);
  $('rs-cloud-save')?.addEventListener('click',()=>saveCloud().catch(x=>msg(x.message,'error')));
@@ -276,6 +389,8 @@ function attach(){
  $('rs-load-selected')?.addEventListener('click',()=>loadCloud(s.cloudEvent?.id).catch(x=>msg(x.message,'error')));
  $('rs-cloud')?.addEventListener('click',evt=>{if(evt.target===evt.currentTarget)closeCloud();});
  loadThemeGallery();
+ // QR fetch is independent of staff login so client links show the exact printed QR.
+ fetchFeedbackQR();fetchCompanyLogo();
  if(initClient())return;
  const stored=JSON.parse(sessionStorage.getItem('raga_session')||'null');
  if(stored?.token && new Date(stored.expiresAt)>new Date()){

@@ -98,3 +98,9 @@ body.ragasaan-locked #ragasaan-auth-root.raga-client-on {display:block;padding:0
  body.raga-print-blocked .print-sheet,body.raga-print-blocked #summary-print-root{display:none!important}
  body.raga-print-blocked:after{content:'Printing requires a signed-in, approved cloud event.';display:block!important;position:fixed;top:40%;left:15%;width:70%;background:white;color:#000;font-size:24pt;text-align:center}
 }
+
+/* Client sees exact print DOM. Only the display scale differs from 100% print. */
+.raga-client-paper.raga-client-paper--actual{display:flex;flex-direction:column;align-items:center;gap:18px;box-shadow:none;background:transparent;padding:0!important;margin:0 auto;width:210mm!important;max-width:none!important;min-height:0!important;height:auto!important;overflow:visible}
+.raga-client-paper--actual>.print-sheet{display:block;flex-shrink:0;box-shadow:0 8px 30px #1115!important;pointer-events:none;user-select:none;max-width:none!important}
+.raga-client-paper--actual [contenteditable]{outline:none!important;cursor:default!important}
+.raga-client-preview{overflow:auto}
