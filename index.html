@@ -1198,6 +1198,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   <!-- SheetJS for Excel Import/Export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- Word export, browser-side. External library required only when downloading DOCX. -->
+  <script src="https://cdn.jsdelivr.net/npm/docx@9.5.1/dist/index.umd.js" defer></script>
   <!-- html2pdf.js for PDF Export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -1405,6 +1407,18 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       #paper-render-target > .print-sheet { break-after:page; page-break-after:always; }
       #paper-render-target > .print-sheet:last-child { break-after:auto;page-break-after:auto; }
     }
+
+    /* Event Allergen Summary: compact input-free meal list on left, A4 preview on right. */
+    .summary-main-layout{display:grid;grid-template-columns:minmax(235px,300px) minmax(0,1fr);gap:14px;align-items:start}
+    .summary-controls-left input,.summary-controls-left select{max-width:190px;padding:5px 7px;font-size:11px}
+    .summary-preview-right{min-width:0;overflow:auto}
+    .summary-compact-group{padding:7px;border:1px solid #475569;border-radius:7px;margin-bottom:6px;background:#0f172a}
+    .summary-compact-group h4{font-size:12px;color:#fbbf24;font-weight:700;padding-bottom:3px;border-bottom:1px solid #334155}
+    .summary-compact-group h4 span{font-weight:400;color:#cbd5e1}
+    .summary-compact-item{padding:3px 1px;font-size:11px;color:#e2e8f0;line-height:1.3;overflow-wrap:anywhere}
+    @media(max-width:950px){.summary-main-layout{grid-template-columns:1fr}.summary-controls-left{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.summary-preview-right{width:100%}}
+    @media(max-width:580px){.summary-controls-left{grid-template-columns:1fr}}
+    #tab-btn-summary[hidden], #builder-course-controls[hidden], #builder-course-control[hidden], #builder-session-time-row[hidden]{display:none!important}
   </style>
 <script src="./github-sync-config.js"></script>
 </head>
@@ -1435,7 +1449,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       <button onclick="switchTab('export')" id="tab-btn-export" class="tab-btn px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-white">
         <i class="fa-solid fa-print"></i> <span class="hidden md:inline">3. Print & Format Studio</span>
       </button>
-      <button onclick="switchTab('summary')" id="tab-btn-summary" class="tab-btn px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-white"><i class="fa-solid fa-clipboard-list"></i><span class="hidden md:inline">4. Event Allergen Summary</span></button>
+      <button onclick="switchTab('summary')" id="tab-btn-summary" hidden class="tab-btn px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-white"><i class="fa-solid fa-clipboard-list"></i><span class="hidden md:inline">4. Event Allergen Summary</span></button>
       <button onclick="switchTab('venues')" id="tab-btn-venues" class="tab-btn px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-white"><i class="fa-solid fa-location-dot"></i><span class="hidden md:inline">5. Venues</span></button>
       <button onclick="switchTab('master')" id="tab-btn-master" class="tab-btn px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-white">
         <i class="fa-solid fa-database text-gold-400"></i> <span class="hidden md:inline">6. Master Database</span>
@@ -1519,12 +1533,16 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         <section class="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-3">
           <div class="flex justify-between items-center gap-2 flex-wrap"><h3 class="text-sm font-semibold text-gold-400">Meal-wise Planning</h3><span class="text-[11px] text-slate-400">Click a meal tab to plan its dishes</span></div>
           <div id="builder-session-tabs" role="tablist" aria-label="Event meal sessions"></div>
-          <div class="flex gap-3 items-center flex-wrap text-xs"><label>Service time <input id="builder-session-time" type="time" onchange="setActiveSessionTime(this.value)" class="p-1.5 rounded bg-slate-900 text-white border border-slate-700 ml-2"></label><span class="text-slate-400">Service type can differ by course, including at Dinner and Lunch.</span></div>
-          <details class="bg-slate-900 border border-slate-800 p-3 rounded-lg">
-            <summary class="text-xs font-semibold text-amber-300 cursor-pointer">Service type for each course (editable) · Open to customise Lunch/Dinner</summary>
-            <div id="builder-course-service-types" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 mt-3 text-xs"></div>
-            <p class="text-[10px] text-slate-400 mt-2">Defaults only for this meal. Individual dishes can override their course service type without changing other dishes.</p>
-          </details>
+          <div class="flex flex-wrap items-end gap-3 text-xs">
+            <label class="text-amber-300">Meal service style<select id="builder-service-mode" aria-label="Meal service style" onchange="setSessionMode(this.value)" class="block mt-1 min-w-48 p-1.5 rounded bg-slate-900 border border-slate-700 text-white"></select></label>
+            <label class="flex items-center gap-2 text-amber-200"><input type="checkbox" id="builder-include-summary" onchange="setClientSummaryEnabled(this.checked)"> Include A4 Client Summary report</label>
+            <label id="builder-session-time-row" hidden>Meal time <input id="builder-session-time" type="time" onchange="setActiveSessionTime(this.value)" class="ml-1 p-1.5 rounded bg-slate-900 text-white border border-slate-700"></label>
+          </div>
+          <p id="builder-service-hint" class="text-[11px] text-slate-400"></p>
+          <div id="builder-course-controls" class="bg-slate-900 border border-slate-800 p-3 rounded-lg" hidden>
+            <h4 class="text-xs font-semibold text-amber-300">Course-wise service and timings</h4>
+            <div id="builder-course-service-types" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 mt-2 text-xs"></div>
+          </div>
         </section>
 
             <div class="builder-planning-grid">
@@ -1553,7 +1571,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
             </details>
             <p class="text-[10px] text-slate-400">Every dish added here is included automatically in the Event Allergen Summary, even if no print format is selected.</p>
           </div>
-          <div class="rounded-lg border border-amber-700/50 bg-slate-900 p-2">
+          <div id="builder-course-control" class="rounded-lg border border-amber-700/50 bg-slate-900 p-2">
             <label for="builder-course-select" class="block mb-1 text-xs font-semibold text-amber-300">Course for the next dish *</label>
             <select id="builder-course-select" class="w-full p-2 rounded bg-slate-950 border border-amber-700 text-white text-xs" required>
               <option value="">Select a course before adding an item...</option>
@@ -1604,7 +1622,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
             <h3 class="text-sm font-semibold text-gold-400">Selected Items — <span id="active-format-name">Breakfast</span> (<span id="active-item-count">0</span>)</h3>
             <button onclick="clearActiveSessionItems()" class="text-[11px] text-rose-400 hover:underline">Clear This Meal</button>
           </div>
-          <p class="text-[11px] text-slate-400">Confirm each dish below. Change its course, service or print format, or remove it if added by mistake. The client summary updates automatically.</p>
+          <p class="text-[11px] text-slate-400">Dish names only for the selected meal. Remove a dish with ×; edit courses and print formats using the controls above.</p>
           <div id="event-items-list" class="flex-1 pr-1"></div>
           </div>
             </div>
@@ -1829,19 +1847,18 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     <section id="tab-summary" class="tab-content hidden flex-1 min-w-0 overflow-y-auto bg-slate-950 p-4 lg:p-6 no-print" style="color:#e6ebf4">
       <div class="flex justify-between gap-2 items-center flex-wrap mb-3">
         <div><h2 class="text-lg font-semibold text-amber-400">Event Allergen Summary</h2><p class="text-xs text-slate-400">Two compact columns • meal, course &amp; service type • serial number and allergens alongside each dish</p></div>
-        <div class="flex gap-2 flex-wrap"><button onclick="saveNamedEvent()" class="bg-amber-500 text-slate-950 font-bold rounded px-3 py-2 text-xs">Save Event</button><button onclick="printEventSummary()" class="bg-amber-500 text-slate-950 font-bold rounded px-3 py-2 text-xs"><i class="fa-solid fa-print"></i> Print / PDF</button></div>
+        <div class="flex gap-2 flex-wrap"><button onclick="saveNamedEvent()" class="bg-amber-500 text-slate-950 font-bold rounded px-3 py-2 text-xs">Save Event</button><button onclick="printEventSummary()" class="bg-amber-500 text-slate-950 font-bold rounded px-3 py-2 text-xs"><i class="fa-solid fa-print"></i> Print / PDF</button><button onclick="exportClientSummaryWord()" class="bg-slate-700 text-white font-bold rounded px-3 py-2 text-xs"><i class="fa-solid fa-file-word"></i> Download Word (.docx)</button></div>
       </div>
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
-        <div class="space-y-3">
+      <div class="summary-main-layout">
+        <div class="summary-controls-left space-y-3">
           <div class="bg-slate-900 rounded-lg border border-slate-700 p-3 space-y-2 text-xs">
             <h3 class="text-amber-400 font-semibold">Event details</h3>
-            <label class="block">Party No.<input id="summary-party-no" oninput="setEventPartyNo(this.value)" placeholder="Party number" class="w-full mt-1 p-2 bg-slate-950 border border-slate-700 rounded text-white"></label>
+            <p class="text-slate-400">Party No. will be left blank on the report. Event title, date and venue come from the Builder.</p>
             <p class="text-slate-400">Date, venue and title are shared with the Event Menu Builder.</p>
           </div>
           <div class="bg-slate-900 rounded-lg border border-slate-700 p-3 space-y-2 text-xs">
-            <h3 class="text-amber-400 font-semibold">Sessions</h3><p class="text-slate-400">Edit course service types in the meal-wise Builder tabs.</p>
-            <div id="summary-session-manager" class="space-y-2"></div>
-            <button onclick="addEventSession()" class="bg-slate-700 text-white rounded px-3 py-2 w-full">+ Add Session</button>
+            <h3 class="text-amber-400 font-semibold">Session times</h3><p class="text-slate-400">Edit course times in Meal-wise Planning.</p>
+            <div id="summary-session-manager" class="space-y-1"></div>
           </div>
           <div class="bg-slate-900 rounded-lg border border-slate-700 p-3 space-y-2 text-xs">
             <h3 class="text-amber-400 font-semibold">Saved events</h3>
@@ -1852,11 +1869,11 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           </div>
           <div class="bg-slate-900 rounded-lg border border-slate-700 p-3 space-y-2 text-xs">
             <h3 class="text-amber-400 font-semibold">Items for this event</h3>
-            <div id="summary-edit-items" class="max-h-80 overflow-y-auto space-y-2"></div>
+            <div id="summary-edit-items" class="max-h-[45vh] overflow-y-auto space-y-1"></div>
           </div>
         </div>
-        <div class="lg:col-span-2 bg-slate-800 rounded-xl p-3 overflow-auto">
-          <div class="flex justify-between gap-2 text-[11px] text-slate-300 mb-2"><span>Live A4 client summary preview</span><span id="summary-page-count"></span></div>
+        <div class="summary-preview-right bg-slate-800 rounded-xl p-3 overflow-auto">
+          <div class="flex justify-between gap-2 text-[11px] text-slate-300 mb-2"><span>Live A4 Client Summary preview · Print/PDF matches this view; Word is editable and may paginate differently.</span><span id="summary-page-count"></span></div>
           <div id="summary-display-preview" class="flex flex-col items-center gap-3"></div>
         </div>
       </div>
@@ -2130,7 +2147,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       renderActiveMenuItems();
       renderContextualControls();
       renderPreview();
-      renderEventSummary();
+      setClientSummaryEnabled(includeClientSummary);renderEventSummary();
       renderVenueDB(); populateVenueOptions(); syncDatePicker();
       // Start fetching the GitHub master as soon as the UI exists. No Excel upload prompt.
       await Promise.all([loadGitHubDatabases(), loadGitHubCompanyLogo()]);
@@ -2165,7 +2182,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       previewMain.classList.toggle('hidden', tabId !== 'design');
       if (tabId === 'master') renderMasterDB();
       else if (tabId === 'venues') renderVenueDB();
-      else if (tabId === 'summary') renderEventSummary();
+      else if (tabId === 'summary') {if(!includeClientSummary){setClientSummaryEnabled(true);}renderEventSummary();}
       else if (tabId === 'builder') {renderBuilderSessionTabs();renderActiveMenuItems();}
       else renderPreview();
     }
@@ -2249,24 +2266,52 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     const TAG_FORMATS=['a8-grid','foldtags-grid','canape-grid','a6-grid'];
     const EVENT_STORE_KEY='ragasaan_event_library_v1';
     let eventRecords=[];
-    let eventSessions=[{id:'breakfast',name:'Breakfast',time:'08:00'}, {id:'lunch',name:'Lunch',time:'12:30'}, {id:'reception',name:'Reception',time:'17:00'}, {id:'dinner',name:'Dinner',time:'19:00'}, {id:'late-night',name:'Late Night Snack',time:'22:30'}];
-    const SERVICE_TYPES=['Buffet','Thali','Table Service','Bowl Food','Live Station'];
+    let eventSessions=[{id:'breakfast',name:'Breakfast',time:'08:00',serviceMode:'Buffet'}, {id:'lunch',name:'Lunch',time:'12:30',serviceMode:'Regular Buffet'}, {id:'dinner',name:'Dinner',time:'19:00',serviceMode:'Table Service'}, {id:'hi-tea',name:'HI Tea',time:'16:00',serviceMode:'Buffet'}, {id:'late-night',name:'Late Night Snack',time:'22:30',serviceMode:'Other'}];
+    const SERVICE_TYPES=['Buffet','Table Service','Bowl Food','Canapé','Live Station','Thali','Other'];
     let currentBuilderSession='breakfast';
-    function defaultServiceTypes(session){
-      const name=String(session.name||'').toLowerCase();
-      const dinner=name.includes('dinner');
-      const reception=name.includes('reception');
-      return {'Canapé':reception?'Bowl Food':'Buffet','Starter':'Buffet','Main Course':dinner?'Table Service':'Buffet','Dessert':'Buffet','Late Night Snack':'Buffet','Live Station':'Live Station','Other':'Buffet'};
+    const SUMMARY_PREF='ragasaan_include_client_summary_v1';
+    let includeClientSummary = localStorage.getItem(SUMMARY_PREF)==='true';
+    function sessionKind(session){
+      const id=String(session.id||'').toLowerCase(), name=String(session.name||'').toLowerCase();
+      if(id==='breakfast'||name==='breakfast')return 'breakfast';
+      if(id==='lunch'||name==='lunch')return 'lunch';
+      if(id==='dinner'||name==='dinner')return 'dinner';
+      if(id==='hi-tea'||name==='hi tea')return 'hi-tea';
+      if(id==='late-night'||name==='late night snack')return 'late-night';
+      return 'custom';
     }
-    function ensureSessionServices(session){
-      const defaults=defaultServiceTypes(session);
-      session.courseServices={...defaults,...(session.courseServices||{})};
-      return session.courseServices;
+    function sessionChoices(session){
+      const kind=sessionKind(session);
+      if(kind==='breakfast'||kind==='hi-tea')return [['Buffet','Buffet']];
+      if(kind==='lunch')return [['Regular Buffet','Regular Buffet'],['Thali','Thali'],['Table Service','Table Service · course-wise']];
+      if(kind==='dinner')return [['Table Service','Table Service · course-wise'],['Buffet','Buffet · one section'],['Thali','Thali · one section'],['Bowl Food','Bowl Food · one section'],['Mixed Courses','Mixed Courses · course-wise']];
+      if(kind==='late-night')return [['Other','Other']];
+      return [['Buffet','Buffet'],['Table Service','Table Service · course-wise'],['Other','Other']];
     }
+    function sessionMode(session){
+      const modes=sessionChoices(session).map(([v])=>v);
+      if(modes.includes(session.serviceMode))return session.serviceMode;
+      const d={breakfast:'Buffet',lunch:'Regular Buffet',dinner:'Table Service','hi-tea':'Buffet','late-night':'Other',custom:'Buffet'};
+      return d[sessionKind(session)];
+    }
+    function isCourseWise(session){return ['Table Service','Mixed Courses'].includes(sessionMode(session));}
+    function availableCourses(session){
+      return isCourseWise(session)?['Starter','Main Course','Dessert','Canapé','Live Station']:['Other'];
+    }
+    function courseDisplay(session,course){return isCourseWise(session)?({ 'Main Course':'Main'}[course]||course||'Other'):'All Items';}
+    function normalizeGroupService(session,course){
+      if(!isCourseWise(session))return sessionMode(session)==='Regular Buffet'?'Buffet':sessionMode(session);
+      if(course==='Canapé')return 'Canapé';
+      if(course==='Live Station')return 'Live Station';
+      if(course==='Main Course')return session.courseServices?.[course]||'Table Service';
+      if(course==='Dessert')return session.courseServices?.[course]||'Table Service';
+      return 'Table Service';
+    }
+    function defaultServiceTypes(session){return {'Canapé':'Canapé','Live Station':'Live Station','Starter':'Table Service','Main Course':'Table Service','Dessert':'Table Service','Other':'Buffet'};}
+    function ensureSessionServices(session){session.courseServices={...defaultServiceTypes(session),...(session.courseServices||{})};return session.courseServices;}
     function getServiceType(item){
-      if(item.serviceType && SERVICE_TYPES.includes(item.serviceType))return item.serviceType;
       const session=eventSessions.find(s=>s.id===item.sessionId)||eventSessions[0];
-      return (session&&ensureSessionServices(session)[item.menuCourse])||'Buffet';
+      return normalizeGroupService(session,item.menuCourse);
     }
     function serviceTypeOptions(selected,includeDefault=false){
       return (includeDefault?'<option value="" '+(!selected?'selected':'')+'>Use course default</option>':'')+SERVICE_TYPES.map(v=>`<option value="${esc(v)}" ${selected===v?'selected':''}>${esc(v)}</option>`).join('');
@@ -2278,24 +2323,60 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       const sel=document.getElementById('builder-session-select');if(sel)sel.value=id;
       renderBuilderSessionTabs();renderActiveMenuItems();
     }
-    function setActiveSessionTime(time){
-      const session=selectedBuilderSession();if(!session)return;
-      editEventSession(session.id,'time',time);
+    function setActiveSessionTime(time){const session=selectedBuilderSession();if(session)editEventSession(session.id,'time',time);}
+    function setSessionMode(value){
+      const session=selectedBuilderSession();if(!session||!sessionChoices(session).some(x=>x[0]===value))return;
+      session.serviceMode=value;
+      if(!isCourseWise(session))session.courseTimes={};
+      onEventRecordsChanged();
+    }
+    function setCourseTime(sessionId,course,time){
+      const session=eventSessions.find(s=>s.id===sessionId);if(!session)return;
+      session.courseTimes={...(session.courseTimes||{}),[course]:time};
+      saveStyle();renderEventSummary();
     }
     function updateCourseService(sessionId,course,type){
-      const session=eventSessions.find(s=>s.id===sessionId);
-      if(!session||!SERVICE_TYPES.includes(type))return;
-      ensureSessionServices(session)[course]=type;
-      onEventRecordsChanged();
+      const session=eventSessions.find(s=>s.id===sessionId);if(!session||!isCourseWise(session))return;
+      const allowed={'Main Course':['Buffet','Table Service','Bowl Food'],'Dessert':['Buffet','Table Service']};
+      if(!allowed[course]?.includes(type))return;
+      ensureSessionServices(session)[course]=type;onEventRecordsChanged();
+    }
+    function setClientSummaryEnabled(checked){
+      includeClientSummary=!!checked;
+      localStorage.setItem(SUMMARY_PREF,String(includeClientSummary));
+      const tab=document.getElementById('tab-btn-summary');if(tab)tab.hidden=!includeClientSummary;
+      const check=document.getElementById('builder-include-summary');if(check)check.checked=includeClientSummary;
+      if(!includeClientSummary&&!document.getElementById('tab-summary')?.classList.contains('hidden'))switchTab('builder');
+      renderBuilderSessionTabs();saveStyle();if(includeClientSummary)renderEventSummary();
     }
     function renderBuilderSessionTabs(){
       const session=selectedBuilderSession();if(!session)return;
       const holder=document.getElementById('builder-session-tabs');
       if(holder){holder.innerHTML=eventSessions.map(s=>`<button type="button" role="tab" aria-selected="${s.id===session.id?'true':'false'}" class="${s.id===session.id?'active':''}" onclick="selectBuilderSession('${esc(s.id)}')"><strong>${esc(s.name)}</strong><small>${eventRecords.filter(i=>i.sessionId===s.id).length} dishes</small></button>`).join('')+'<button type="button" class="add-session" onclick="addEventSession()">+ Custom Session</button>'}
       const dropdown=document.getElementById('builder-session-select');if(dropdown)dropdown.value=session.id;
+      const mode=document.getElementById('builder-service-mode');if(mode){mode.innerHTML=sessionChoices(session).map(([v,label])=>`<option value="${esc(v)}" ${sessionMode(session)===v?'selected':''}>${esc(label)}</option>`).join('');}
+      const summaryEl=document.getElementById('builder-include-summary');if(summaryEl)summaryEl.checked=includeClientSummary;
+      const timeRow=document.getElementById('builder-session-time-row');if(timeRow)timeRow.hidden=!includeClientSummary;
       const time=document.getElementById('builder-session-time');if(time&&time!==document.activeElement)time.value=session.time||'';
+      const courseHolder=document.getElementById('builder-course-controls');if(courseHolder)courseHolder.hidden=!isCourseWise(session);
       const area=document.getElementById('builder-course-service-types');
-      if(area){const services=ensureSessionServices(session);area.innerHTML=MENU_COURSES.filter(c=>c!=='Other').map(course=>`<label class="text-slate-300">${esc(course)}<select aria-label="${esc(course)} service type" onchange="updateCourseService('${esc(session.id)}','${esc(course)}',this.value)" class="w-full mt-1 rounded bg-slate-950 border border-slate-700 p-1.5 text-white">${serviceTypeOptions(services[course])}</select></label>`).join('')}
+      if(area){
+        const services=ensureSessionServices(session);
+        area.innerHTML=['Canapé','Live Station','Starter','Main Course','Dessert'].map(course=>{
+          const allowed=course==='Main Course'?['Table Service','Buffet','Bowl Food']:course==='Dessert'?['Table Service','Buffet']:[];
+          const service=allowed.length?`<select aria-label="${esc(course)} service" onchange="updateCourseService('${esc(session.id)}','${esc(course)}',this.value)" class="w-full rounded bg-slate-950 border border-slate-700 p-1 text-white">${allowed.map(v=>`<option value="${esc(v)}" ${services[course]===v?'selected':''}>${esc(v)}</option>`).join('')}</select>`:`<span class="text-slate-400">${esc(normalizeGroupService(session,course))}</span>`;
+          const courseTime=includeClientSummary?`<label class="text-[10px]">Course time <input type="time" aria-label="${esc(course)} time" value="${esc(session.courseTimes?.[course]||'')}" onchange="setCourseTime('${esc(session.id)}','${esc(course)}',this.value)" class="w-full mt-1 p-1 rounded bg-slate-950 border border-slate-700 text-white"></label>`:'';
+          return `<div class="rounded bg-slate-950 p-2 border border-slate-700"><b class="text-amber-300">${esc(courseDisplay(session,course))}</b><div class="mt-1">${service}</div>${courseTime}</div>`;
+        }).join('');
+      }
+      const courses=document.getElementById('builder-course-select');
+      if(courses){
+        const list=availableCourses(session),old=courses.value;
+        courses.innerHTML=list.map(c=>`<option value="${esc(c)}" ${old===c?'selected':''}>${esc(courseDisplay(session,c))}</option>`).join('');
+        if(!list.includes(old))courses.value=list[0];
+      }
+      const selector=document.getElementById('builder-course-control');if(selector)selector.hidden=!isCourseWise(session);
+      if(document.getElementById('builder-service-hint'))document.getElementById('builder-service-hint').textContent=isCourseWise(session)?'Choose course and, when requesting A4 Client Summary, enter a time for each course.':'One section for all dishes — course selection is not needed.';
     }
 
     let activeEventName='';
@@ -2367,16 +2448,16 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       eventSessions=eventSessions.filter(s=>s.id!==id);if(currentBuilderSession===id)currentBuilderSession=eventSessions[0].id;updateSessionPicker();onEventRecordsChanged();
     }
     function setEventPartyNo(value){state.event.partyNo=value;saveStyle();renderEventSummary()}
-    function eventSnapshot(){return {format:'ragasaan-event-v2',name:activeEventName,title:state.event.title,date:state.event.date,venue:state.event.venue,partyNo:state.event.partyNo||'',sessions:eventSessions,items:eventRecords,designs:state.designs,themeId:window.ragaActiveThemeId||''}}
+    function eventSnapshot(){return {format:'ragasaan-event-v2',name:activeEventName,title:state.event.title,date:state.event.date,venue:state.event.venue,partyNo:'',includeClientSummary,sessions:eventSessions,items:eventRecords,designs:state.designs,themeId:window.ragaActiveThemeId||''}}
     function restoreEventSnapshot(snapshot){
       if(!snapshot||!Array.isArray(snapshot.sessions)||!Array.isArray(snapshot.items))throw Error('Invalid event file');
       if(!confirm('Load this event and replace the current event menu and design settings?'))return false;
-      state.event.title=String(snapshot.title||'');state.event.date=String(snapshot.date||'');state.event.venue=String(snapshot.venue||'');state.event.partyNo=String(snapshot.partyNo||'');
-      eventSessions=snapshot.sessions.filter(x=>x&&x.id&&x.name).map(x=>({id:String(x.id),name:String(x.name),time:String(x.time||''),courseServices:{...(x.courseServices||{})}}));
-      if(!eventSessions.length)eventSessions=[{id:'lunch',name:'Lunch',time:'',courseServices:{}}];
-      eventRecords=snapshot.items.filter(x=>x&&x.name).map(x=>({...x,eventUid:x.eventUid||eventUid(),sessionId:x.sessionId||eventSessions[0].id,printFormats:Array.isArray(x.printFormats)?x.printFormats.filter(f=>MENU_FORMATS.includes(f)):[],tagCopies:x.tagCopies||{}}));
+      state.event.title=String(snapshot.title||'');state.event.date=String(snapshot.date||'');state.event.venue=String(snapshot.venue||'');state.event.partyNo='';includeClientSummary=!!snapshot.includeClientSummary;localStorage.setItem(SUMMARY_PREF,String(includeClientSummary));
+      eventSessions=snapshot.sessions.filter(x=>x&&x.id&&x.name&&String(x.name).toLowerCase()!=='reception').map(x=>({id:String(x.id),name:String(x.name),time:String(x.time||''),serviceMode:x.serviceMode,courseTimes:{...(x.courseTimes||{})},courseServices:{...(x.courseServices||{})}}));
+      if(!eventSessions.length)eventSessions=[{id:'lunch',name:'Lunch',time:'',serviceMode:'Regular Buffet',courseServices:{}}];
+      eventRecords=snapshot.items.filter(x=>x&&x.name).map(x=>({...x,eventUid:x.eventUid||eventUid(),sessionId:String(x.sessionId)==='reception'?'dinner':(x.sessionId||eventSessions[0].id),printFormats:Array.isArray(x.printFormats)?x.printFormats.filter(f=>MENU_FORMATS.includes(f)):[],tagCopies:x.tagCopies||{}}));
       if(snapshot.designs&&typeof snapshot.designs==='object')MENU_FORMATS.forEach(f=>{if(snapshot.designs[f])Object.assign(state.designs[f],snapshot.designs[f])});
-      currentBuilderSession=eventSessions[0].id;state.design=state.designs[state.layout];activeEventName=snapshot.name||'';window.ragaActiveThemeId=snapshot.themeId||'';
+      currentBuilderSession=eventSessions[0].id;setClientSummaryEnabled(includeClientSummary);state.design=state.designs[state.layout];activeEventName=snapshot.name||'';window.ragaActiveThemeId=snapshot.themeId||'';
       document.getElementById('cfg-couple').value=state.event.title;document.getElementById('cfg-venue').value=state.event.venue;syncDatePicker();updateSessionPicker();onEventRecordsChanged();renderContextualControls();return true;
     }
     function savedEventLibrary(){try{return JSON.parse(localStorage.getItem(EVENT_STORE_KEY)||'{}')}catch(_){return {}}}
@@ -2392,10 +2473,14 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     function downloadEventFile(){const blob=new Blob([JSON.stringify(eventSnapshot(),null,2)],{type:'application/json'});const a=document.createElement('a');const url=URL.createObjectURL(blob);a.href=url;a.download=(activeEventName||state.event.title||'Ragasaan_Event').replace(/[^a-z0-9_-]+/gi,'_')+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000)}
     async function importEventFile(e){const file=e.target.files?.[0];if(!file)return;try{const snapshot=JSON.parse(await file.text());restoreEventSnapshot(snapshot)}catch(err){alert('Cannot load event JSON: '+err.message)}finally{e.target.value=''}}
     function renderEventSummary(){
-      const summaryTab=document.getElementById('tab-summary');if(!summaryTab)return;
-      const party=document.getElementById('summary-party-no');if(party&&party!==document.activeElement)party.value=state.event.partyNo||'';
-      const manager=document.getElementById('summary-session-manager');if(manager)manager.innerHTML=eventSessions.map(s=>`<div class="flex items-center gap-1"><input aria-label="Session name" value="${esc(s.name)}" onchange="editEventSession('${esc(s.id)}','name',this.value)" class="min-w-0 flex-1 bg-slate-950 rounded p-1.5 text-white border border-slate-700"><input aria-label="Session time" type="time" value="${esc(s.time)}" onchange="editEventSession('${esc(s.id)}','time',this.value)" style="width:95px" class="rounded p-1.5 bg-slate-950 text-white border border-slate-700"><button title="Delete empty session" onclick="deleteEventSession('${esc(s.id)}')" class="text-rose-300 p-1">×</button></div>`).join('');
-      const editor=document.getElementById('summary-edit-items');if(editor)editor.innerHTML=eventRecords.map(item=>`<div class="border border-slate-700 rounded p-2"><div class="flex justify-between gap-1"><b class="text-slate-100">${esc(item.name)}</b><button class="text-rose-300" onclick="removeEventRecord('${esc(item.eventUid)}')">Remove</button></div><div class="grid grid-cols-2 gap-1 mt-1"><select aria-label="Session" onchange="updateEventRecord('${esc(item.eventUid)}','sessionId',this.value)" class="bg-slate-950 rounded p-1 text-white">${eventSessions.map(s=>`<option value="${esc(s.id)}" ${s.id===item.sessionId?'selected':''}>${esc(s.name)}</option>`).join('')}</select><select aria-label="Course" onchange="updateEventRecord('${esc(item.eventUid)}','menuCourse',this.value)" class="bg-slate-950 rounded p-1 text-white">${MENU_COURSES.map(c=>`<option value="${esc(c)}" ${c===item.menuCourse?'selected':''}>${esc(c)}</option>`).join('')}</select></div><label class="block mt-1 text-slate-400">Service type<select onchange="updateEventRecord('${esc(item.eventUid)}','serviceType',this.value)" class="w-full bg-slate-950 rounded p-1 mt-1 text-white">${serviceTypeOptions(item.serviceType||'',true)}</select></label><details><summary class="cursor-pointer text-amber-300 mt-1">Print formats (${(item.printFormats||[]).length})</summary><div class="grid grid-cols-2 gap-1 mt-1">${MENU_FORMATS.map(fmt=>`<label><input type="checkbox" ${item.printFormats?.includes(fmt)?'checked':''} onchange="toggleEventItemFormat('${esc(item.eventUid)}','${fmt}',this.checked)"> ${esc(MENU_NAMES[fmt])}</label>`).join('')}</div></details></div>`).join('')||'<p class="text-slate-400">Add dishes in Event Menu Builder.</p>';
+      if(!includeClientSummary)return;
+      const manager=document.getElementById('summary-session-manager');
+      if(manager)manager.innerHTML=eventSessions.filter(s=>eventRecords.some(i=>i.sessionId===s.id)).map(s=>`<div class="flex justify-between gap-2 border-b border-slate-800 py-1"><b>${esc(s.name)}</b><span>${esc(s.time||'Time not set')}</span></div>`).join('')||'<p class="text-slate-400">Choose a meal and add items.</p>';
+      const editor=document.getElementById('summary-edit-items');
+      if(editor)editor.innerHTML=eventSessions.map(session=>{
+        const rows=eventRecords.filter(x=>x.sessionId===session.id);if(!rows.length)return '';
+        return `<div class="summary-compact-group"><h4>${esc(session.name)} <span>(${rows.length})</span></h4>${rows.map((x,i)=>`<div class="summary-compact-item">${i+1}. ${esc(x.name)}</div>`).join('')}</div>`;
+      }).join('')||'<p class="text-slate-400">No dishes added yet.</p>';
       refreshSavedEventSelect();renderSummaryPaper();
     }
     function toggleEventItemFormat(uid,fmt,checked){const item=eventRecords.find(x=>x.eventUid===uid);if(!item)return;const set=new Set(item.printFormats||[]);if(checked)set.add(fmt);else set.delete(fmt);updateEventRecord(uid,'printFormats',[...set])}
@@ -2403,13 +2488,13 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       // Sequence stays unchanged, but course/service groups provide the client with a clear meal breakdown.
       const groups=[];
       entryRows.forEach(row=>{
-        const course=row.item.menuCourse||'Other';
+        const course=courseDisplay(session,row.item.menuCourse||'Other');
         const service=getServiceType(row.item);
         const last=groups[groups.length-1];
         if(last&&last.course===course&&last.service===service)last.rows.push(row);
         else groups.push({course,service,rows:[row]});
       });
-      return `<section class="summary-session-card"><div class="summary-session-heading">${esc(session.name).toUpperCase()}${session.time?' · '+esc(session.time):''}</div>${groups.map(group=>`<div class="summary-course-heading">${esc(group.course)} <span class="summary-service-label">· ${esc(group.service)}</span></div>${group.rows.map(row=>{
+      return `<section class="summary-session-card"><div class="summary-session-heading">${esc(session.name).toUpperCase()}${session.time?' · '+esc(session.time):''}</div>${groups.map(group=>`<div class="summary-course-heading">${esc(group.course)} <span class="summary-service-label">· ${esc(group.service)}${isCourseWise(session)&&session.courseTimes?.[group.rows[0].item.menuCourse]?' · '+esc(session.courseTimes[group.rows[0].item.menuCourse]):''}</span></div>${group.rows.map(row=>{
         const a=Array.isArray(row.item.allergens)?row.item.allergens.join(', '):'';
         const m=Array.isArray(row.item.mayContain)?row.item.mayContain.join(', '):'';
         return `<div class="summary-item-row"><span>${row.sl}.</span><span class="summary-item-text"><span class="summary-item-name">${esc(row.item.name)}</span> <span class="summary-item-allergens">${a?'· '+esc(a):''}</span>${m?` <span class="summary-item-may">· May contain: ${esc(m)}</span>`:''}${!a&&!m?` <span class="summary-item-none">· Allergens not declared</span>`:''}</span></div>`;
@@ -2429,7 +2514,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         const col=totals[0]<=totals[1]?0:1;cols[col].push({session,rows});totals[col]+=entries.length+2;
       });
       const buildPage=(split)=>{
-        const date=esc(state.event.date||'');const venue=esc(state.event.venue||'');const title=esc(state.event.title||'');const party=esc(state.event.partyNo||'—');
+        const date=esc(state.event.date||'');const venue=esc(state.event.venue||'');const title=esc(state.event.title||'');const party='';
         return `<div class="summary-a4-page"><header class="summary-top-two-lines"><div><b>EVENT DATE:</b> ${date}</div><div><b>VENUE:</b> ${venue}</div><div><b>PARTY NO:</b> ${party}</div><div><b>EVENT:</b> ${title}</div></header><div class="summary-heading"><h2>Event Menu &amp; Allergen Summary</h2><div style="margin-top:1.5mm;display:flex;justify-content:center;align-items:center;height:8mm">${state.sharedCompanyLogo?`<img src="${state.sharedCompanyLogo}" alt="Ragasaan" style="height:8mm;max-width:30mm;object-fit:contain">`:`<div style="width:30mm">${ragasaanLogoSvg}</div>`}</div></div><div class="summary-columns">${split.map(col=>`<div class="summary-column">${col.map(({session,rows})=>summaryBox(session,rows)).join('')}</div>`).join('')}</div><footer class="summary-footer">Allergen information must be checked against ingredients, recipes and cross-contact risks for this event. Red = declared allergen; amber = may contain.</footer></div>`;
       };
       const firstPage=buildPage(cols);screen.innerHTML=firstPage;print.innerHTML=firstPage;
@@ -2449,12 +2534,18 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         return {ok:used<=usable+2,used,usable};
       };
       let fitInfo={ok:true,used:0,usable:0},fitted=1;
-      // Hidden tabs cannot be measured. The summary recalculates when opened.
+      // Target approximately 80% of the available column height while staying readable.
+      // Never silently clip allergens: show a warning if the minimum scale still overflows.
       if(page.clientHeight){
-        for(const scale of [1,.96,.92,.88,.84,.80,.76,.72,.68,.65]){
-          fitted=scale;page.style.setProperty('--summary-fit',String(scale));
-          fitInfo=fits();if(fitInfo.ok)break;
+        page.style.setProperty('--summary-fit','1');
+        fitInfo=fits();
+        const desired=Math.min(1.28,Math.max(.84,fitInfo.used?0.80*fitInfo.usable/fitInfo.used:1));
+        let picked=false;
+        for(let scale=desired;scale>=.84-.001;scale-=.025){
+          fitted=Number(Math.max(.84,scale).toFixed(3));page.style.setProperty('--summary-fit',String(fitted));
+          fitInfo=fits();if(fitInfo.ok){picked=true;break;}
         }
+        if(!picked){fitted=.84;page.style.setProperty('--summary-fit','0.84');fitInfo=fits();}
       }
       print.firstElementChild?.style.setProperty('--summary-fit',String(fitted));
       const label=document.getElementById('summary-page-count');
@@ -2470,6 +2561,47 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       document.body.classList.add('print-event-summary');setTimeout(()=>window.print(),60)
     }
     window.addEventListener('afterprint',()=>document.body.classList.remove('print-event-summary'));
+    async function exportClientSummaryWord(){
+      if(!includeClientSummary){alert('Enable A4 Client Summary in Meal-wise Planning first.');return;}
+      if(window.ragasaanSummaryFits===false){alert('The A4 preview exceeds the readable single-page limit. Shorten the menu or use Print/PDF.');return;}
+      const w=window.docx;
+      if(!w?.Document||!w?.Packer){alert('Word library unavailable. Please connect to the internet and refresh.');return;}
+      try{
+        const P=(text,style={})=>new w.Paragraph({children:[new w.TextRun({text:String(text),bold:!!style.bold,color:style.color||'222222',size:style.size||17})],spacing:{after:style.after??45},keepWithNext:!!style.keep});
+        const title=[
+          P('EVENT DATE: '+(state.event.date||''),{bold:true,size:16}),
+          P('VENUE: '+(state.event.venue||''),{bold:true,size:16}),
+          P('PARTY NO: ',{bold:true,size:16}),
+          P('EVENT: '+(state.event.title||''),{bold:true,size:16,after:100}),
+          P('EVENT MENU & ALLERGEN SUMMARY',{bold:true,size:25,color:'7C5D32',after:50}),
+          P('RAGASAAN',{bold:true,size:18,color:'7C5D32',after:130})
+        ];
+        const columns=[[],[]],totals=[0,0];let serial=0;
+        // Same per-session column balancing used in the physical A4 preview.
+        for(const session of eventSessions){
+          const entries=eventRecords.filter(x=>x.sessionId===session.id);
+          if(!entries.length)continue;
+          const at=totals[0]<=totals[1]?0:1;
+          totals[at]+=entries.length+2;
+          columns[at].push(P(session.name.toUpperCase()+(session.time?' · '+session.time:''),{bold:true,size:20,color:'795A31',after:65,keep:true}));
+          let last='';
+          for(const item of entries){
+            const course=courseDisplay(session,item.menuCourse),service=getServiceType(item);
+            const timing=isCourseWise(session)?session.courseTimes?.[item.menuCourse]:'';
+            const group=course+' · '+service+(timing?' · '+timing:'');
+            if(group!==last){columns[at].push(P(group,{bold:true,size:17,color:'795A31',after:40,keep:true}));last=group;}
+            const allergens=Array.isArray(item.allergens)&&item.allergens.length?' · '+item.allergens.join(', '):' · Allergens not declared';
+            const may=Array.isArray(item.mayContain)&&item.mayContain.length?' · May contain: '+item.mayContain.join(', '):'';
+            columns[at].push(P((++serial)+'. '+item.name+allergens+may,{size:16,after:40}));
+          }
+        }
+        const cell=children=>new w.TableCell({width:{size:4970,type:w.WidthType.DXA},children:children.length?children:[P(' ',{size:16})],margins:{top:110,bottom:110,left:130,right:130}});
+        const table=new w.Table({width:{size:9940,type:w.WidthType.DXA},rows:[new w.TableRow({children:[cell(columns[0]),cell(columns[1])],cantSplit:true})]});
+        const foot=P('Allergen information must be checked against ingredients, recipes and cross-contact risks for this event.',{size:14,after:0});
+        const doc=new w.Document({sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:570,bottom:540,left:690,right:690}}},children:[...title,table,foot]}]});
+        saveBlob(await w.Packer.toBlob(doc),safeFilename(state.event.title||'Event')+'_A4_Client_Summary.docx');
+      }catch(err){console.error('Client summary Word export failed',err);alert('Could not create Word document: '+err.message);}
+    }
     function setupFormatState() {
       const template = {...state.design};
       // Each dimension receives its own settings, not merely a shared A4 width slider.
@@ -2477,7 +2609,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         ...template, titleFontSize:10, dishNameFontSize:10, descFontSize:10, allergenFontSize:10, autoFitText:true,
         logoWidth: 110, menuHeading:'Menu',
         coupleLogoWidth: 100, borderOutsetCm:0.2, coupleOffsetX:0, coupleOffsetY:0, showDescription:false,
-        foldTagsBottomHeightCm:3, foldTagsDividerWidthMm:0.3, foldTagsDividerColor:'#8f8572', foldTagsPanelInsetMm:2.5, foldTagsLogoWidth:28,
+        foldTagsBottomHeightCm:3, foldTagsDividerWidthMm:0.3, foldTagsDividerColor:'#8f8572', foldTagsPanelInsetMm:2.5, foldTagsLogoWidth:100,
         showHalfBackLeftImage:false, showHalfBackRightImage:false,
         halfBackLeftImageWidth:170, halfBackRightImageWidth:170,
         halfBackLeftImageShade:'none', halfBackRightImageShade:'none',
@@ -2502,7 +2634,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           cfg.foldTagsBottomHeightCm=Math.max(2.2,Math.min(4.5,Number(cfg.foldTagsBottomHeightCm)||3));
           cfg.foldTagsDividerWidthMm=Math.max(.2,Math.min(2,Number(cfg.foldTagsDividerWidthMm)||.3));
           cfg.foldTagsPanelInsetMm=Math.max(1,Math.min(8,Number(cfg.foldTagsPanelInsetMm)||2.5));
-          cfg.foldTagsLogoWidth=Math.max(20,Math.min(120,Number(cfg.foldTagsLogoWidth)||28));
+          cfg.foldTagsLogoWidth=Math.max(20,Math.min(120,Number(cfg.foldTagsLogoWidth)||100));
           if(!cfg.foldTagsDividerColor) cfg.foldTagsDividerColor = cfg.borderColor || '#8f8572';
           // migrate old single-image back-page settings if present
           if (!cfg.halfBackLeftImageUrl && cfg.halfBackImageUrl) cfg.halfBackLeftImageUrl = cfg.halfBackImageUrl;
@@ -2525,9 +2657,10 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
               .map(item => ({ ...item, menuCourse: String(item.menuCourse || '').trim() }));
           }
         });
-        if(saved.eventSessions?.length)eventSessions=saved.eventSessions;
+        if(saved.eventSessions?.length)eventSessions=saved.eventSessions.filter(x=>String(x.name||'').toLowerCase()!=='reception');
+        if(!eventSessions.some(x=>String(x.name||'').toLowerCase()==='hi tea'))eventSessions.push({id:'hi-tea',name:'HI Tea',time:'16:00',serviceMode:'Buffet',courseServices:{}});
         if(!eventSessions.some(x=>String(x.name||'').toLowerCase()==='late night snack'))eventSessions.push({id:'late-night',name:'Late Night Snack',time:'22:30',courseServices:{}});
-        if(Array.isArray(saved.eventRecords))eventRecords=saved.eventRecords.map(i=>({...i,eventUid:i.eventUid||eventUid(),serviceType:i.serviceType||'',tagCopies:i.tagCopies||{}}));
+        if(Array.isArray(saved.eventRecords))eventRecords=saved.eventRecords.map(i=>({...i,sessionId:i.sessionId==='reception'?'dinner':i.sessionId,eventUid:i.eventUid||eventUid(),serviceType:i.serviceType||'',tagCopies:i.tagCopies||{}}));
         else {
           // Migrate the older per-format menus without dropping existing data.
           const seen=new Map();
@@ -2542,6 +2675,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         state.sharedCompanyLogo=saved.companyLogo||'';
         state.sharedCoupleLogo=saved.coupleLogo||'';
         state.appTheme=saved.appTheme||'dark';
+        if(typeof saved.includeClientSummary==='boolean')includeClientSummary=saved.includeClientSummary;
         if(saved.event) Object.assign(state.event,{title:saved.event.title||state.event.title,date:saved.event.date||state.event.date,venue:saved.event.venue||state.event.venue});
       } catch(e){console.warn('Saved style unavailable',e);}
       applySharedLogos(); applyAppTheme(state.appTheme||'dark');
@@ -2587,7 +2721,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       MENU_FORMATS.forEach(fmt=>{state.designs[fmt].logoUrl=state.sharedCompanyLogo||'';state.designs[fmt].coupleLogoUrl=state.sharedCoupleLogo||'';});
     }
     function saveStyle() {
-      try {localStorage.setItem('ragasaan_style_v3',JSON.stringify({designs:state.designs,eventSessions,eventRecords,companyLogo:state.sharedCompanyLogo||'',coupleLogo:state.sharedCoupleLogo||'',appTheme:state.appTheme||'dark',event:{title:state.event.title,date:state.event.date,venue:state.event.venue,partyNo:state.event.partyNo||''}}));}
+      try {localStorage.setItem('ragasaan_style_v3',JSON.stringify({designs:state.designs,eventSessions,eventRecords,companyLogo:state.sharedCompanyLogo||'',coupleLogo:state.sharedCoupleLogo||'',appTheme:state.appTheme||'dark',includeClientSummary,event:{title:state.event.title,date:state.event.date,venue:state.event.venue,partyNo:state.event.partyNo||''}}));}
       catch(e){console.warn('Storage full; consider smaller logo images',e);}
     }
     function applyAppTheme(theme) {
@@ -2676,10 +2810,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           </div>
           <label class="flex items-start gap-2 text-amber-300"><input type="checkbox" ${d.autoFitText!==false?'checked':''} onchange="state.design.autoFitText=this.checked;renderPreview()"> <span><b>Auto-fit text to the page</b><span class="block text-[10px] text-slate-400">Shrinks all text proportionally when needed. If the minimum readable size is reached, creates extra pages instead of hiding dishes.</span></span></label>
           <label class="block text-slate-400"><input type="checkbox" ${d.showDescription===true?'checked':''} onchange="state.design.showDescription=this.checked;renderPreview()"> Show menu descriptions on this format</label>
-          <div class="border-t border-slate-800 pt-3">
-            <label class="block text-slate-400 mb-2">Quick Color Palettes (9)</label>
-            <div class="grid grid-cols-2 gap-2">${themes}</div>
-          </div>
+
         </details>
         <details data-compact="borders" class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-3 text-xs">
           <summary class="font-semibold text-gold-400 cursor-pointer mb-2">Borders</summary>
@@ -2713,7 +2844,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
             <label class="text-slate-400">Panel inset (mm)<input type="number" min="1" max="8" step="0.5" value="${Number(d.foldTagsPanelInsetMm)||2.5}" oninput="state.design.foldTagsPanelInsetMm=Math.max(1,Math.min(8,Number(this.value)||2.5));renderPreview()" class="w-full mt-1 p-1.5 rounded bg-slate-900 border border-slate-700 text-white"></label>
             <label class="text-slate-400">Divider line width (mm)<input type="number" min="0.2" max="2" step="0.1" value="${Number(d.foldTagsDividerWidthMm)||0.3}" oninput="state.design.foldTagsDividerWidthMm=Math.max(0.2,Math.min(2,Number(this.value)||0.3));renderPreview()" class="w-full mt-1 p-1.5 rounded bg-slate-900 border border-slate-700 text-white"></label>
             <label class="text-slate-400">Divider line color<input type="color" value="${d.foldTagsDividerColor||d.borderColor}" oninput="state.design.foldTagsDividerColor=this.value;renderPreview()" class="w-full mt-1 h-8 rounded"></label>
-            <label class="text-slate-400">FoldTags logo width (px)<input type="number" min="20" max="120" step="2" value="${Number(d.foldTagsLogoWidth)||28}" oninput="state.design.foldTagsLogoWidth=Math.max(20,Math.min(120,Number(this.value)||28));renderPreview()" class="w-full mt-1 p-1.5 rounded bg-slate-900 border border-slate-700 text-white"></label>
+            <label class="text-slate-400">FoldTags logo width (px)<input type="number" min="20" max="120" step="2" value="${Number(d.foldTagsLogoWidth)||100}" oninput="state.design.foldTagsLogoWidth=Math.max(20,Math.min(120,Number(this.value)||100));renderPreview()" class="w-full mt-1 p-1.5 rounded bg-slate-900 border border-slate-700 text-white"></label>
           </div>
         </details>`:''}
         ${state.layout==='a4-live'?`<div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs">
@@ -3135,6 +3266,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     }
     function selectedMenuCourse() {
       const select = document.getElementById('builder-course-select');
+      const session=selectedBuilderSession();if(!isCourseWise(session))return 'Other';
       const course = String(select?.value || '').trim();
       if (!course) { alert('Please select a course (Starter, Main Course, Dessert, etc.) before adding the dish.'); select?.focus(); return ''; }
       return course;
@@ -3174,21 +3306,12 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       addEventDish(dish,menuCourse);
     }
 
-    function renderActiveMenuItems() {
+    function renderActiveMenuItems(){
       const container=document.getElementById('event-items-list');if(!container)return;
-      const session=selectedBuilderSession();
-      const entries=eventRecords.filter(item=>item.sessionId===session?.id);
+      const session=selectedBuilderSession(),entries=eventRecords.filter(i=>i.sessionId===session?.id);
       const count=document.getElementById('active-item-count');if(count)count.textContent=entries.length;
       const name=document.getElementById('active-format-name');if(name)name.textContent=session?.name||'Meal';
-      container.innerHTML=entries.map((item,i)=>`<div class="bg-slate-900 border border-slate-800 p-3 rounded-lg text-xs space-y-2">
-        <div class="flex items-start justify-between gap-2"><span class="min-w-0 flex-1"><b>${i+1}. ${esc(item.name)}</b><span class="block text-[10px] text-slate-400">${esc(item.category||'Master item')} · ${Array.isArray(item.allergens)&&item.allergens.length?'Allergens: '+esc(item.allergens.join(', ')):'Allergens not declared'}</span></span><button type="button" onclick="removeEventRecord('${esc(item.eventUid)}')" aria-label="Remove ${esc(item.name)}" title="Remove item from this event" class="text-rose-200 border border-rose-800/70 bg-rose-950/50 hover:bg-rose-900/70 px-2.5 py-1.5 rounded font-semibold whitespace-nowrap">Remove</button></div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <label class="text-slate-300">Course<select aria-label="Course for ${esc(item.name)}" onchange="updateEventRecord('${esc(item.eventUid)}','menuCourse',this.value)" class="w-full mt-1 bg-slate-950 text-white border border-slate-700 rounded p-1.5">${menuCourseOptions(item.menuCourse)}</select></label>
-          <label class="text-slate-300">Service type<select aria-label="Service for ${esc(item.name)}" onchange="updateEventRecord('${esc(item.eventUid)}','serviceType',this.value)" class="w-full mt-1 bg-slate-950 text-white border border-slate-700 rounded p-1.5">${serviceTypeOptions(item.serviceType||'',true)}</select><span class="block text-[10px] text-slate-500 mt-1">Effective: ${esc(getServiceType(item))}</span></label>
-        </div>
-        <details class="border-t border-slate-800 pt-2"><summary class="text-amber-300 cursor-pointer">Print formats (${(item.printFormats||[]).length})</summary><div class="grid grid-cols-2 md:grid-cols-3 gap-1 mt-2 text-slate-300">${MENU_FORMATS.map(fmt=>`<label class="flex gap-1 items-center"><input type="checkbox" ${item.printFormats?.includes(fmt)?'checked':''} onchange="toggleEventItemFormat('${esc(item.eventUid)}','${fmt}',this.checked)">${esc(MENU_NAMES[fmt])}</label>`).join('')}</div></details>
-        ${TAG_FORMATS.some(fmt=>item.printFormats?.includes(fmt))?`<div class="border-t border-slate-800 pt-2"><div class="text-amber-300 text-[11px] mb-2">Tag print quantities</div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2">${TAG_FORMATS.filter(fmt=>item.printFormats?.includes(fmt)).map(fmt=>`<label class="text-slate-400">${esc(MENU_NAMES[fmt])}<input aria-label="${esc(MENU_NAMES[fmt])} quantity for ${esc(item.name)}" type="number" min="1" max="200" step="1" value="${Math.max(1,Number(item.tagCopies?.[fmt])||1)}" onchange="updateEventTagCopies('${esc(item.eventUid)}','${fmt}',this.value)" class="w-full mt-1 bg-slate-950 text-white border border-slate-700 rounded p-1.5"></label>`).join('')}</div></div>`:''}
-      </div>`).join('')||'<p class="text-slate-400 text-xs py-3">No dishes in this meal yet. Select a dish to add it.</p>';
+      container.innerHTML=entries.map((item,i)=>`<div class="flex items-start gap-2 justify-between rounded border border-slate-800 bg-slate-900 px-2 py-1.5 text-xs"><span class="min-w-0">${i+1}. ${esc(item.name)}</span><button type="button" onclick="removeEventRecord('${esc(item.eventUid)}')" aria-label="Remove ${esc(item.name)}" class="text-rose-300 font-semibold" title="Remove item">×</button></div>`).join('')||'<p class="text-slate-400 text-xs py-3">No dishes selected for this meal.</p>';
     }
     function clearActiveSessionItems(){
       const session=selectedBuilderSession();if(!session)return;
@@ -3219,7 +3342,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       const brand = (maxWidth = d.logoWidth) => d.logoUrl
         ? `<img src="${d.logoUrl}" alt="Company Logo" style="display:block;height:auto;width:${maxWidth}px;max-width:100%;object-fit:contain;margin:auto">`
         : `<div style="width:${maxWidth}px;max-width:100%;margin:auto">${ragasaanLogoSvg}</div>`;
-      const brandMark = (maxWidth = Number(d.foldTagsLogoWidth)||28) => d.logoUrl
+      const brandMark = (maxWidth = Number(d.foldTagsLogoWidth)||100) => d.logoUrl
         ? `<img src="${d.logoUrl}" alt="Ragasaan Logo" style="display:block;height:auto;width:${maxWidth}px;max-width:100%;object-fit:contain;margin:auto">`
         : `<div style="width:${maxWidth}px;max-width:100%;margin:auto">${ragasaanMarkSvg}</div>`;
       const wedding = () => d.showCoupleLogo && d.coupleLogoUrl
@@ -3321,7 +3444,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       // retains its independent vertically-centred area between heading and logo.
       const formatHeading = (label, editable=false) => `<h2 ${editable?'contenteditable="true" onblur="state.design.'+(editable==='buffet'?'menuHeading':'liveTitle')+'=this.innerText.trim();saveStyle()"':''} class="font-bold uppercase tracking-widest text-center" style="font-family:${titleFamily};color:${d.accentColor};${font(d.titleFontSize)};padding-top:3px;margin:0;line-height:1.15;flex-shrink:0">${escText(label)}</h2>`;
       // Size content against the *physical* A4 DOM, not the zoomed preview.
-      // Shrink text to a 70% legibility floor, then create extra printed pages.
+      // Shrink text to an 84% legibility floor, then create extra printed pages.
       const fitMenuPage = pageElement => {
         const area=pageElement.querySelector('[data-auto-fit-area]');
         const flow=pageElement.querySelector('[data-auto-fit-flow]');
@@ -3331,7 +3454,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           // Compare actual intrinsic content, including course headings and descriptions.
           return content.height <= bounds.height+1 && content.width <= bounds.width+1;
         };
-        const min=d.autoFitText===false?1:0.70;
+        const min=d.autoFitText===false?1:0.84;
         for(let factor=1;factor>=min-.001;factor-=.025) {
           pageElement.style.setProperty('--ragasaan-fit',String(Math.max(min,Number(factor.toFixed(3)))));
           if(fits()) return true;
@@ -3394,11 +3517,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         const makeTableFront=(records)=>{
           const p=page('paper-half-a4','flex flex-col'); p.style.padding=`${Math.max(2.3,Number(d.borderOutsetCm)+.25)}cm`; p.style.paddingTop=`${Math.max(0.8, Number(d.borderOutsetCm)+Number(d.borderWidth||1)/10+0.2)}cm`;
           const left=`<div class="text-center flex flex-col justify-between" style="min-width:0;border-right:1px solid ${d.accentColor}55;padding:0 12px 0 0">
-            <div style="padding-top:${Math.min(Number(d.halfTitleTop)||0, 10)}px"><h1 contenteditable="true" oninput="state.design.clientCoupleTitle=this.innerText;saveStyle()" style="color:${d.accentColor};${font(d.titleFontSize)}" class="font-bold">${escText(d.clientCoupleTitle||state.event.title)}</h1>${wedding()}${d.clientWelcomeMessage?`<p class="menu-body-font" style="margin:8px auto;color:${d.textColor};${font(d.descFontSize)}">${escText(d.clientWelcomeMessage)}</p>`:''}</div>
-            <div class="menu-body-font" style="margin-bottom:${d.halfVenueBottom}px;${font(d.descFontSize)}">
-              <p contenteditable="true" oninput="state.event.venue=this.innerText">${escText(state.event.venue)}</p>
-              <p contenteditable="true" oninput="state.event.date=this.innerText">${escText(state.event.date)}</p></div>
-            <div>${brand()}</div></div>`;
+            <div style="padding-top:${Math.min(Number(d.halfTitleTop)||0, 10)}px"><h1 contenteditable="true" oninput="state.design.clientCoupleTitle=this.innerText;saveStyle()" style="color:${d.accentColor};${font(d.titleFontSize)}" class="font-bold">${escText(d.clientCoupleTitle||state.event.title)}</h1><p class="menu-body-font" style="${font(d.descFontSize)};margin:5px auto 0">${escText(state.event.date)}</p><div style="display:flex;justify-content:center;margin:7px 0">${wedding()}</div>${d.clientWelcomeMessage?`<p class="menu-body-font" style="margin:8px auto;color:${d.textColor};${font(d.descFontSize)}">${escText(d.clientWelcomeMessage)}</p>`:''}</div>
+            <div class="menu-body-font" style="margin-bottom:${d.halfVenueBottom}px;${font(d.descFontSize)}"><p contenteditable="true" oninput="state.event.venue=this.innerText">${escText(state.event.venue)}</p><div style="margin-top:6px">${brand()}</div></div></div>`;
           const right=`<div class="menu-body-font flex flex-col" style="min-width:0;padding:0 12px 0;overflow:hidden"><div data-auto-fit-area style="overflow:hidden;flex:1;min-height:0;display:flex;flex-direction:column"><div data-auto-fit-flow style="flex:0 0 auto;margin:auto 0"><h2 contenteditable="true" data-preview-text="tableMenuHeading" class="font-bold text-center uppercase tracking-widest" style="font-family:${titleFamily};color:${d.accentColor};${font(d.titleFontSize)};margin-bottom:6px;line-height:1.15">${escText(d.tableMenuHeading ?? 'Menu')}</h2>${tableCardCollection(records)}</div></div><div>${brand()}</div></div>`;
           p.innerHTML=`${frame()}<div style="height:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px;min-height:0">${left}${right}</div>`;
           return p;
@@ -3442,7 +3562,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
               label.innerHTML=`
                 <div style="height:${topHeight}cm;flex:0 0 auto"></div>
                 <div style="height:${panelHeight}cm;flex:0 0 auto;margin:0 ${inset}mm ${inset}mm;border:${dividerWidth}mm solid ${dividerColor};display:flex;flex-direction:column;justify-content:flex-start;align-items:center;padding:1.1mm 2mm 1.6mm;box-sizing:border-box;overflow:hidden">
-                  <div style="flex:0 0 auto;margin-bottom:1.2mm;line-height:1">${brandMark(Number(d.foldTagsLogoWidth)||28)}</div>
+                  <div style="flex:0 0 auto;margin-bottom:1.2mm;line-height:1">${brandMark(Number(d.foldTagsLogoWidth)||100)}</div>
                   <div class="menu-body-font" style="min-width:0;max-width:100%;overflow-wrap:anywhere;word-break:break-word;white-space:normal;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:1.2mm;overflow:hidden">
                     <h4 contenteditable="true" oninput="updateActiveItem(${i},'name',this.innerText)" onblur="finishCanvasItemEdit(${i})" class="font-bold leading-tight" style="margin:0;color:${d.textColor};${font(Math.max(10,(Number(d.dishNameFontSize)||10)*0.96))};text-transform:uppercase">${escText(item.name)}</h4>
                     <div class="leading-tight" style="${font(Math.max(9,(Number(d.allergenFontSize)||10)*0.84))}">${allergies(item,i)}</div>
@@ -3802,7 +3922,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 
   <!-- Login is a presentation gate. Worker/D1 enforce the actual cloud permissions. -->
   <div id="ragasaan-auth-root" class="no-print">
-    <form id="rs-login-form" class="raga-login-card" aria-label="Ragasaan staff login">
+    <form id="rs-login-form" onsubmit="event.preventDefault();if(window.ragaLoginSubmit){window.ragaLoginSubmit(event);}else{document.getElementById('rs-login-error').textContent='Login script is not loading. Check security-app.js in GitHub and refresh.';}return false;" class="raga-login-card" aria-label="Ragasaan staff login">
       <div style="font-size:36px;color:#eab308;margin-bottom:12px">✦</div>
       <h1>Ragasaan Menu Studio</h1>
       <p>Secure Event Planner &amp; Administrator access</p>

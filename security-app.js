@@ -7,17 +7,7 @@
 const API='https://ragasaan-security-api.arunkumarnkl.workers.dev';
 const FMT=['a4','a4-live','half-a4','a8-grid','foldtags-grid','a6-grid','canape-grid'];
 const FN={'a4':'Buffet A4','a4-live':'Live Station','half-a4':'Table Menu Card','a8-grid':'A8 Tags','foldtags-grid':'FoldTags','a6-grid':'A6 Tags','canape-grid':'Canapé Labels'};
-const PRESETS=[
- {id:'executive-ivory',name:'Executive Ivory',kind:'professional',titleFont:'font-serif',bodyFont:'font-sans',textColor:'#24272d',accentColor:'#8b7551',borderColor:'#b5a78b',borderStyle:'solid',borderWidth:0.7,frameMotif:'fine-line',titleFontSize:20,dishNameFontSize:13,descFontSize:11,allergenFontSize:10},
- {id:'midnight-premier',name:'Midnight Premier',kind:'professional',titleFont:'font-montserrat',bodyFont:'font-sans',textColor:'#18243a',accentColor:'#2d5172',borderColor:'#456982',borderStyle:'double',borderWidth:1.1,frameMotif:'art-deco',titleFontSize:20,dishNameFontSize:13,descFontSize:11,allergenFontSize:10},
- {id:'modern-minimal',name:'Modern Minimal',kind:'professional',titleFont:'font-sans',bodyFont:'font-sans',textColor:'#111827',accentColor:'#475569',borderColor:'#64748b',borderStyle:'solid',borderWidth:0.3,frameMotif:'none',titleFontSize:19,dishNameFontSize:13,descFontSize:11,allergenFontSize:10},
- {id:'heritage-burgundy',name:'Heritage Burgundy',kind:'professional',titleFont:'font-serif',bodyFont:'font-cormorant',textColor:'#38252b',accentColor:'#70283c',borderColor:'#a47483',borderStyle:'double',borderWidth:1,frameMotif:'corner-flourish',titleFontSize:22,dishNameFontSize:14,descFontSize:11,allergenFontSize:10},
- {id:'botanical-emerald',name:'Botanical Emerald',kind:'professional',titleFont:'font-cormorant',bodyFont:'font-sans',textColor:'#20392e',accentColor:'#33755e',borderColor:'#7d9e8d',borderStyle:'solid',borderWidth:.8,frameMotif:'botanical',titleFontSize:21,dishNameFontSize:14,descFontSize:11,allergenFontSize:10},
- {id:'slate-gold',name:'Slate & Gold',kind:'professional',titleFont:'font-montserrat',bodyFont:'font-sans',textColor:'#202835',accentColor:'#987637',borderColor:'#aa904f',borderStyle:'double',borderWidth:1.2,frameMotif:'art-deco',titleFontSize:20,dishNameFontSize:13,descFontSize:11,allergenFontSize:10},
- {id:'romantic-blush',name:'Romantic Blush',kind:'wedding',titleFont:'font-script',bodyFont:'font-cormorant',textColor:'#573d47',accentColor:'#b67789',borderColor:'#cfa5b0',borderStyle:'double',borderWidth:.9,frameMotif:'corner-flourish',titleFontSize:25,dishNameFontSize:14,descFontSize:12,allergenFontSize:10},
- {id:'royal-wedding',name:'Royal Wedding',kind:'wedding',titleFont:'font-serif',bodyFont:'font-cormorant',textColor:'#2c2532',accentColor:'#a07b35',borderColor:'#beaa76',borderStyle:'double',borderWidth:1.3,frameMotif:'art-deco',titleFontSize:23,dishNameFontSize:14,descFontSize:12,allergenFontSize:10},
- {id:'garden-ceremony',name:'Garden Ceremony',kind:'wedding',titleFont:'font-script',bodyFont:'font-cormorant',textColor:'#2e4736',accentColor:'#698868',borderColor:'#92aa8e',borderStyle:'solid',borderWidth:.9,frameMotif:'botanical',titleFontSize:25,dishNameFontSize:14,descFontSize:12,allergenFontSize:10}
-];
+const PRESETS=[{"id":"executive-ivory","name":"Executive Ivory","kind":"professional","titleFont":"font-serif","bodyFont":"font-sans","textColor":"#24272d","accentColor":"#8b7551","borderColor":"#b5a78b","borderStyle":"solid","borderWidth":0.7,"frameMotif":"fine-line","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10,"weightGroup":"bold"},{"id":"midnight-premier","name":"Midnight Premier","kind":"professional","titleFont":"font-montserrat","bodyFont":"font-sans","textColor":"#18243a","accentColor":"#2d5172","borderColor":"#456982","borderStyle":"double","borderWidth":1.1,"frameMotif":"art-deco","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10,"weightGroup":"bold"},{"id":"modern-minimal","name":"Modern Minimal","kind":"professional","titleFont":"font-sans","bodyFont":"font-sans","textColor":"#111827","accentColor":"#475569","borderColor":"#64748b","borderStyle":"solid","borderWidth":0.3,"frameMotif":"none","titleFontSize":19,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10,"weightGroup":"bold"},{"id":"heritage-burgundy","name":"Heritage Burgundy","kind":"professional","titleFont":"font-serif","bodyFont":"font-cormorant","textColor":"#38252b","accentColor":"#70283c","borderColor":"#a47483","borderStyle":"double","borderWidth":1,"frameMotif":"corner-flourish","titleFontSize":22,"dishNameFontSize":14,"descFontSize":11,"allergenFontSize":10,"weightGroup":"bold"},{"id":"botanical-emerald","name":"Botanical Emerald","kind":"professional","titleFont":"font-cormorant","bodyFont":"font-sans","textColor":"#20392e","accentColor":"#33755e","borderColor":"#7d9e8d","borderStyle":"solid","borderWidth":0.8,"frameMotif":"botanical","titleFontSize":21,"dishNameFontSize":14,"descFontSize":11,"allergenFontSize":10,"weightGroup":"bold"},{"id":"slate-gold","name":"Slate & Gold","kind":"professional","titleFont":"font-montserrat","bodyFont":"font-sans","textColor":"#202835","accentColor":"#987637","borderColor":"#aa904f","borderStyle":"double","borderWidth":1.2,"frameMotif":"art-deco","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10,"weightGroup":"bold"},{"id":"romantic-blush","name":"Romantic Blush","kind":"wedding","titleFont":"font-script","bodyFont":"font-cormorant","textColor":"#573d47","accentColor":"#b67789","borderColor":"#cfa5b0","borderStyle":"double","borderWidth":0.9,"frameMotif":"corner-flourish","titleFontSize":25,"dishNameFontSize":14,"descFontSize":12,"allergenFontSize":10,"weightGroup":"mild"},{"id":"royal-wedding","name":"Royal Wedding","kind":"wedding","titleFont":"font-serif","bodyFont":"font-cormorant","textColor":"#2c2532","accentColor":"#a07b35","borderColor":"#beaa76","borderStyle":"double","borderWidth":1.3,"frameMotif":"art-deco","titleFontSize":23,"dishNameFontSize":14,"descFontSize":12,"allergenFontSize":10,"weightGroup":"mild"},{"id":"garden-ceremony","name":"Garden Ceremony","kind":"wedding","titleFont":"font-script","bodyFont":"font-cormorant","textColor":"#2e4736","accentColor":"#698868","borderColor":"#92aa8e","borderStyle":"solid","borderWidth":0.9,"frameMotif":"botanical","titleFontSize":25,"dishNameFontSize":14,"descFontSize":12,"allergenFontSize":10,"weightGroup":"mild"},{"id":"monarch-navy","name":"Monarch Navy","kind":"professional","weightGroup":"bold","titleFont":"font-montserrat","bodyFont":"font-serif","textColor":"#f1f5f9","accentColor":"#0f3563","borderColor":"#284b73","borderStyle":"double","borderWidth":1,"frameMotif":"art-deco","titleFontSize":24,"dishNameFontSize":14,"descFontSize":11,"allergenFontSize":10},{"id":"crimson-gala","name":"Crimson Gala","kind":"wedding","weightGroup":"bold","titleFont":"font-serif","bodyFont":"font-cormorant","textColor":"#562a32","accentColor":"#9d283b","borderColor":"#b95b69","borderStyle":"double","borderWidth":1,"frameMotif":"corner-flourish","titleFontSize":24,"dishNameFontSize":14,"descFontSize":11,"allergenFontSize":10},{"id":"copper-regency","name":"Copper Regency","kind":"wedding","weightGroup":"bold","titleFont":"font-serif","bodyFont":"font-cormorant","textColor":"#4b3027","accentColor":"#a24d30","borderColor":"#b88f78","borderStyle":"double","borderWidth":1,"frameMotif":"corner-flourish","titleFontSize":24,"dishNameFontSize":14,"descFontSize":11,"allergenFontSize":10},{"id":"golden-celebration","name":"Golden Celebration","kind":"wedding","weightGroup":"bold","titleFont":"font-script","bodyFont":"font-cormorant","textColor":"#533c1d","accentColor":"#a57a19","borderColor":"#c9af63","borderStyle":"double","borderWidth":1,"frameMotif":"art-deco","titleFontSize":24,"dishNameFontSize":14,"descFontSize":11,"allergenFontSize":10},{"id":"linen-serif","name":"Linen Serif","kind":"professional","weightGroup":"mild","titleFont":"font-serif","bodyFont":"font-sans","textColor":"#333335","accentColor":"#8a847f","borderColor":"#cabfb1","borderStyle":"solid","borderWidth":0.6,"frameMotif":"fine-line","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10},{"id":"sage-elegance","name":"Sage Elegance","kind":"wedding","weightGroup":"mild","titleFont":"font-cormorant","bodyFont":"font-cormorant","textColor":"#364c40","accentColor":"#78927e","borderColor":"#a9bbaa","borderStyle":"solid","borderWidth":0.6,"frameMotif":"botanical","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10},{"id":"powder-blue","name":"Powder Blue","kind":"professional","weightGroup":"mild","titleFont":"font-sans","bodyFont":"font-sans","textColor":"#304156","accentColor":"#718ea4","borderColor":"#afc1d0","borderStyle":"solid","borderWidth":0.6,"frameMotif":"fine-line","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10},{"id":"blush-linen","name":"Blush Linen","kind":"wedding","weightGroup":"mild","titleFont":"font-script","bodyFont":"font-cormorant","textColor":"#62464d","accentColor":"#bf9ca5","borderColor":"#d2b9be","borderStyle":"solid","borderWidth":0.6,"frameMotif":"corner-flourish","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10},{"id":"soft-pearl","name":"Soft Pearl","kind":"professional","weightGroup":"mild","titleFont":"font-cormorant","bodyFont":"font-sans","textColor":"#4c5158","accentColor":"#87929b","borderColor":"#c8ced3","borderStyle":"solid","borderWidth":0.6,"frameMotif":"fine-line","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10},{"id":"almond-garden","name":"Almond Garden","kind":"wedding","weightGroup":"mild","titleFont":"font-cormorant","bodyFont":"font-sans","textColor":"#514e3e","accentColor":"#a59d75","borderColor":"#cbc5a5","borderStyle":"double","borderWidth":0.6,"frameMotif":"botanical","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10},{"id":"lavender-mist","name":"Lavender Mist","kind":"wedding","weightGroup":"mild","titleFont":"font-serif","bodyFont":"font-cormorant","textColor":"#534f65","accentColor":"#8b86a8","borderColor":"#bdb8d0","borderStyle":"solid","borderWidth":0.6,"frameMotif":"corner-flourish","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10}];
 const SAFE=['titleFont','bodyFont','textColor','accentColor','bgColor','borderColor','borderStyle','borderWidth','borderOutsetCm','titleFontSize','dishNameFontSize','descFontSize','allergenFontSize','frameMotif'];
 const s={token:null, user:null,cloudEvent:null, events:[], planners:[], activeTheme:'', clientToken:null, clientEvent:null, clientDesign:{designs:{}},clientFmt:'half-a4',themes:[...PRESETS], pendingChanges:false};
 const $=id=>document.getElementById(id);
@@ -46,7 +36,10 @@ async function login(evt){evt?.preventDefault();onLoginError('Signing in…');tr
  }catch(err){onLoginError(err.message);}
 }
 async function logout(){try{if(s.token)await call('/logout','POST',{},true)}catch(_){}finally{s.token=null;s.user=null;s.cloudEvent=null;sessionStorage.removeItem('raga_session');document.body.classList.add('ragasaan-locked');onLoginError('Signed out.');}}
-function showAuthenticated(){gateStatus();document.querySelectorAll('[data-rs-admin]').forEach(n=>n.hidden=s.user?.role!=='admin');
+function showAuthenticated(){gateStatus();
+  const venueButton=$('tab-btn-venues');if(venueButton)venueButton.hidden=s.user?.role!=='admin';
+  const venueTab=$('tab-venues');if(venueTab&&s.user?.role!=='admin')venueTab.hidden=true;
+document.querySelectorAll('[data-rs-admin]').forEach(n=>n.hidden=s.user?.role!=='admin');
   document.querySelectorAll('[data-rs-staff]').forEach(n=>n.hidden=!s.user);
   const banner=$('rs-security-banner');if(banner)banner.textContent='Cloud events are shared through D1. Browser backups remain local. GitHub master publishing uses separate Admin authentication.';
   renderThemeGallery();refreshCloudList().catch(x=>msg(x.message,'error'));
@@ -81,8 +74,33 @@ function drawSelected(){const el=$('rs-cloud-selected');if(!el)return;
  const enabled=!!x;
  ['rs-make-link','rs-load-submissions','rs-list-links','rs-approve-print','rs-load-selected'].forEach(id=>{const b=$(id);if(b)b.disabled=!enabled});
 }
+// Keep cloud event JSON below Worker request limits. Never upload large embedded images
+// or duplicate identical images across all seven format designs. Master data stays in GitHub.
+function compactCloudSnapshot(raw){
+ const snapshot=data(raw);const imageKeys=/^(logoUrl|coupleLogoUrl|halfBackLeftImageUrl|halfBackRightImageUrl|halfBackImageUrl|imageUrl)$/i;
+ function stripImages(node){
+  if(Array.isArray(node))return node.map(stripImages);
+  if(node&&typeof node==='object'){const o={};for(const [key,val] of Object.entries(node)){
+   if(imageKeys.test(key)||typeof val==='string'&&val.startsWith('data:image/'))continue;
+   o[key]=stripImages(val);
+  }return o;}return node;
+ }
+ const cleaned=stripImages(snapshot);
+ // Preserve small event logos once rather than seven duplicated copies. Large images
+ // stay browser-local; the company logo is also served centrally from GitHub.
+ const logoCandidate=(snapshot.designs?.['half-a4']||snapshot.designs?.a4||{});
+ const oneLogo=(key)=>{
+   const val=logoCandidate[key]||snapshot.designs?.a4?.[key]||'';
+   return typeof val==='string'&&/^data:image\/(png|jpeg|webp);base64,/i.test(val)&&val.length<125000?val:'';
+ };
+ const companyLogo=oneLogo('logoUrl'),coupleLogo=oneLogo('coupleLogoUrl');
+ if(companyLogo||coupleLogo)cleaned.sharedImages={companyLogo,coupleLogo};
+ const bytes=new TextEncoder().encode(JSON.stringify(cleaned)).length;
+ if(bytes>480000)throw Error('Event is still too large ('+Math.ceil(bytes/1024)+' KB). Reduce the number of items or descriptions before saving. Images remain browser-local.');
+ return cleaned;
+}
 async function saveCloud(){if(!s.user)throw Error('Sign in first');
- const snapshot=eventSnapshot(),current=s.cloudEvent;
+ const snapshot=compactCloudSnapshot(eventSnapshot()),current=s.cloudEvent;
  const chosenName=String(snapshot.name||snapshot.title||'Event').trim();
  const payload={name:chosenName,eventDate:snapshot.date||'',venue:snapshot.venue||'',partyNo:snapshot.partyNo||'',eventData:snapshot};
  if(s.user.role==='admin'){const planner=$('rs-event-planner');payload.plannerUserId=planner?.value||null;}
@@ -93,7 +111,8 @@ async function saveCloud(){if(!s.user)throw Error('Sign in first');
 }
 async function loadCloud(id){const x=await call('/events/'+id);if(!x.event)throw Error('Cloud event not found');
  // Loading a cloud snapshot also loads its approved client design. Keep local browser copy intact until confirmed.
- if(restoreEventSnapshot(x.event.eventData)!==true)return;s.cloudEvent=x.event;s.activeTheme=x.event.eventData?.themeId||'';renderThemeGallery();s.loadedSnapshot=JSON.stringify(eventSnapshot());s.loadedRemote=JSON.stringify(x.event.eventData);
+ const remote=data(x.event.eventData);for(const fmt of FMT){if(remote.designs?.[fmt]){for(const k of ['logoUrl','coupleLogoUrl']){const v=remote.sharedImages?.[k==='logoUrl'?'companyLogo':'coupleLogo'];if(v&&!remote.designs[fmt][k])remote.designs[fmt][k]=v;}if(state.designs?.[fmt])for(const k of ['logoUrl','coupleLogoUrl','halfBackLeftImageUrl','halfBackRightImageUrl'])if(!remote.designs[fmt][k]&&state.designs[fmt][k])remote.designs[fmt][k]=state.designs[fmt][k];}}
+ if(restoreEventSnapshot(remote)!==true)return;s.cloudEvent=x.event;s.activeTheme=x.event.eventData?.themeId||'';renderThemeGallery();s.loadedSnapshot=JSON.stringify(compactCloudSnapshot(eventSnapshot()));s.loadedRemote=JSON.stringify(x.event.eventData);
  drawSelected();msg('Loaded cloud event '+x.event.name);closeCloud();
 }
 async function createLink(){if(!s.cloudEvent)return msg('Save to Cloud first','error');
@@ -129,7 +148,7 @@ async function canPrint(){if(!s.user){alert('Please sign in to print.');return f
  try{const check=await call('/events/'+s.cloudEvent.id+'/print-status');if(!check.allowed){alert('Printing not approved for this cloud event. Review the latest design and approve printing.');openCloud();return false;}
  // Ensure local working draft matches the cloud approved snapshot, rather than an unsaved edit.
  const latest=await call('/events/'+s.cloudEvent.id);
- if(!s.loadedSnapshot||!s.loadedRemote||JSON.stringify(eventSnapshot())!==s.loadedSnapshot||JSON.stringify(latest.event?.eventData)!==s.loadedRemote){
+ if(!s.loadedSnapshot||!s.loadedRemote||JSON.stringify(compactCloudSnapshot(eventSnapshot()))!==s.loadedSnapshot||JSON.stringify(latest.event?.eventData)!==s.loadedRemote){
    alert('Your browser contains unsaved changes, or the approved cloud event was updated. Load the approved cloud event before printing.');return false;
  }
  return true;
@@ -137,12 +156,14 @@ async function canPrint(){if(!s.user){alert('Please sign in to print.');return f
 function lockMaster(){if(s.user?.role!=='admin'){alert('Only the Admin can modify the master allergen database.');return false;}return true;}
 const nativeRequestMaster=window.requestMasterAuthorization;
 window.requestMasterAuthorization=function(label,callback){if(!lockMaster())return;return nativeRequestMaster(label,callback);};
+const originalSwitchTab=window.switchTab;
+if(typeof originalSwitchTab==='function')window.switchTab=function(name){if(name==='venues'&&s.user?.role!=='admin')return;return originalSwitchTab.apply(this,arguments);};
 const originalMasterRender=window.renderMasterDB;
 if(typeof originalMasterRender==='function')window.renderMasterDB=function(...args){const result=originalMasterRender.apply(this,args);if(s.user?.role!=='admin')document.querySelectorAll('#tab-master button[onclick*="requestMasterAuthorization"]').forEach(b=>b.hidden=true);return result;};
 for(const fn of ['publishMasterToGitHub','saveDishModal','deleteDish','openDishModal','importExcel']){
  const original=window[fn];if(typeof original==='function')window[fn]=function(...args){if(!lockMaster())return;return original.apply(this,args);};
 }
-for(const fn of ['triggerPrint','downloadPDF','printEventSummary','exportFormatWord']){
+for(const fn of ['triggerPrint','downloadPDF','printEventSummary','exportClientSummaryWord','exportFormatWord']){
  const native=window[fn];if(typeof native==='function')window[fn]=async function(...args){if(!(await canPrint()))return;return native.apply(this,args);};
 }
 // A browser's Ctrl+P cannot be server-authorized. Reduce accidental bypass with a beforeprint warning.
@@ -180,7 +201,7 @@ function themeCard(t,context='staff'){
 }
 function renderThemeGallery(){const root=$('rs-theme-gallery');if(!root)return;const themes=allThemes();
  const list=themes.map(t=>themeCard(t)).join('');
- root.innerHTML=`<div class="raga-gallery-head"><div><h3>Design Theme Gallery</h3><p>Nine full presets · six professional and three wedding · all seven menu/tag formats</p></div><div class="raga-actions"><button class="raga-btn" onclick="ragaSaveCurrentTheme()">Save custom theme</button><button class="raga-btn" onclick="ragaExportThemes()">Export</button><label class="raga-btn" style="cursor:pointer">Import <input type="file" accept="application/json,.json" onchange="ragaImportThemes(event)" hidden></label></div></div><div class="raga-theme-grid">${list}</div><p class="raga-help">Choose a gallery theme to update fonts, typography sizes, colors and decorative borders across all formats. You can still fine-tune each format below. Custom themes stay in this browser unless exported or added to <code>themes/gallery.json</code> on GitHub.</p>`;
+ root.innerHTML=`<div class="raga-gallery-head"><div><h3>Design Theme Gallery</h3><p>20 complete presets · 10 bold and 10 mild · professional and wedding · all seven menu/tag formats</p></div><div class="raga-actions"><button class="raga-btn" onclick="ragaSaveCurrentTheme()">Save custom theme</button><button class="raga-btn" onclick="ragaExportThemes()">Export</button><label class="raga-btn" style="cursor:pointer">Import <input type="file" accept="application/json,.json" onchange="ragaImportThemes(event)" hidden></label></div></div><div class="raga-theme-grid">${list}</div><p class="raga-help">Choose a gallery theme to update fonts, typography sizes, colors and decorative borders across all formats. You can still fine-tune each format below. Custom themes stay in this browser unless exported or added to <code>themes/gallery.json</code> on GitHub.</p>`;
 }
 function saveCurrentTheme(){if(!s.user)return;const name=prompt('Custom theme name:');if(!name?.trim())return;
  const id='custom-'+crypto.randomUUID().slice(0,13),style=styleFrom(state.design),theme={id,name:name.trim(),kind:'custom',...style};
@@ -188,8 +209,8 @@ function saveCurrentTheme(){if(!s.user)return;const name=prompt('Custom theme na
 function exportThemes(){const blob=new Blob([JSON.stringify(savedThemes(),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ragasaan-custom-themes.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000);}
 async function importThemes(ev){const f=ev.target.files?.[0];if(!f)return;try{const raw=JSON.parse(await f.text());if(!Array.isArray(raw))throw Error('Expected a JSON array');const got=raw.map(validTheme).filter(Boolean),map=new Map(savedThemes().map(x=>[x.id,x]));for(const t of got)map.set(t.id,t);localStorage.setItem('ragasaan_custom_themes_v1',JSON.stringify([...map.values()]));renderThemeGallery();alert(`Imported ${got.length} valid themes`);}catch(err){alert('Theme import failed: '+err.message);}finally{ev.target.value='';}}
 function initClient(){const fragment=location.hash.match(/(?:^#|&)client=([a-f0-9]{64})/i);
- if(!fragment){$('rs-login-panel').hidden=false;return false;}
- s.clientToken=fragment[1];$('ragasaan-auth-root').classList.add('raga-client-on');$('rs-login-panel').hidden=true;$('rs-client-panel').hidden=false;openClient().catch(err=>{$('rs-client-panel').innerHTML=`<div class="raga-login-card"><h2>Client link unavailable</h2><p>${e(err.message)}</p></div>`;});return true;
+ if(!fragment){$('rs-login-form').hidden=false;return false;}
+ s.clientToken=fragment[1];$('ragasaan-auth-root').classList.add('raga-client-on');$('rs-login-form').hidden=true;$('rs-client-panel').hidden=false;openClient().catch(err=>{$('rs-client-panel').innerHTML=`<div class="raga-login-card"><h2>Client link unavailable</h2><p>${e(err.message)}</p></div>`;});return true;
 }
 async function openClient(){const result=await call('/client/view','POST',{token:s.clientToken},false);s.clientEvent=result.event;
  s.clientDesign={themeId:'executive-ivory',designs:{},coupleTitle:'',brideName:'',groomName:'',welcomeMessage:'',coupleLogo:'',coupleLogoWidth:110};
@@ -240,7 +261,7 @@ async function submitClient(){if(!s.clientToken)return;
 }
 function copyLink(){const x=$('rs-link-output').value;if(!x)return;try{navigator.clipboard.writeText(x).then(()=>msg('Client link copied.')).catch(()=>{ $('rs-link-output').select();document.execCommand('copy');});}catch(_){$('rs-link-output').select();}}
 function attach(){
- $('rs-login-form')?.addEventListener('submit',login);
+ // The form uses an inline fail-closed submit handler so missing JS cannot silently reload the page.
  $('rs-open-cloud')?.addEventListener('click',openCloud);
  $('rs-close-cloud')?.addEventListener('click',closeCloud);
  $('rs-logout')?.addEventListener('click',logout);
@@ -263,7 +284,7 @@ function attach(){
 }
 // Export only specific event handlers to the global namespace for CSP-compatible markup callbacks.
 Object.assign(window,{
- ragaApplyTheme:applyTheme,ragaSaveCurrentTheme:saveCurrentTheme,ragaExportThemes:exportThemes,ragaImportThemes:importThemes,
+ ragaLoginSubmit:login, ragaApplyTheme:applyTheme,ragaSaveCurrentTheme:saveCurrentTheme,ragaExportThemes:exportThemes,ragaImportThemes:importThemes,
  ragaSelectClientTheme:selectClientTheme,ragaClientChangeFormat:clientFormat,ragaClientDetail:detailClient,
  ragaClientStyle:updateClientStyle,ragaClientLogo:clientLogo,ragaSubmitClientDesign:submitClient
 });
