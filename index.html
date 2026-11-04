@@ -1279,6 +1279,67 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       border: 1px solid #ca8a04;
     }
 
+    .paper-foldtags-grid {
+      width: 210mm; height: 297mm;
+      display: grid; grid-template-columns: repeat(2, 90mm); grid-template-rows: repeat(4, 60mm);
+      gap: 6mm; padding: 16.5mm 12mm; box-sizing: border-box; background: white; overflow: hidden;
+      align-content: start; justify-content: center;
+    }
+    .paper-foldtags-single {
+      width: 90mm; height: 60mm; box-sizing: border-box;
+      position: relative; overflow: hidden; padding: 0;
+      border: 1px solid var(--label-border, #ca8a04);
+      background: #ffffff;
+    }
+    .paper-foldtags-single p {overflow-wrap:anywhere;word-break:break-word;white-space:normal;max-width:100%;}
+
+
+    .summary-a4-page{width:210mm;height:297mm;max-height:297mm;overflow:hidden;box-sizing:border-box;background:white;color:#262626;position:relative;padding:11mm 12mm 10mm;font-family:Arial,sans-serif;box-shadow:0 3px 16px #0004;flex-shrink:0}
+    .summary-top-two-lines{font:9px/1.4 Arial,sans-serif;color:#555;display:grid;grid-template-columns:1fr 1fr;gap:1mm 5mm;border-bottom:.3mm solid #a78b55;padding-bottom:2.5mm}
+    .summary-heading{margin:3mm 0 3mm;text-align:center;border-bottom:.2mm solid #d4c7b4;padding-bottom:2mm}
+    .summary-heading h2{font:bold 15px/1.1 Georgia,serif;margin:0;color:#26221f}
+    .summary-columns{display:grid;grid-template-columns:1fr 1fr;gap:3mm;align-items:start;min-height:0}
+    .summary-column{display:flex;flex-direction:column;gap:calc(2mm * var(--summary-fit,1));min-width:0}
+    .summary-session-card{border:.25mm solid #b3a18c;break-inside:avoid;overflow:hidden;border-radius:1mm}
+    .summary-session-heading{padding:calc(1.1mm * var(--summary-fit,1)) 2mm;background:#f4eee4;border-bottom:.25mm solid #c2b095;color:#6b5028;font-weight:700;font-size:calc(10px * var(--summary-fit,1));line-height:1.2}
+    .summary-course-heading{font-size:calc(8.5px * var(--summary-fit,1));font-weight:700;color:#6b5028;padding:calc(1mm * var(--summary-fit,1)) 2mm calc(.65mm * var(--summary-fit,1));background:#faf8f3;border-bottom:.2mm solid #ebe1d1}
+    .summary-service-label{font-weight:500;color:#6c6252;font-size:calc(8px * var(--summary-fit,1))}
+    #sidebar-controls.workspace-wide{width:100%!important;max-width:none!important;border-right:0!important;flex:1 1 auto!important}
+    #tab-builder .builder-page-grid{display:grid;grid-template-columns:minmax(276px,310px) minmax(0,1fr);align-items:start;gap:14px}
+    #tab-builder .builder-static-column{display:flex;flex-direction:column;gap:14px;min-width:0;position:sticky;top:0}
+    #tab-builder .builder-meal-column{display:flex;flex-direction:column;gap:14px;min-width:0}
+    #tab-builder .builder-planning-grid{display:flex;flex-direction:column;gap:14px;min-width:0}
+    #tab-builder .builder-planning-grid > *{min-width:0;width:100%}
+    #tab-builder #event-items-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+    #tab-builder #event-items-list > div{margin:0;min-width:0}
+    #tab-builder .builder-status{margin-top:6px;border-radius:7px;border:1px solid #6d9257;background:#162f25;color:#d1f3ce;padding:9px 12px;font-size:12px}
+    #tab-builder .builder-status.hidden{display:none}
+    @media(max-width:1050px){#tab-builder .builder-page-grid{grid-template-columns:minmax(235px,270px) minmax(0,1fr)}#tab-builder #event-items-list{grid-template-columns:1fr}}
+    @media(max-width:720px){#tab-builder .builder-page-grid{grid-template-columns:1fr}#tab-builder .builder-static-column{position:static}}
+    #builder-session-tabs{display:flex;gap:7px;flex-wrap:wrap}
+    #builder-session-tabs button{border:1px solid #44516a;color:#d7e1ef;border-radius:9px;padding:10px 13px;background:#152035;min-width:115px;text-align:left}
+    #builder-session-tabs button.active{background:#473d25;border-color:#e2b34e;color:#ffd98a}
+    #builder-session-tabs button small{display:block;font-size:10px;color:#9eacc3;margin-top:2px}
+    #builder-session-tabs button.active small{color:#ead5a2}
+    #builder-session-tabs button.add-session{min-width:auto;border-style:dashed}
+    #tab-builder .selected-events-panel{min-height:140px;overflow:visible}
+    @media print {#sidebar-controls.workspace-wide{display:none!important}#preview-main-panel{display:block!important}}
+    .summary-item-row{display:grid;grid-template-columns:calc(7mm * var(--summary-fit,1)) minmax(0,1fr);gap:1mm;align-items:start;padding:calc(1.05mm * var(--summary-fit,1)) 1.7mm;border-bottom:.2mm solid #eee8df;font-size:calc(9px * var(--summary-fit,1));line-height:1.22;overflow-wrap:anywhere}
+    .summary-item-row:last-child{border-bottom:0}
+    .summary-item-text{display:block;min-width:0}
+    .summary-item-name{font-weight:700;color:#26221f}
+    .summary-item-allergens{color:#a3290a}
+    .summary-item-may{color:#93600f}
+    .summary-item-none{color:#777}
+    .summary-footer{font-size:8px;line-height:1.3;color:#555;border-top:.2mm solid #d4c7b4;margin-top:3mm;padding-top:1.5mm}
+    #summary-print-root{display:none}
+    @media print{
+      body.print-event-summary > *{display:none!important}
+      body.print-event-summary #summary-print-root{display:block!important;position:static!important;width:210mm!important;margin:0!important;padding:0!important}
+      body.print-event-summary .summary-a4-page{display:block!important;width:210mm!important;height:297mm!important;box-shadow:none!important;margin:0!important;break-after:page;page-break-after:always}
+      body.print-event-summary .summary-a4-page:last-child{break-after:auto;page-break-after:auto}
+      @page{size:A4 portrait;margin:0}
+    }
     [contenteditable="true"]:hover {
       outline: 1px dashed #ca8a04;
       background: rgba(202, 138, 4, 0.05);
@@ -1326,9 +1387,11 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       justify-content:center!important;align-content:center!important;box-sizing:border-box!important;}
     .paper-a8-single {width:74mm!important;height:52.5mm!important;padding:1mm!important;
       overflow:hidden!important;box-sizing:border-box!important;border:1px double var(--label-border,#a39161)!important;}
-    .paper-a8-single p,.paper-a6-single p,.paper-canape-single p {overflow-wrap:anywhere;word-break:break-word;white-space:normal;max-width:100%;}
+    .paper-a8-single p,.paper-a6-single p,.paper-canape-single p,.paper-foldtags-single p {overflow-wrap:anywhere;word-break:break-word;white-space:normal;max-width:100%;}
+    .paper-foldtags-grid, .paper-foldtags-grid.print-sheet {width:210mm!important;height:297mm!important;display:grid!important;grid-template-columns:repeat(2,90mm)!important;grid-template-rows:repeat(4,60mm)!important;column-gap:6mm!important;row-gap:6mm!important;padding:16.5mm 12mm!important;justify-content:center!important;align-content:start!important;box-sizing:border-box!important;overflow:hidden!important;}
+    .paper-foldtags-single {width:90mm!important;height:60mm!important;padding:0!important;overflow:hidden!important;box-sizing:border-box!important;border:1px solid var(--label-border,#a39161)!important;background:#fff!important;}
     @media print {
-      .paper-a8-grid.print-sheet {width:210mm!important;height:297mm!important;}
+      .paper-a8-grid.print-sheet, .paper-foldtags-grid.print-sheet {width:210mm!important;height:297mm!important;}
     }
 
     @media print {
@@ -1370,9 +1433,10 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       <button onclick="switchTab('export')" id="tab-btn-export" class="tab-btn px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-white">
         <i class="fa-solid fa-print"></i> <span class="hidden md:inline">3. Print & Format Studio</span>
       </button>
-      <button onclick="switchTab('venues')" id="tab-btn-venues" class="tab-btn px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-white"><i class="fa-solid fa-location-dot"></i><span class="hidden md:inline">4. Venues</span></button>
+      <button onclick="switchTab('summary')" id="tab-btn-summary" class="tab-btn px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-white"><i class="fa-solid fa-clipboard-list"></i><span class="hidden md:inline">4. Event Allergen Summary</span></button>
+      <button onclick="switchTab('venues')" id="tab-btn-venues" class="tab-btn px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-white"><i class="fa-solid fa-location-dot"></i><span class="hidden md:inline">5. Venues</span></button>
       <button onclick="switchTab('master')" id="tab-btn-master" class="tab-btn px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-white">
-        <i class="fa-solid fa-database text-gold-400"></i> <span class="hidden md:inline">5. Master Database</span>
+        <i class="fa-solid fa-database text-gold-400"></i> <span class="hidden md:inline">6. Master Database</span>
       </button>
     </nav>
 
@@ -1406,19 +1470,21 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   <div class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
 
     <!-- LEFT SIDEBAR: CONTROL PANELS -->
-    <aside id="sidebar-controls" class="no-print w-full md:w-[480px] lg:w-[520px] bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 overflow-hidden">
+    <aside id="sidebar-controls" class="no-print workspace-wide w-full md:w-[480px] lg:w-[520px] bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 overflow-hidden">
 
       <!-- TAB 1: EVENT MENU BUILDER -->
       <div id="tab-builder" class="tab-content flex-1 flex flex-col overflow-y-auto p-4 gap-4">
         <div>
-          <h2 class="text-sm font-semibold text-slate-200">Event Menu Builder</h2>
-          <p class="text-xs text-slate-400">Choose dishes from Master Database to populate active wedding menu</p>
+          <div class="flex justify-between items-center gap-2"><h2 class="text-sm font-semibold text-slate-200">Event Menu Builder</h2><button onclick="saveNamedEvent()" class="bg-amber-500 text-slate-950 font-bold rounded px-3 py-1.5 text-xs">Save Event</button></div>
+          <p class="text-xs text-slate-400">Plan each meal in its own tab. Choose a course, service type and print formats once; the Event Allergen Summary and all selected menu/tag formats update automatically.</p>
         </div>
 
+        <div class="builder-page-grid">
+          <section class="builder-static-column" aria-label="Event header and couple logo">
         <!-- Standard Event Header Details -->
         <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2 text-xs">
           <h3 class="text-xs font-semibold text-gold-400">Standard Event Header Details</h3>
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-1 gap-2">
             <div>
               <label class="block text-slate-400 mb-1">Couple / Event Title</label>
               <input type="text" id="cfg-couple" value="Charlotte & Alexander" oninput="state.event.title = this.value; renderPreview()" class="w-full bg-slate-900 border border-slate-800 rounded p-1.5 text-slate-100">
@@ -1439,17 +1505,23 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
            <label class="block text-xs font-semibold text-gold-400">Bride / Groom Image or Logo</label>
            <input type="file" accept="image/*" onchange="handleCoupleLogoUpload(event)" class="block w-full text-xs text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-800 file:text-white file:px-2 file:py-1">
-           <p class="text-[10px] text-slate-500">Displayed below the couple title; size and alignment can be adjusted for each card type.</p>
+           <p class="text-[10px] text-slate-500">Used across the supported menu layouts; preview and alignment options are in Styling &amp; Graphics.</p>
          </div>
-         <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
-           <label class="block text-xs font-semibold text-gold-400">Type Of Menu Card/Tags</label>
-           <select id="builder-format-select" onchange="setLayout(this.value)" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-100">
-             <option value="a4">Buffet Menu (A4)</option><option value="a4-live">Live Station</option>
-             <option value="half-a4">Table Menu Card</option><option value="a8-grid">Tags (A8)</option>
-             <option value="a6-grid">Tags (A6)</option><option value="canape-grid">Canape Labels</option>
-           </select>
-           <p class="text-[10px] text-slate-500">Each format has its own independent Add Menu Items list.</p>
-         </div>
+          </section>
+          <section class="builder-meal-column" aria-label="Meal-wise event planning">
+        <!-- Meal-wise event planning: one active session at a time, with editable per-course service styles. -->
+        <section class="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-3">
+          <div class="flex justify-between items-center gap-2 flex-wrap"><h3 class="text-sm font-semibold text-gold-400">Meal-wise Planning</h3><span class="text-[11px] text-slate-400">Click a meal tab to plan its dishes</span></div>
+          <div id="builder-session-tabs" role="tablist" aria-label="Event meal sessions"></div>
+          <div class="flex gap-3 items-center flex-wrap text-xs"><label>Service time <input id="builder-session-time" type="time" onchange="setActiveSessionTime(this.value)" class="p-1.5 rounded bg-slate-900 text-white border border-slate-700 ml-2"></label><span class="text-slate-400">Service type can differ by course, including at Dinner and Lunch.</span></div>
+          <details class="bg-slate-900 border border-slate-800 p-3 rounded-lg">
+            <summary class="text-xs font-semibold text-amber-300 cursor-pointer">Service type for each course (editable) · Open to customise Lunch/Dinner</summary>
+            <div id="builder-course-service-types" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 mt-3 text-xs"></div>
+            <p class="text-[10px] text-slate-400 mt-2">Defaults only for this meal. Individual dishes can override their course service type without changing other dishes.</p>
+          </details>
+        </section>
+
+            <div class="builder-planning-grid">
          <!-- Searchable Add Dish Picker -->
         <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
           <label class="text-xs font-semibold text-gold-400 flex items-center justify-between">
@@ -1460,6 +1532,21 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
             <button id="add-mode-master" onclick="toggleAddMode('master')" class="flex-1 p-2 bg-amber-600 text-slate-950 font-semibold">Master Database</button>
             <button id="add-mode-manual" onclick="toggleAddMode('manual')" class="flex-1 p-2 bg-slate-800 text-slate-200">Manual Entry</button>
           </div>
+          <div class="rounded-lg border border-slate-700 bg-slate-900 p-2 space-y-2">
+            <label for="builder-session-select" class="block text-xs font-semibold text-amber-300">Event session *</label>
+            <div class="flex gap-2"><select id="builder-session-select" onchange="selectBuilderSession(this.value)" class="flex-1 min-w-0 p-2 rounded bg-slate-950 border border-amber-700 text-white text-xs"></select><button type="button" onclick="addEventSession()" class="px-3 rounded bg-slate-700 text-white text-xs">+ Session</button></div>
+            <label class="block text-xs font-semibold text-amber-300">Print in these menu formats (multiple allowed)</label>
+            <div id="builder-print-formats" class="grid grid-cols-2 gap-1 text-[11px] text-slate-200"></div>
+            <details class="border-t border-slate-700 pt-2" open><summary class="text-[11px] text-amber-300 font-semibold cursor-pointer">Tag copies per dish (small tags only)</summary>
+              <div id="builder-tag-copies" class="grid grid-cols-2 gap-2 mt-2 text-[11px] text-slate-300">
+                <label>A8 Tags<input type="number" min="1" max="200" step="1" value="1" data-tag-format="a8-grid" aria-label="A8 tag copies" class="w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-white"></label>
+                <label>FoldTags<input type="number" min="1" max="200" step="1" value="1" data-tag-format="foldtags-grid" aria-label="FoldTags copies" class="w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-white"></label>
+                <label>Canapé Labels<input type="number" min="1" max="200" step="1" value="1" data-tag-format="canape-grid" aria-label="Canapé Label copies" class="w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-white"></label>
+                <label>A6 Tags<input type="number" min="1" max="200" step="1" value="1" data-tag-format="a6-grid" aria-label="A6 tag copies" class="w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-white"></label>
+              </div>
+            </details>
+            <p class="text-[10px] text-slate-400">Every dish added here is included automatically in the Event Allergen Summary, even if no print format is selected.</p>
+          </div>
           <div class="rounded-lg border border-amber-700/50 bg-slate-900 p-2">
             <label for="builder-course-select" class="block mb-1 text-xs font-semibold text-amber-300">Course for the next dish *</label>
             <select id="builder-course-select" class="w-full p-2 rounded bg-slate-950 border border-amber-700 text-white text-xs" required>
@@ -1467,12 +1554,14 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
               <option value="Starter">Starter</option>
               <option value="Main Course">Main Course</option>
               <option value="Dessert">Dessert</option>
-              <option value="Canapés">Canapés</option>
+              <option value="Canapé">Canapé</option>
+              <option value="Late Night Snack">Late Night Snack</option>
               <option value="Live Station">Live Station</option>
               <option value="Other">Other / Uncategorised</option>
             </select>
             <p class="text-[10px] text-slate-400 mt-1">Assigned only to this menu. Does not change the Master Database category. Each item can be moved later.</p>
           </div>
+          <div id="builder-added-feedback" class="builder-status hidden" role="status" aria-live="polite"></div>
           <div id="master-add-controls" class="space-y-2">
           <div class="flex gap-2">
             <select id="builder-cat-filter" onchange="filterBuilderDropdown()" class="w-1/3 bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-200">
@@ -1496,23 +1585,24 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
               <input id="manual-subcategory" placeholder="Sub-category (optional)" class="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white">
             </div>
             <textarea id="manual-description" rows="2" placeholder="Description (optional)" class="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white"></textarea>
-            <button type="button" onclick="addManualDishToMenu()" class="w-full py-2.5 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shadow"><i class="fa-solid fa-plus mr-1"></i> Add Item to Live Preview</button>
+            <button type="button" onclick="addManualDishToMenu()" class="w-full py-2.5 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shadow"><i class="fa-solid fa-plus mr-1"></i> Add Item to This Meal</button>
             <p id="manual-add-feedback" role="status" aria-live="polite" class="text-[11px] text-emerald-400 hidden"></p>
             <details class="border border-slate-800 rounded-lg p-2" open><summary class="cursor-pointer text-amber-400 font-semibold">Allergens (UK 14)</summary><div id="manual-allergens" class="grid grid-cols-2 gap-1 pt-2"></div></details>
             <details class="border border-slate-800 rounded-lg p-2"><summary class="cursor-pointer text-amber-400 font-semibold">May Contain (cross-contact)</summary><div id="manual-maycontain" class="grid grid-cols-2 gap-1 pt-2"></div></details>
-            <button type="button" onclick="addManualDishToMenu()" class="w-full p-2 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold"><i class="fa-solid fa-plus"></i> Add Manual Item to Selected Format</button>
-            <p class="text-[10px] text-slate-400">Manual items remain in this menu format only and do not update the Master Database.</p>
+            <p class="text-[10px] text-slate-400">Manual items belong to this event, appear in the allergen summary and selected print formats, and do not update the Master Database.</p>
           </div>
         </div>
 
-        <!-- Selected Active Event Items List -->
-        <div class="flex-1 flex flex-col overflow-hidden">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="text-xs font-semibold text-slate-300"><span id="active-format-name">Buffet Menu (A4)</span> Items (<span id="active-item-count">0</span>)</h3>
-            <button onclick="clearEventMenu()" class="text-[11px] text-rose-400 hover:underline">Clear This Format</button>
+          <div class="selected-events-panel bg-slate-950 border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
+          <div class="flex items-center justify-between mb-1 gap-2">
+            <h3 class="text-sm font-semibold text-gold-400">Selected Items — <span id="active-format-name">Breakfast</span> (<span id="active-item-count">0</span>)</h3>
+            <button onclick="clearActiveSessionItems()" class="text-[11px] text-rose-400 hover:underline">Clear This Meal</button>
           </div>
-          <div id="event-items-list" class="flex-1 overflow-y-auto space-y-2 pr-1">
+          <p class="text-[11px] text-slate-400">Confirm each dish below. Change its course, service or print format, or remove it if added by mistake. The client summary updates automatically.</p>
+          <div id="event-items-list" class="flex-1 pr-1"></div>
           </div>
+            </div>
+          </section>
         </div>
       </div>
 
@@ -1539,6 +1629,9 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
             </button>
             <button onclick="setLayout('a8-grid')" id="fmt-btn-a8-grid" class="p-2 border border-slate-800 rounded-lg text-[11px] text-center text-slate-400 hover:border-slate-700 transition">
               <i class="fa-solid fa-grip-fill block text-base mb-1"></i> Tags (A8)
+            </button>
+            <button onclick="setLayout('foldtags-grid')" id="fmt-btn-foldtags-grid" class="p-2 border border-slate-800 rounded-lg text-[11px] text-center text-slate-400 hover:border-slate-700 transition">
+              <i class="fa-solid fa-note-sticky block text-base mb-1 text-gold-400"></i> FoldTags
             </button>
             <button onclick="setLayout('a6-grid')" id="fmt-btn-a6-grid" class="p-2 border border-slate-800 rounded-lg text-[11px] text-center text-slate-400 hover:border-slate-700 transition">
               <i class="fa-solid fa-id-card block text-base mb-1"></i> Tags (A6)
@@ -1618,6 +1711,17 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <div class="grid grid-cols-2 gap-1 pt-0">
              <button onclick="setLayout('a8-grid'); downloadPDF()" class="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-rose-400 rounded-lg font-semibold text-[11px] transition border border-slate-800 flex items-center justify-center gap-1.5"><i class="fa-solid fa-file-pdf"></i> PDF</button>
             <button onclick="setLayout('a8-grid'); triggerPrint()" class="px-2 py-1 bg-gold-500 hover:bg-gold-400 text-slate-950 rounded-lg font-semibold text-[11px] transition flex items-center justify-center gap-1.5 shadow"><i class="fa-solid fa-print"></i> Print</button>
+          </div>
+        </div>
+
+        <!-- FoldTags -->
+        <div class="bg-slate-950 px-2 py-2 rounded-lg border border-slate-800 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-gold-400"><i class="fa-solid fa-note-sticky"></i> FoldTags</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1 pt-0">
+             <button onclick="setLayout('foldtags-grid'); downloadPDF()" class="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-rose-400 rounded-lg font-semibold text-[11px] transition border border-slate-800 flex items-center justify-center gap-1.5"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+            <button onclick="setLayout('foldtags-grid'); triggerPrint()" class="px-2 py-1 bg-gold-500 hover:bg-gold-400 text-slate-950 rounded-lg font-semibold text-[11px] transition flex items-center justify-center gap-1.5 shadow"><i class="fa-solid fa-print"></i> Print</button>
           </div>
         </div>
 
@@ -1713,8 +1817,45 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     </div>
 
 
+
+    <!-- Dedicated client summary. This is independent of the existing format print canvas. -->
+    <section id="tab-summary" class="tab-content hidden flex-1 min-w-0 overflow-y-auto bg-slate-950 p-4 lg:p-6 no-print" style="color:#e6ebf4">
+      <div class="flex justify-between gap-2 items-center flex-wrap mb-3">
+        <div><h2 class="text-lg font-semibold text-amber-400">Event Allergen Summary</h2><p class="text-xs text-slate-400">Two compact columns • meal, course &amp; service type • serial number and allergens alongside each dish</p></div>
+        <div class="flex gap-2 flex-wrap"><button onclick="saveNamedEvent()" class="bg-amber-500 text-slate-950 font-bold rounded px-3 py-2 text-xs">Save Event</button><button onclick="printEventSummary()" class="bg-amber-500 text-slate-950 font-bold rounded px-3 py-2 text-xs"><i class="fa-solid fa-print"></i> Print / PDF</button></div>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+        <div class="space-y-3">
+          <div class="bg-slate-900 rounded-lg border border-slate-700 p-3 space-y-2 text-xs">
+            <h3 class="text-amber-400 font-semibold">Event details</h3>
+            <label class="block">Party No.<input id="summary-party-no" oninput="setEventPartyNo(this.value)" placeholder="Party number" class="w-full mt-1 p-2 bg-slate-950 border border-slate-700 rounded text-white"></label>
+            <p class="text-slate-400">Date, venue and title are shared with the Event Menu Builder.</p>
+          </div>
+          <div class="bg-slate-900 rounded-lg border border-slate-700 p-3 space-y-2 text-xs">
+            <h3 class="text-amber-400 font-semibold">Sessions</h3><p class="text-slate-400">Edit course service types in the meal-wise Builder tabs.</p>
+            <div id="summary-session-manager" class="space-y-2"></div>
+            <button onclick="addEventSession()" class="bg-slate-700 text-white rounded px-3 py-2 w-full">+ Add Session</button>
+          </div>
+          <div class="bg-slate-900 rounded-lg border border-slate-700 p-3 space-y-2 text-xs">
+            <h3 class="text-amber-400 font-semibold">Saved events</h3>
+            <div class="flex gap-2"><select id="saved-event-select" class="flex-1 min-w-0 bg-slate-950 text-white border border-slate-700 rounded p-2"></select><button onclick="loadNamedEvent()" class="bg-slate-700 px-2 rounded">Load</button></div>
+            <div class="flex gap-2"><button onclick="saveNamedEvent()" class="bg-amber-500 text-slate-950 font-bold rounded px-3 py-2 flex-1">Save Event</button><button onclick="downloadEventFile()" class="bg-slate-700 rounded px-3 py-2 flex-1">Export JSON</button></div>
+            <label class="block cursor-pointer bg-slate-700 rounded p-2 text-center">Import Event JSON<input type="file" accept="application/json,.json" class="hidden" onchange="importEventFile(event)"></label>
+            <p class="text-slate-400">Saved locally in this browser. Export JSON to transfer or back up an event. Does not alter the GitHub master database.</p>
+          </div>
+          <div class="bg-slate-900 rounded-lg border border-slate-700 p-3 space-y-2 text-xs">
+            <h3 class="text-amber-400 font-semibold">Items for this event</h3>
+            <div id="summary-edit-items" class="max-h-80 overflow-y-auto space-y-2"></div>
+          </div>
+        </div>
+        <div class="lg:col-span-2 bg-slate-800 rounded-xl p-3 overflow-auto">
+          <div class="flex justify-between gap-2 text-[11px] text-slate-300 mb-2"><span>Live A4 client summary preview</span><span id="summary-page-count"></span></div>
+          <div id="summary-display-preview" class="flex flex-col items-center gap-3"></div>
+        </div>
+      </div>
+    </section>
     <!-- RIGHT SIDE: LIVE INTERACTIVE PREVIEW CANVAS -->
-    <main id="preview-main-panel" class="flex-1 bg-slate-950 flex flex-col overflow-hidden relative">
+    <main id="preview-main-panel" class="hidden flex-1 bg-slate-950 flex flex-col overflow-hidden relative">
 
       <!-- Preview Top Toolbar -->
       <div class="no-print bg-slate-900 border-b border-slate-800 px-4 py-2 flex items-center justify-between shrink-0 text-xs">
@@ -1748,6 +1889,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 
   </div>
 
+
+  <div id="summary-print-root" aria-hidden="true"></div>
 
   <!-- MODAL: MASTER PASSWORD AUTHENTICATION -->
   <div id="auth-modal" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4">
@@ -1890,6 +2033,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       <line x1="96" y1="74" x2="325" y2="74" stroke="#ca8a04" stroke-width="1.5"/>
     </svg>`;
 
+    const ragasaanMarkSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 76 76" width="100%"><circle cx="38" cy="38" r="36" fill="#d9bd6a"/><path d="M30 20 C30 20 23 27 23 38 C23 49 30 56 30 56 M30 38 L48 38" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round" fill="none"/></svg>`;
+
     const defaultMasterDB = [
       {
         id: 'db-1', category: 'Canapés', name: 'Seared Duck Breast & Black Cherry Crostini',
@@ -1978,6 +2123,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       renderActiveMenuItems();
       renderContextualControls();
       renderPreview();
+      renderEventSummary();
       renderVenueDB(); populateVenueOptions(); syncDatePicker();
       // Start fetching the GitHub master as soon as the UI exists. No Excel upload prompt.
       await Promise.all([loadGitHubDatabases(), loadGitHubCompanyLogo()]);
@@ -2004,13 +2150,16 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       const previewMain = document.getElementById('preview-main-panel');
       const sidebar = document.getElementById('sidebar-controls');
       const master = document.getElementById('tab-master');
-      // Only Print & Format Studio has a narrow sidebar. Other tabs retain their original widths.
-      sidebar.classList.toggle('print-format-compact', tabId === 'export');
-      sidebar.classList.toggle('hidden', tabId === 'master' || tabId === 'venues');
+      // Full-page meal planning. Only Styling & Graphics displays the live canvas beside controls.
+      sidebar.classList.remove('print-format-compact');
+      sidebar.classList.toggle('workspace-wide', tabId === 'builder' || tabId === 'export');
+      sidebar.classList.toggle('hidden', tabId === 'master' || tabId === 'venues' || tabId === 'summary');
       master.classList.toggle('master-preview-split', tabId === 'master');
-      previewMain.classList.toggle('hidden', tabId === 'master' || tabId === 'venues');
+      previewMain.classList.toggle('hidden', tabId !== 'design');
       if (tabId === 'master') renderMasterDB();
       else if (tabId === 'venues') renderVenueDB();
+      else if (tabId === 'summary') renderEventSummary();
+      else if (tabId === 'builder') {renderBuilderSessionTabs();renderActiveMenuItems();}
       else renderPreview();
     }
 
@@ -2081,14 +2230,239 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       document.getElementById('print-canvas-wrapper').style.transform = 'scale(0.75)';
     }
 
-    const MENU_FORMATS = ['a4', 'a4-live', 'half-a4', 'a8-grid', 'a6-grid', 'canape-grid'];
+    const MENU_FORMATS = ['a4', 'a4-live', 'half-a4', 'a8-grid', 'foldtags-grid', 'a6-grid', 'canape-grid'];
     const MENU_NAMES = {
       a4: 'Buffet Menu (A4)', 'a4-live': 'Live Station Menu Board (A4)', 'half-a4': 'Table Menu Card',
-      'a8-grid': 'Tags (A8)', 'a6-grid': 'Tags (A6)', 'canape-grid': 'Canape Labels'
+      'a8-grid': 'Tags (A8)', 'foldtags-grid': 'FoldTags', 'a6-grid': 'Tags (A6)', 'canape-grid': 'Canape Labels'
     };
     function esc(value) {
       return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
     }
+    // Shared event records: one dish can appear in multiple print formats and one client summary.
+    const TAG_FORMATS=['a8-grid','foldtags-grid','canape-grid','a6-grid'];
+    const EVENT_STORE_KEY='ragasaan_event_library_v1';
+    let eventRecords=[];
+    let eventSessions=[{id:'breakfast',name:'Breakfast',time:'08:00'}, {id:'lunch',name:'Lunch',time:'12:30'}, {id:'reception',name:'Reception',time:'17:00'}, {id:'dinner',name:'Dinner',time:'19:00'}, {id:'late-night',name:'Late Night Snack',time:'22:30'}];
+    const SERVICE_TYPES=['Buffet','Thali','Table Service','Bowl Food','Live Station'];
+    let currentBuilderSession='breakfast';
+    function defaultServiceTypes(session){
+      const name=String(session.name||'').toLowerCase();
+      const dinner=name.includes('dinner');
+      const reception=name.includes('reception');
+      return {'Canapé':reception?'Bowl Food':'Buffet','Starter':'Buffet','Main Course':dinner?'Table Service':'Buffet','Dessert':'Buffet','Late Night Snack':'Buffet','Live Station':'Live Station','Other':'Buffet'};
+    }
+    function ensureSessionServices(session){
+      const defaults=defaultServiceTypes(session);
+      session.courseServices={...defaults,...(session.courseServices||{})};
+      return session.courseServices;
+    }
+    function getServiceType(item){
+      if(item.serviceType && SERVICE_TYPES.includes(item.serviceType))return item.serviceType;
+      const session=eventSessions.find(s=>s.id===item.sessionId)||eventSessions[0];
+      return (session&&ensureSessionServices(session)[item.menuCourse])||'Buffet';
+    }
+    function serviceTypeOptions(selected,includeDefault=false){
+      return (includeDefault?'<option value="" '+(!selected?'selected':'')+'>Use course default</option>':'')+SERVICE_TYPES.map(v=>`<option value="${esc(v)}" ${selected===v?'selected':''}>${esc(v)}</option>`).join('');
+    }
+    function selectedBuilderSession(){return eventSessions.find(s=>s.id===currentBuilderSession)||eventSessions[0]}
+    function selectBuilderSession(id){
+      if(!eventSessions.some(s=>s.id===id))return;
+      currentBuilderSession=id;
+      const sel=document.getElementById('builder-session-select');if(sel)sel.value=id;
+      renderBuilderSessionTabs();renderActiveMenuItems();
+    }
+    function setActiveSessionTime(time){
+      const session=selectedBuilderSession();if(!session)return;
+      editEventSession(session.id,'time',time);
+    }
+    function updateCourseService(sessionId,course,type){
+      const session=eventSessions.find(s=>s.id===sessionId);
+      if(!session||!SERVICE_TYPES.includes(type))return;
+      ensureSessionServices(session)[course]=type;
+      onEventRecordsChanged();
+    }
+    function renderBuilderSessionTabs(){
+      const session=selectedBuilderSession();if(!session)return;
+      const holder=document.getElementById('builder-session-tabs');
+      if(holder){holder.innerHTML=eventSessions.map(s=>`<button type="button" role="tab" aria-selected="${s.id===session.id?'true':'false'}" class="${s.id===session.id?'active':''}" onclick="selectBuilderSession('${esc(s.id)}')"><strong>${esc(s.name)}</strong><small>${eventRecords.filter(i=>i.sessionId===s.id).length} dishes</small></button>`).join('')+'<button type="button" class="add-session" onclick="addEventSession()">+ Custom Session</button>'}
+      const dropdown=document.getElementById('builder-session-select');if(dropdown)dropdown.value=session.id;
+      const time=document.getElementById('builder-session-time');if(time&&time!==document.activeElement)time.value=session.time||'';
+      const area=document.getElementById('builder-course-service-types');
+      if(area){const services=ensureSessionServices(session);area.innerHTML=MENU_COURSES.filter(c=>c!=='Other').map(course=>`<label class="text-slate-300">${esc(course)}<select aria-label="${esc(course)} service type" onchange="updateCourseService('${esc(session.id)}','${esc(course)}',this.value)" class="w-full mt-1 rounded bg-slate-950 border border-slate-700 p-1.5 text-white">${serviceTypeOptions(services[course])}</select></label>`).join('')}
+    }
+
+    let activeEventName='';
+    function eventUid(){return 'evt-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9)}
+    function normalizeEventFormatRecords(){
+      state.formatMenus=Object.fromEntries(MENU_FORMATS.map(fmt=>[fmt,[]]));
+      eventRecords.forEach(item=>{
+        const formats=Array.isArray(item.printFormats)?item.printFormats:[];
+        formats.forEach(fmt=>{
+          if(!state.formatMenus[fmt])return;
+          const copies=TAG_FORMATS.includes(fmt)?Math.max(1,Math.min(200,Math.floor(Number(item.tagCopies?.[fmt])||1))):1;
+          for(let n=0;n<copies;n++) state.formatMenus[fmt].push(item);
+        });
+      });
+      state.event.items=state.formatMenus[state.layout]||[];
+    }
+    function selectedEventSession(){return currentBuilderSession || eventSessions[0]?.id || 'breakfast'}
+    function selectedPrintFormats(){return [...document.querySelectorAll('#builder-print-formats input:checked')].map(el=>el.value).filter(fmt=>MENU_FORMATS.includes(fmt))}
+    function updateSessionPicker(){
+      const sel=document.getElementById('builder-session-select');if(!sel)return;
+      const previous=currentBuilderSession||sel.value||'breakfast';
+      sel.innerHTML=eventSessions.map(v=>`<option value="${esc(v.id)}">${esc(v.name)}</option>`).join('');
+      currentBuilderSession=eventSessions.some(s=>s.id===previous)?previous:(eventSessions[0]?.id||'');sel.value=currentBuilderSession;
+    }
+    function renderFormatCheckboxes(){
+      const root=document.getElementById('builder-print-formats');if(!root)return;
+      const chosen=new Set([...root.querySelectorAll('input:checked')].map(x=>x.value));
+      if(!root.dataset.initialised){chosen.add(state.layout);root.dataset.initialised='yes'}
+      root.innerHTML=MENU_FORMATS.map(fmt=>`<label class="flex items-center gap-1"><input type="checkbox" value="${esc(fmt)}" ${chosen.has(fmt)?'checked':''}> ${esc(MENU_NAMES[fmt])}</label>`).join('');
+    }
+    function addEventDish(dish,menuCourse){
+      const formats=selectedPrintFormats();
+      const copies={};
+      document.querySelectorAll('#builder-tag-copies [data-tag-format]').forEach(el=>{
+        copies[el.dataset.tagFormat]=Math.max(1,Math.min(200,Math.floor(Number(el.value)||1)));
+      });
+      eventRecords.push({...JSON.parse(JSON.stringify(dish)),eventUid:eventUid(),sessionId:selectedEventSession(),menuCourse,serviceType:'',printFormats:formats,tagCopies:copies});
+      onEventRecordsChanged();
+      const panel=document.getElementById('builder-added-feedback');
+      if(panel){panel.textContent=`✓ ${dish.name} added to ${selectedBuilderSession()?.name||'this meal'} · ${menuCourse} · ${formats.length?formats.map(f=>MENU_NAMES[f]).join(', '):'Summary only'}. Confirm or remove it below.`;panel.classList.remove('hidden')}
+      document.querySelector('#event-items-list > div:last-child')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+    function onEventRecordsChanged(){normalizeEventFormatRecords();saveStyle();renderBuilderSessionTabs();renderActiveMenuItems();renderPreview();renderEventSummary()}
+    function updateEventRecord(uid,key,value){
+      const item=eventRecords.find(i=>i.eventUid===uid);if(!item)return;
+      if(key==='printFormats') item.printFormats=Array.isArray(value)?value:[];
+      else item[key]=value;
+      onEventRecordsChanged();
+    }
+    function updateEventTagCopies(uid,fmt,value){
+      if(!TAG_FORMATS.includes(fmt))return;
+      const item=eventRecords.find(i=>i.eventUid===uid);if(!item)return;
+      if(!item.tagCopies)item.tagCopies={};
+      item.tagCopies[fmt]=Math.max(1,Math.min(200,Math.floor(Number(value)||1)));
+      onEventRecordsChanged();
+    }
+    function removeEventRecord(uid){eventRecords=eventRecords.filter(item=>item.eventUid!==uid);onEventRecordsChanged()}
+    function addEventSession(){
+      const name=prompt('Session name (e.g. Evening Snacks, Breakfast, Lunch):','Evening Snacks');if(!name?.trim())return;
+      const id=eventUid();eventSessions.push({id,name:name.trim(),time:'',courseServices:{}});currentBuilderSession=id;updateSessionPicker();onEventRecordsChanged();
+    }
+    function editEventSession(id,key,value){
+      const row=eventSessions.find(i=>i.id===id);if(!row)return;
+      row[key]=value;updateSessionPicker();onEventRecordsChanged();
+    }
+    function deleteEventSession(id){
+      if(eventSessions.length<2)return alert('Keep at least one session.');
+      if(eventRecords.some(item=>item.sessionId===id))return alert('Move the dishes to another session before deleting this session.');
+      eventSessions=eventSessions.filter(s=>s.id!==id);if(currentBuilderSession===id)currentBuilderSession=eventSessions[0].id;updateSessionPicker();onEventRecordsChanged();
+    }
+    function setEventPartyNo(value){state.event.partyNo=value;saveStyle();renderEventSummary()}
+    function eventSnapshot(){return {format:'ragasaan-event-v2',name:activeEventName,title:state.event.title,date:state.event.date,venue:state.event.venue,partyNo:state.event.partyNo||'',sessions:eventSessions,items:eventRecords,designs:state.designs}}
+    function restoreEventSnapshot(snapshot){
+      if(!snapshot||!Array.isArray(snapshot.sessions)||!Array.isArray(snapshot.items))throw Error('Invalid event file');
+      if(!confirm('Load this event and replace the current event menu and design settings?'))return;
+      state.event.title=String(snapshot.title||'');state.event.date=String(snapshot.date||'');state.event.venue=String(snapshot.venue||'');state.event.partyNo=String(snapshot.partyNo||'');
+      eventSessions=snapshot.sessions.filter(x=>x&&x.id&&x.name).map(x=>({id:String(x.id),name:String(x.name),time:String(x.time||''),courseServices:{...(x.courseServices||{})}}));
+      if(!eventSessions.length)eventSessions=[{id:'lunch',name:'Lunch',time:'',courseServices:{}}];
+      eventRecords=snapshot.items.filter(x=>x&&x.name).map(x=>({...x,eventUid:x.eventUid||eventUid(),sessionId:x.sessionId||eventSessions[0].id,printFormats:Array.isArray(x.printFormats)?x.printFormats.filter(f=>MENU_FORMATS.includes(f)):[],tagCopies:x.tagCopies||{}}));
+      if(snapshot.designs&&typeof snapshot.designs==='object')MENU_FORMATS.forEach(f=>{if(snapshot.designs[f])Object.assign(state.designs[f],snapshot.designs[f])});
+      currentBuilderSession=eventSessions[0].id;state.design=state.designs[state.layout];activeEventName=snapshot.name||'';
+      document.getElementById('cfg-couple').value=state.event.title;document.getElementById('cfg-venue').value=state.event.venue;syncDatePicker();updateSessionPicker();onEventRecordsChanged();renderContextualControls();
+    }
+    function savedEventLibrary(){try{return JSON.parse(localStorage.getItem(EVENT_STORE_KEY)||'{}')}catch(_){return {}}}
+    function refreshSavedEventSelect(){const sel=document.getElementById('saved-event-select');if(!sel)return;const names=Object.keys(savedEventLibrary()).sort();sel.innerHTML=names.map(name=>`<option value="${esc(name)}">${esc(name)}</option>`).join('');if(activeEventName&&names.includes(activeEventName))sel.value=activeEventName}
+    function saveNamedEvent(){
+      const proposed=activeEventName||state.event.title||'Event';const name=prompt('Save event as:',proposed)?.trim();if(!name)return;
+      const library=savedEventLibrary();if(library[name]&&!confirm(`Overwrite saved event "${name}"?`))return;
+      activeEventName=name;library[name]=JSON.parse(JSON.stringify(eventSnapshot()));
+      try{localStorage.setItem(EVENT_STORE_KEY,JSON.stringify(library))}catch(err){alert('Browser storage is full. Use Export Event JSON instead.');return}
+      refreshSavedEventSelect();alert('Event saved locally: '+name);
+    }
+    function loadNamedEvent(){const name=document.getElementById('saved-event-select')?.value;const saved=savedEventLibrary()[name];if(saved)restoreEventSnapshot(saved)}
+    function downloadEventFile(){const blob=new Blob([JSON.stringify(eventSnapshot(),null,2)],{type:'application/json'});const a=document.createElement('a');const url=URL.createObjectURL(blob);a.href=url;a.download=(activeEventName||state.event.title||'Ragasaan_Event').replace(/[^a-z0-9_-]+/gi,'_')+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000)}
+    async function importEventFile(e){const file=e.target.files?.[0];if(!file)return;try{const snapshot=JSON.parse(await file.text());restoreEventSnapshot(snapshot)}catch(err){alert('Cannot load event JSON: '+err.message)}finally{e.target.value=''}}
+    function renderEventSummary(){
+      const summaryTab=document.getElementById('tab-summary');if(!summaryTab)return;
+      const party=document.getElementById('summary-party-no');if(party&&party!==document.activeElement)party.value=state.event.partyNo||'';
+      const manager=document.getElementById('summary-session-manager');if(manager)manager.innerHTML=eventSessions.map(s=>`<div class="flex items-center gap-1"><input aria-label="Session name" value="${esc(s.name)}" onchange="editEventSession('${esc(s.id)}','name',this.value)" class="min-w-0 flex-1 bg-slate-950 rounded p-1.5 text-white border border-slate-700"><input aria-label="Session time" type="time" value="${esc(s.time)}" onchange="editEventSession('${esc(s.id)}','time',this.value)" style="width:95px" class="rounded p-1.5 bg-slate-950 text-white border border-slate-700"><button title="Delete empty session" onclick="deleteEventSession('${esc(s.id)}')" class="text-rose-300 p-1">×</button></div>`).join('');
+      const editor=document.getElementById('summary-edit-items');if(editor)editor.innerHTML=eventRecords.map(item=>`<div class="border border-slate-700 rounded p-2"><div class="flex justify-between gap-1"><b class="text-slate-100">${esc(item.name)}</b><button class="text-rose-300" onclick="removeEventRecord('${esc(item.eventUid)}')">Remove</button></div><div class="grid grid-cols-2 gap-1 mt-1"><select aria-label="Session" onchange="updateEventRecord('${esc(item.eventUid)}','sessionId',this.value)" class="bg-slate-950 rounded p-1 text-white">${eventSessions.map(s=>`<option value="${esc(s.id)}" ${s.id===item.sessionId?'selected':''}>${esc(s.name)}</option>`).join('')}</select><select aria-label="Course" onchange="updateEventRecord('${esc(item.eventUid)}','menuCourse',this.value)" class="bg-slate-950 rounded p-1 text-white">${MENU_COURSES.map(c=>`<option value="${esc(c)}" ${c===item.menuCourse?'selected':''}>${esc(c)}</option>`).join('')}</select></div><label class="block mt-1 text-slate-400">Service type<select onchange="updateEventRecord('${esc(item.eventUid)}','serviceType',this.value)" class="w-full bg-slate-950 rounded p-1 mt-1 text-white">${serviceTypeOptions(item.serviceType||'',true)}</select></label><details><summary class="cursor-pointer text-amber-300 mt-1">Print formats (${(item.printFormats||[]).length})</summary><div class="grid grid-cols-2 gap-1 mt-1">${MENU_FORMATS.map(fmt=>`<label><input type="checkbox" ${item.printFormats?.includes(fmt)?'checked':''} onchange="toggleEventItemFormat('${esc(item.eventUid)}','${fmt}',this.checked)"> ${esc(MENU_NAMES[fmt])}</label>`).join('')}</div></details></div>`).join('')||'<p class="text-slate-400">Add dishes in Event Menu Builder.</p>';
+      refreshSavedEventSelect();renderSummaryPaper();
+    }
+    function toggleEventItemFormat(uid,fmt,checked){const item=eventRecords.find(x=>x.eventUid===uid);if(!item)return;const set=new Set(item.printFormats||[]);if(checked)set.add(fmt);else set.delete(fmt);updateEventRecord(uid,'printFormats',[...set])}
+    function summaryBox(session,entryRows){
+      // Sequence stays unchanged, but course/service groups provide the client with a clear meal breakdown.
+      const groups=[];
+      entryRows.forEach(row=>{
+        const course=row.item.menuCourse||'Other';
+        const service=getServiceType(row.item);
+        const last=groups[groups.length-1];
+        if(last&&last.course===course&&last.service===service)last.rows.push(row);
+        else groups.push({course,service,rows:[row]});
+      });
+      return `<section class="summary-session-card"><div class="summary-session-heading">${esc(session.name).toUpperCase()}${session.time?' · '+esc(session.time):''}</div>${groups.map(group=>`<div class="summary-course-heading">${esc(group.course)} <span class="summary-service-label">· ${esc(group.service)}</span></div>${group.rows.map(row=>{
+        const a=Array.isArray(row.item.allergens)?row.item.allergens.join(', '):'';
+        const m=Array.isArray(row.item.mayContain)?row.item.mayContain.join(', '):'';
+        return `<div class="summary-item-row"><span>${row.sl}.</span><span class="summary-item-text"><span class="summary-item-name">${esc(row.item.name)}</span> <span class="summary-item-allergens">${a?'· '+esc(a):''}</span>${m?` <span class="summary-item-may">· May contain: ${esc(m)}</span>`:''}${!a&&!m?` <span class="summary-item-none">· Allergens not declared</span>`:''}</span></div>`;
+      }).join('')}`).join('')}</section>`;
+    }
+
+    function renderSummaryPaper(){
+      const screen=document.getElementById('summary-display-preview'),print=document.getElementById('summary-print-root');if(!screen||!print)return;
+      const cols=[[],[]];let totals=[0,0],sl=0;
+      eventSessions.forEach(session=>{
+        const entries=eventRecords.filter(x=>x.sessionId===session.id).map((item,index)=>({item,index})).sort((a,b)=>{
+          const ca=MENU_COURSES.indexOf(a.item.menuCourse),cb=MENU_COURSES.indexOf(b.item.menuCourse);
+          return (ca<0?99:ca)-(cb<0?99:cb)||a.index-b.index;
+        }).map(row=>row.item);
+        if(!entries.length)return;
+        const rows=entries.map(item=>({sl:++sl,item}));
+        const col=totals[0]<=totals[1]?0:1;cols[col].push({session,rows});totals[col]+=entries.length+2;
+      });
+      const buildPage=(split)=>{
+        const date=esc(state.event.date||'');const venue=esc(state.event.venue||'');const title=esc(state.event.title||'');const party=esc(state.event.partyNo||'—');
+        return `<div class="summary-a4-page"><header class="summary-top-two-lines"><div><b>EVENT DATE:</b> ${date}</div><div><b>VENUE:</b> ${venue}</div><div><b>PARTY NO:</b> ${party}</div><div><b>EVENT:</b> ${title}</div></header><div class="summary-heading"><h2>Event Menu &amp; Allergen Summary</h2><div style="margin-top:1.5mm;display:flex;justify-content:center;align-items:center;height:8mm">${state.sharedCompanyLogo?`<img src="${state.sharedCompanyLogo}" alt="Ragasaan" style="height:8mm;max-width:30mm;object-fit:contain">`:`<div style="width:30mm">${ragasaanLogoSvg}</div>`}</div></div><div class="summary-columns">${split.map(col=>`<div class="summary-column">${col.map(({session,rows})=>summaryBox(session,rows)).join('')}</div>`).join('')}</div><footer class="summary-footer">Allergen information must be checked against ingredients, recipes and cross-contact risks for this event. Red = declared allergen; amber = may contain.</footer></div>`;
+      };
+      const firstPage=buildPage(cols);screen.innerHTML=firstPage;print.innerHTML=firstPage;
+      // Keep the client summary to ONE physical A4 sheet. Shrink all session-row
+      // typography and spacing together, rather than dropping allergen values.
+      // If a very large event still cannot fit legibly, show a warning and prevent
+      // silent clipping when the print button is used.
+      const page=screen.firstElementChild;
+      const fits=()=>{
+        const columns=[...page.querySelectorAll('.summary-column')];
+        const head=page.querySelector('.summary-top-two-lines');
+        const title=page.querySelector('.summary-heading');
+        const footer=page.querySelector('.summary-footer');
+        const pad=getComputedStyle(page);
+        const usable=page.clientHeight-parseFloat(pad.paddingTop)-parseFloat(pad.paddingBottom)-head.offsetHeight-title.offsetHeight-footer.offsetHeight-35;
+        const used=Math.max(0,...columns.map(x=>x.scrollHeight));
+        return {ok:used<=usable+2,used,usable};
+      };
+      let fitInfo={ok:true,used:0,usable:0},fitted=1;
+      // Hidden tabs cannot be measured. The summary recalculates when opened.
+      if(page.clientHeight){
+        for(const scale of [1,.96,.92,.88,.84,.80,.76,.72,.68,.65]){
+          fitted=scale;page.style.setProperty('--summary-fit',String(scale));
+          fitInfo=fits();if(fitInfo.ok)break;
+        }
+      }
+      print.firstElementChild?.style.setProperty('--summary-fit',String(fitted));
+      const label=document.getElementById('summary-page-count');
+      window.ragasaanSummaryFits = fitInfo.ok;
+      if(label){
+        label.textContent=fitInfo.ok?`1 A4 page · 2-column compact fit${fitted<1?' · text '+Math.round(fitted*100)+'%':''}`:'Too many dishes for readable single A4: shorten item text or reduce items before printing';
+        label.style.color=fitInfo.ok?'':'#fca5a5';
+      }
+    }
+    function printEventSummary(){
+      renderSummaryPaper();
+      if(window.ragasaanSummaryFits===false){alert('The event summary exceeds one A4 page at the minimum readable font size. Reduce or shorten some dishes before printing so allergens are not cut off.');return}
+      document.body.classList.add('print-event-summary');setTimeout(()=>window.print(),60)
+    }
+    window.addEventListener('afterprint',()=>document.body.classList.remove('print-event-summary'));
     function setupFormatState() {
       const template = {...state.design};
       // Each dimension receives its own settings, not merely a shared A4 width slider.
@@ -2096,6 +2470,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         ...template, titleFontSize:10, dishNameFontSize:10, descFontSize:10, allergenFontSize:10, autoFitText:true,
         logoWidth: 110, menuHeading:'Menu',
         coupleLogoWidth: 100, borderOutsetCm:0.2, coupleOffsetX:0, coupleOffsetY:0, showDescription:false,
+        foldTagsBottomHeightCm:3, foldTagsDividerWidthMm:0.3, foldTagsDividerColor:'#8f8572', foldTagsPanelInsetMm:2.5, foldTagsLogoWidth:28,
         showHalfBackLeftImage:false, showHalfBackRightImage:false,
         halfBackLeftImageWidth:170, halfBackRightImageWidth:170,
         halfBackLeftImageShade:'none', halfBackRightImageShade:'none',
@@ -2117,6 +2492,11 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           cfg.logoWidth=Math.max(100,Number(cfg.logoWidth)||100);
           cfg.coupleLogoWidth=Math.max(100,Number(cfg.coupleLogoWidth)||100);
           cfg.borderOutsetCm=Math.max(.2,Math.min(.5,Number(cfg.borderOutsetCm)||.2));
+          cfg.foldTagsBottomHeightCm=Math.max(2.2,Math.min(4.5,Number(cfg.foldTagsBottomHeightCm)||3));
+          cfg.foldTagsDividerWidthMm=Math.max(.2,Math.min(2,Number(cfg.foldTagsDividerWidthMm)||.3));
+          cfg.foldTagsPanelInsetMm=Math.max(1,Math.min(8,Number(cfg.foldTagsPanelInsetMm)||2.5));
+          cfg.foldTagsLogoWidth=Math.max(20,Math.min(120,Number(cfg.foldTagsLogoWidth)||28));
+          if(!cfg.foldTagsDividerColor) cfg.foldTagsDividerColor = cfg.borderColor || '#8f8572';
           // migrate old single-image back-page settings if present
           if (!cfg.halfBackLeftImageUrl && cfg.halfBackImageUrl) cfg.halfBackLeftImageUrl = cfg.halfBackImageUrl;
           if (!cfg.halfBackRightImageUrl && cfg.halfBackImageUrl) cfg.halfBackRightImageUrl = cfg.halfBackImageUrl;
@@ -2138,13 +2518,27 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
               .map(item => ({ ...item, menuCourse: String(item.menuCourse || '').trim() }));
           }
         });
-        state.event.items = state.formatMenus[state.layout];
+        if(saved.eventSessions?.length)eventSessions=saved.eventSessions;
+        if(!eventSessions.some(x=>String(x.name||'').toLowerCase()==='late night snack'))eventSessions.push({id:'late-night',name:'Late Night Snack',time:'22:30',courseServices:{}});
+        if(Array.isArray(saved.eventRecords))eventRecords=saved.eventRecords.map(i=>({...i,eventUid:i.eventUid||eventUid(),serviceType:i.serviceType||'',tagCopies:i.tagCopies||{}}));
+        else {
+          // Migrate the older per-format menus without dropping existing data.
+          const seen=new Map();
+          MENU_FORMATS.forEach(fmt=>state.formatMenus[fmt].forEach(item=>{
+            const signature=JSON.stringify([item.id,item.name,item.menuCourse,item.desc]);
+            if(!seen.has(signature)){const record={...item,eventUid:eventUid(),sessionId:'dinner',printFormats:[fmt]};seen.set(signature,record);eventRecords.push(record)}
+            else seen.get(signature).printFormats.push(fmt);
+          }));
+        }
+        normalizeEventFormatRecords();
+        state.event.partyNo=saved.event?.partyNo||'';
         state.sharedCompanyLogo=saved.companyLogo||'';
         state.sharedCoupleLogo=saved.coupleLogo||'';
         state.appTheme=saved.appTheme||'dark';
         if(saved.event) Object.assign(state.event,{title:saved.event.title||state.event.title,date:saved.event.date||state.event.date,venue:saved.event.venue||state.event.venue});
       } catch(e){console.warn('Saved style unavailable',e);}
       applySharedLogos(); applyAppTheme(state.appTheme||'dark');
+      updateSessionPicker();renderFormatCheckboxes();renderBuilderSessionTabs();
       state.design=state.designs[state.layout];
       syncFormatLabels();
     }
@@ -2186,7 +2580,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       MENU_FORMATS.forEach(fmt=>{state.designs[fmt].logoUrl=state.sharedCompanyLogo||'';state.designs[fmt].coupleLogoUrl=state.sharedCoupleLogo||'';});
     }
     function saveStyle() {
-      try {localStorage.setItem('ragasaan_style_v3',JSON.stringify({designs:state.designs,formatMenus:state.formatMenus,companyLogo:state.sharedCompanyLogo||'',coupleLogo:state.sharedCoupleLogo||'',appTheme:state.appTheme||'dark',event:{title:state.event.title,date:state.event.date,venue:state.event.venue}}));}
+      try {localStorage.setItem('ragasaan_style_v3',JSON.stringify({designs:state.designs,eventSessions,eventRecords,companyLogo:state.sharedCompanyLogo||'',coupleLogo:state.sharedCoupleLogo||'',appTheme:state.appTheme||'dark',event:{title:state.event.title,date:state.event.date,venue:state.event.venue,partyNo:state.event.partyNo||''}}));}
       catch(e){console.warn('Storage full; consider smaller logo images',e);}
     }
     function applyAppTheme(theme) {
@@ -2201,11 +2595,10 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     function syncFormatLabels() {
       const label = document.getElementById('preview-format-label');
       const formatName = MENU_NAMES[state.layout] || state.layout;
-      if(label) label.textContent = `${formatName} — ${state.layout==='a8-grid'?'10 tags / portrait A4':state.layout==='a6-grid'?'4 tags / A4':'210 × 297 mm'}`;
+      if(label) label.textContent = `${formatName} — ${state.layout==='a8-grid'?'10 tags / portrait A4':state.layout==='foldtags-grid'?'8 fold tags / portrait A4':state.layout==='a6-grid'?'4 tags / A4':'210 × 297 mm'}`;
       const addFormat = document.getElementById('builder-format-select');
       if(addFormat) addFormat.value = state.layout;
-      const activeName = document.getElementById('active-format-name');
-      if(activeName) activeName.textContent = formatName;
+      // The Builder selected-items heading represents the active meal, not the preview format.
     }
     function setLayout(fmt) {
       if (!MENU_FORMATS.includes(fmt)) return;
@@ -2305,6 +2698,17 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
               ${compactNumber('coupleOffsetY','Vertical position (px)',-100,100)}
             </div>` : ''}
         </details>
+        ${state.layout==='foldtags-grid'?`<details data-compact="foldtags" class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-3 text-xs">
+          <summary class="font-semibold text-gold-400 cursor-pointer mb-2">FoldTags Layout</summary>
+          <p class="text-[10px] text-slate-400">Physical tag size is fixed to approximately 9 × 6 cm, matching your sample. Adjust the lower text panel and dividing line here.</p>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="text-slate-400">Bottom panel height (cm)<input type="number" min="2.2" max="4.5" step="0.1" value="${Number(d.foldTagsBottomHeightCm)||3}" oninput="state.design.foldTagsBottomHeightCm=Math.max(2.2,Math.min(4.5,Number(this.value)||3));renderPreview()" class="w-full mt-1 p-1.5 rounded bg-slate-900 border border-slate-700 text-white"></label>
+            <label class="text-slate-400">Panel inset (mm)<input type="number" min="1" max="8" step="0.5" value="${Number(d.foldTagsPanelInsetMm)||2.5}" oninput="state.design.foldTagsPanelInsetMm=Math.max(1,Math.min(8,Number(this.value)||2.5));renderPreview()" class="w-full mt-1 p-1.5 rounded bg-slate-900 border border-slate-700 text-white"></label>
+            <label class="text-slate-400">Divider line width (mm)<input type="number" min="0.2" max="2" step="0.1" value="${Number(d.foldTagsDividerWidthMm)||0.3}" oninput="state.design.foldTagsDividerWidthMm=Math.max(0.2,Math.min(2,Number(this.value)||0.3));renderPreview()" class="w-full mt-1 p-1.5 rounded bg-slate-900 border border-slate-700 text-white"></label>
+            <label class="text-slate-400">Divider line color<input type="color" value="${d.foldTagsDividerColor||d.borderColor}" oninput="state.design.foldTagsDividerColor=this.value;renderPreview()" class="w-full mt-1 h-8 rounded"></label>
+            <label class="text-slate-400">FoldTags logo width (px)<input type="number" min="20" max="120" step="2" value="${Number(d.foldTagsLogoWidth)||28}" oninput="state.design.foldTagsLogoWidth=Math.max(20,Math.min(120,Number(this.value)||28));renderPreview()" class="w-full mt-1 p-1.5 rounded bg-slate-900 border border-slate-700 text-white"></label>
+          </div>
+        </details>`:''}
         ${state.layout==='a4-live'?`<div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs">
           <label class="font-semibold text-gold-400 block mb-2">Live Station Title (editable)</label>
           <input type="text" value="${esc(d.liveTitle)}" oninput="state.design.liveTitle=this.value;renderPreview()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white">
@@ -2337,6 +2741,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <p class="text-[11px] text-slate-400">Tip: you can also drag each back-page image directly in the live preview.</p>
         </details>`:''}
         ${state.layout==='a8-grid'?`<p class="text-[11px] text-amber-400 p-2">A8 tags: 10 per portrait A4 (2 × 5) with 2mm gaps, at full A8 dimensions and thin double borders. Allergens and May Contain are included.</p>`:''}
+        ${state.layout==='foldtags-grid'?`<p class="text-[11px] text-amber-400 p-2">FoldTags: 8 folded tags per portrait A4 (2 × 4). Each tag is approximately 9 × 6cm with a blank upper fold panel and editable lower text panel.</p>`:''}
         ${state.layout==='a6-grid'?`<p class="text-[11px] text-amber-400 p-2">Four A6-position tags per A4 sheet. Any cut clearance reduces the tag area slightly below full ISO A6.</p>`:''}
       `;
       if(expanded.length) container.querySelectorAll('details[data-compact]').forEach(el=>el.open=expanded.includes(el.dataset.compact));
@@ -2730,12 +3135,10 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     function changeMenuCourse(index, course) {
       const item = state.event.items[index];
       if (!item || !course) return;
-      item.menuCourse = course;  // Never overwrite the source/master category.
-      saveStyle();
-      renderActiveMenuItems();
-      renderPreview();
+      item.menuCourse = course; // Never overwrite the source/master category.
+      onEventRecordsChanged();
     }
-    const MENU_COURSES = ['Starter','Main Course','Dessert','Canapés','Live Station','Other'];
+    const MENU_COURSES = ['Canapé','Starter','Main Course','Dessert','Late Night Snack','Live Station','Other'];
     function menuCourseOptions(selected) {
       const all = MENU_COURSES.includes(selected) || !selected ? MENU_COURSES : [...MENU_COURSES, selected];
       return `<option value="" ${!selected?'selected':''} disabled>Choose course</option>` +
@@ -2750,11 +3153,9 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       const dish={id:'manual-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),name,menuCourse,
         category:get('manual-category')||'Other',subcategory:get('manual-subcategory'),desc:get('manual-description'),
         allergens:checks('manual-allergens'),mayContain:checks('manual-maycontain'),price:'',manual:true};
-      state.formatMenus[state.layout].push(dish);
-      state.event.items=state.formatMenus[state.layout];
-      renderActiveMenuItems();renderPreview();
+      addEventDish(dish,menuCourse);
       const feedback=document.getElementById('manual-add-feedback');
-      if(feedback){feedback.textContent='✓ '+name+' added to '+(MENU_NAMES[state.layout]||'the selected menu');feedback.classList.remove('hidden');}
+      if(feedback){feedback.textContent='✓ '+name+' added to '+(selectedBuilderSession()?.name||'this meal');feedback.classList.remove('hidden');}
       for(const id of ['manual-name','manual-description','manual-subcategory']) document.getElementById(id).value='';
       document.querySelectorAll('#manual-allergens input:checked,#manual-maycontain input:checked').forEach(el=>el.checked=false);
     }
@@ -2763,28 +3164,36 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       const id = document.getElementById('builder-add-select').value;
       const dish = state.masterDB.find(d => d.id === id);
       if (!dish) return alert("Please select a dish.");
-      state.event.items.push({ ...JSON.parse(JSON.stringify(dish)), menuCourse });
-      renderActiveMenuItems();
-      renderPreview();
+      addEventDish(dish,menuCourse);
     }
 
     function renderActiveMenuItems() {
-      const container = document.getElementById('event-items-list');
-      document.getElementById('active-item-count').textContent = state.event.items.length;
-      container.innerHTML = '';
-      state.event.items.forEach((item, idx) => {
-        const div = document.createElement('div');
-        div.className = "bg-slate-950 border border-slate-800 p-2 rounded text-xs";
-        div.innerHTML = `<div class="flex items-center justify-between gap-2 mb-1">
-            <span class="database-item-wrap min-w-0 flex-1"><b>${esc(item.name)}</b><span class="block text-[10px] text-slate-500">Master category: ${esc(item.category||'Uncategorised')}</span></span>
-            <button type="button" aria-label="Remove ${esc(item.name)}" onclick="state.event.items.splice(${idx},1); renderActiveMenuItems(); renderPreview();" class="text-rose-400 hover:text-rose-300" title="Remove item"><i class="fa-solid fa-xmark"></i></button>
-          </div><label class="flex items-center gap-2 text-[11px] text-amber-300"><span class="shrink-0">Print under</span>
-          <select aria-label="Course for ${esc(item.name)}" onchange="changeMenuCourse(${idx},this.value)" class="min-w-0 flex-1 bg-slate-900 border border-slate-700 rounded p-1 text-white">${menuCourseOptions(item.menuCourse)}</select></label>`;
-        container.appendChild(div);
-      });
+      const container=document.getElementById('event-items-list');if(!container)return;
+      const session=selectedBuilderSession();
+      const entries=eventRecords.filter(item=>item.sessionId===session?.id);
+      const count=document.getElementById('active-item-count');if(count)count.textContent=entries.length;
+      const name=document.getElementById('active-format-name');if(name)name.textContent=session?.name||'Meal';
+      container.innerHTML=entries.map((item,i)=>`<div class="bg-slate-900 border border-slate-800 p-3 rounded-lg text-xs space-y-2">
+        <div class="flex items-start justify-between gap-2"><span class="min-w-0 flex-1"><b>${i+1}. ${esc(item.name)}</b><span class="block text-[10px] text-slate-400">${esc(item.category||'Master item')} · ${Array.isArray(item.allergens)&&item.allergens.length?'Allergens: '+esc(item.allergens.join(', ')):'Allergens not declared'}</span></span><button type="button" onclick="removeEventRecord('${esc(item.eventUid)}')" aria-label="Remove ${esc(item.name)}" title="Remove item from this event" class="text-rose-200 border border-rose-800/70 bg-rose-950/50 hover:bg-rose-900/70 px-2.5 py-1.5 rounded font-semibold whitespace-nowrap">Remove</button></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <label class="text-slate-300">Course<select aria-label="Course for ${esc(item.name)}" onchange="updateEventRecord('${esc(item.eventUid)}','menuCourse',this.value)" class="w-full mt-1 bg-slate-950 text-white border border-slate-700 rounded p-1.5">${menuCourseOptions(item.menuCourse)}</select></label>
+          <label class="text-slate-300">Service type<select aria-label="Service for ${esc(item.name)}" onchange="updateEventRecord('${esc(item.eventUid)}','serviceType',this.value)" class="w-full mt-1 bg-slate-950 text-white border border-slate-700 rounded p-1.5">${serviceTypeOptions(item.serviceType||'',true)}</select><span class="block text-[10px] text-slate-500 mt-1">Effective: ${esc(getServiceType(item))}</span></label>
+        </div>
+        <details class="border-t border-slate-800 pt-2"><summary class="text-amber-300 cursor-pointer">Print formats (${(item.printFormats||[]).length})</summary><div class="grid grid-cols-2 md:grid-cols-3 gap-1 mt-2 text-slate-300">${MENU_FORMATS.map(fmt=>`<label class="flex gap-1 items-center"><input type="checkbox" ${item.printFormats?.includes(fmt)?'checked':''} onchange="toggleEventItemFormat('${esc(item.eventUid)}','${fmt}',this.checked)">${esc(MENU_NAMES[fmt])}</label>`).join('')}</div></details>
+        ${TAG_FORMATS.some(fmt=>item.printFormats?.includes(fmt))?`<div class="border-t border-slate-800 pt-2"><div class="text-amber-300 text-[11px] mb-2">Tag print quantities</div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2">${TAG_FORMATS.filter(fmt=>item.printFormats?.includes(fmt)).map(fmt=>`<label class="text-slate-400">${esc(MENU_NAMES[fmt])}<input aria-label="${esc(MENU_NAMES[fmt])} quantity for ${esc(item.name)}" type="number" min="1" max="200" step="1" value="${Math.max(1,Number(item.tagCopies?.[fmt])||1)}" onchange="updateEventTagCopies('${esc(item.eventUid)}','${fmt}',this.value)" class="w-full mt-1 bg-slate-950 text-white border border-slate-700 rounded p-1.5"></label>`).join('')}</div></div>`:''}
+      </div>`).join('')||'<p class="text-slate-400 text-xs py-3">No dishes in this meal yet. Select a dish to add it.</p>';
+    }
+    function clearActiveSessionItems(){
+      const session=selectedBuilderSession();if(!session)return;
+      const count=eventRecords.filter(i=>i.sessionId===session.id).length;
+      if(!count||!confirm(`Remove all ${count} dishes from ${session.name}? This also removes their menu and tag print assignments.`))return;
+      eventRecords=eventRecords.filter(i=>i.sessionId!==session.id);onEventRecordsChanged();
     }
 
-    function clearEventMenu() { state.formatMenus[state.layout] = []; state.event.items = state.formatMenus[state.layout]; renderActiveMenuItems(); renderPreview(); }
+    function clearEventMenu() {
+      if(!confirm('Remove this print format from all assigned dishes? The dishes remain in the Event Allergen Summary.'))return;
+      eventRecords.forEach(item=>item.printFormats=(item.printFormats||[]).filter(fmt=>fmt!==state.layout));onEventRecordsChanged();
+    }
 
     // Physical A4 preview, with isolated data and styles for every menu dimension.
     function renderPreview() {
@@ -2803,6 +3212,9 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       const brand = (maxWidth = d.logoWidth) => d.logoUrl
         ? `<img src="${d.logoUrl}" alt="Company Logo" style="display:block;height:auto;width:${maxWidth}px;max-width:100%;object-fit:contain;margin:auto">`
         : `<div style="width:${maxWidth}px;max-width:100%;margin:auto">${ragasaanLogoSvg}</div>`;
+      const brandMark = (maxWidth = Number(d.foldTagsLogoWidth)||28) => d.logoUrl
+        ? `<img src="${d.logoUrl}" alt="Ragasaan Logo" style="display:block;height:auto;width:${maxWidth}px;max-width:100%;object-fit:contain;margin:auto">`
+        : `<div style="width:${maxWidth}px;max-width:100%;margin:auto">${ragasaanMarkSvg}</div>`;
       const wedding = () => d.showCoupleLogo && d.coupleLogoUrl
         ? `<img src="${d.coupleLogoUrl}" alt="Bride/Groom Logo" style="display:block;width:${d.coupleLogoWidth}px;max-width:100%;height:auto;object-fit:contain;margin:${12+Math.max(0,Number(d.coupleOffsetY)||0)}px auto ${18+Math.max(0,-Number(d.coupleOffsetY)||0)}px;transform:translateX(${d.coupleOffsetX}px)">` : '';
       const halfBackShadeFilters = {
@@ -2992,10 +3404,10 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           return back;
         };
         fitPaginated(visibleItems,makeTableFront,makeTableBack);
-      } else if(fmt==='a8-grid'||fmt==='a6-grid'||fmt==='canape-grid') {
+      } else if(fmt==='a8-grid'||fmt==='foldtags-grid'||fmt==='a6-grid'||fmt==='canape-grid') {
         const perPage=fmt==='a8-grid'?10:fmt==='a6-grid'?4:8;
-        const pageClass=fmt==='a8-grid'?'paper-a8-grid':fmt==='a6-grid'?'paper-a6-grid':'paper-canape-grid';
-        const cardClass=fmt==='a8-grid'?'paper-a8-single':fmt==='a6-grid'?'paper-a6-single':'paper-canape-single';
+        const pageClass=fmt==='a8-grid'?'paper-a8-grid':fmt==='foldtags-grid'?'paper-foldtags-grid':fmt==='a6-grid'?'paper-a6-grid':'paper-canape-grid';
+        const cardClass=fmt==='a8-grid'?'paper-a8-single':fmt==='foldtags-grid'?'paper-foldtags-single':fmt==='a6-grid'?'paper-a6-single':'paper-canape-single';
         const n=Math.max(1,Math.ceil(visibleItems.length/perPage));
         for(let j=0;j<n;j++) {
           const sheet=page(pageClass,j?'page-break':'');
@@ -3010,10 +3422,27 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
             const label=document.createElement('div');
             label.className=`${cardClass} menu-body-font flex flex-col justify-between text-center`;
             label.style.cssText=`background:#ffffff;color:${d.textColor};--body-family:${bodyFamily};--label-border:${d.borderColor};${d.borderStyle==='none'?'border:none;':''}`;
-            // Small-format outset is scaled to label geometry, so no frame crosses cut gutters.
-            const labelInset = fmt==='a8-grid' ? 0.7 : Math.max(2,Math.min(5,Number(d.borderOutsetCm)*10));
-            const miniFrame = d.borderStyle==='none'?'':`<div aria-hidden="true" style="position:absolute;pointer-events:none;inset:${labelInset}mm;border:1px ${d.borderStyle==='triple'?'double':d.borderStyle} ${d.borderColor};opacity:.45"></div>`;
-            {
+            if(fmt==='foldtags-grid') {
+              const outerStyle = d.borderStyle==='none' ? 'border:none;' : `border:${Math.max(.2,Math.min(2,Number(d.borderWidth)||.8))}mm ${d.borderStyle==='triple'?'double':d.borderStyle} ${d.borderColor};`;
+              const panelHeight = Math.max(2.2,Math.min(4.5,Number(d.foldTagsBottomHeightCm)||3));
+              const inset = Math.max(1,Math.min(8,Number(d.foldTagsPanelInsetMm)||2.5));
+              const dividerWidth = Math.max(.2,Math.min(2,Number(d.foldTagsDividerWidthMm)||.3));
+              const dividerColor = d.foldTagsDividerColor || d.borderColor;
+              const topHeight = Math.max(0.8, 6 - panelHeight);
+              label.style.cssText += outerStyle;
+              label.innerHTML=`
+                <div style="height:${topHeight}cm;flex:0 0 auto"></div>
+                <div style="height:${panelHeight}cm;flex:0 0 auto;margin:0 ${inset}mm ${inset}mm;border:${dividerWidth}mm solid ${dividerColor};display:flex;flex-direction:column;justify-content:flex-start;align-items:center;padding:1.1mm 2mm 1.6mm;box-sizing:border-box;overflow:hidden">
+                  <div style="flex:0 0 auto;margin-bottom:1.2mm;line-height:1">${brandMark(Number(d.foldTagsLogoWidth)||28)}</div>
+                  <div class="menu-body-font" style="min-width:0;max-width:100%;overflow-wrap:anywhere;word-break:break-word;white-space:normal;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:1.2mm;overflow:hidden">
+                    <h4 contenteditable="true" oninput="updateActiveItem(${i},'name',this.innerText)" onblur="finishCanvasItemEdit(${i})" class="font-bold leading-tight" style="margin:0;color:${d.textColor};${font(Math.max(10,(Number(d.dishNameFontSize)||10)*0.96))};text-transform:uppercase">${escText(item.name)}</h4>
+                    <div class="leading-tight" style="${font(Math.max(9,(Number(d.allergenFontSize)||10)*0.84))}">${allergies(item,i)}</div>
+                  </div>
+                </div>`;
+            } else {
+              // Small-format outset is scaled to label geometry, so no frame crosses cut gutters.
+              const labelInset = fmt==='a8-grid' ? 0.7 : Math.max(2,Math.min(5,Number(d.borderOutsetCm)*10));
+              const miniFrame = d.borderStyle==='none'?'':`<div aria-hidden="true" style="position:absolute;pointer-events:none;inset:${labelInset}mm;border:1px ${d.borderStyle==='triple'?'double':d.borderStyle} ${d.borderColor};opacity:.45"></div>`;
               const logoTop = fmt==='a6-grid'?wedding():brand(d.logoWidth);
               const logoBottom = fmt==='a6-grid'?brand():'';
               label.innerHTML=`${miniFrame}<div>${logoTop}</div><div class="menu-body-font" style="min-width:0;overflow-wrap:anywhere;word-break:break-word;white-space:normal;max-height:100%;overflow:hidden">
@@ -3038,6 +3467,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         fitStatus.style.color=warning?'#fbbf24':'';
       }
       saveStyle();
+      if(document.getElementById('tab-summary') && !document.getElementById('tab-summary').classList.contains('hidden'))renderEventSummary();
       // Keep zoom aligned with new pages without scaling print or Word exports.
       document.getElementById('print-canvas-wrapper').style.transform=`scale(${state.zoom})`;
     }
@@ -3081,20 +3511,18 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       const normalized = String(value || '').trim();
       if (state.event.items[index][key] !== normalized) {
         state.event.items[index][key] = normalized;
-        renderActiveMenuItems();
-        renderPreview();
+        onEventRecordsChanged();
       }
     }
 
     function updateActiveItem(idx,key,value) {
-      if(state.event.items[idx]) state.event.items[idx][key]=value;
+      if(state.event.items[idx]) {state.event.items[idx][key]=value;saveStyle();}
     }
     function finishCanvasItemEdit(idx) {
       const item=state.event.items[idx];
       if (!item) return;
-      if (!String(item.name||'').trim()) state.event.items.splice(idx,1);
-      renderActiveMenuItems();
-      renderPreview();
+      if (!String(item.name||'').trim())eventRecords=eventRecords.filter(x=>x!==item);
+      onEventRecordsChanged();
     }
 
     // Helper to parse edited single-line allergen string back into item object
@@ -3133,6 +3561,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     function editAllergenValues(idx,key,value) {
       const item=state.formatMenus[state.layout]?.[idx]; if(!item)return;
       item[key]=value.trim()==='—'?[]:value.split(',').map(x=>x.trim()).filter(Boolean);
+      saveStyle();renderEventSummary();
     }
     // Browser-only backup/restore. This does not upload anything to GitHub.
     function downloadWebBackup() {
@@ -3279,9 +3708,9 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
             children:[labelCell(item,105,148.5)]})]})
         ]);
       } else {
-        const col= format==='a8-grid'?74:95;
-        const height=format==='a8-grid'?52.5:67;
-        const gap=format==='a8-grid'?20:5;
+        const col= format==='a8-grid'?74:format==='foldtags-grid'?90:95;
+        const height=format==='a8-grid'?52.5:format==='foldtags-grid'?60:67;
+        const gap=format==='a8-grid'?20:format==='foldtags-grid'?6:5;
         pages=[];
         const perPage=8;
         for(let start=0;start<Math.max(items.length,1);start+=perPage) {
@@ -3300,10 +3729,10 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       // Each page is a separate Word section with physical A4 paper dimensions.
       const sections=pages.map((children,index)=>({
         properties:{page:{size:{width:twips(210),height:twips(297)},margin:{
-          top:twips(format==='a8-grid'?13.5:format==='canape-grid'?7:format==='a6-grid'?45:20),
-          bottom:twips(format==='a8-grid'?13.5:format==='canape-grid'?7:format==='a6-grid'?45:20),
-          left:twips(format==='a8-grid'?21:format==='canape-grid'?7.5:format==='a6-grid'?52.5:17.5),
-          right:twips(format==='a8-grid'?21:format==='canape-grid'?7.5:format==='a6-grid'?52.5:17.5)
+          top:twips(format==='a8-grid'?13.5:format==='foldtags-grid'?16.5:format==='canape-grid'?7:format==='a6-grid'?45:20),
+          bottom:twips(format==='a8-grid'?13.5:format==='foldtags-grid'?16.5:format==='canape-grid'?7:format==='a6-grid'?45:20),
+          left:twips(format==='a8-grid'?21:format==='foldtags-grid'?12:format==='canape-grid'?7.5:format==='a6-grid'?52.5:17.5),
+          right:twips(format==='a8-grid'?21:format==='foldtags-grid'?12:format==='canape-grid'?7.5:format==='a6-grid'?52.5:17.5)
         }},type:index===0?'nextPage':'nextPage'},children
       }));
       return sections;
