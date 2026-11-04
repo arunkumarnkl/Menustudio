@@ -1,0 +1,100 @@
+/* Ragasaan Menu Studio — authenticated cloud experience.
+   The GitHub Pages JavaScript and public JSON remain public; access control
+   for D1 resources is enforced server-side by the Cloudflare Security API. */
+body.ragasaan-locked > :not(#ragasaan-auth-root):not(script) {display:none!important}
+#ragasaan-auth-root {display:none; position:fixed;inset:0;z-index:2147480000;overflow:auto;color:#e2e8f0;background:radial-gradient(circle at 10% 10%,#334155 0,#0f172a 45%,#020617 100%);font-family:Inter,system-ui,sans-serif}
+body.ragasaan-locked #ragasaan-auth-root {display:flex;align-items:center;justify-content:center;padding:22px}
+.raga-login-card {width:min(450px,100%);border:1px solid #475569;border-radius:18px;background:#0f172a;box-shadow:0 28px 85px #0008;padding:32px}
+.raga-login-card h1 {font-family:'Playfair Display',serif;color:#eab308;font-size:29px;margin-bottom:6px}
+.raga-login-card p {font-size:13px;color:#94a3b8;margin-bottom:22px}
+.raga-login-card label {display:block;font-size:12px;margin:12px 0 5px;color:#cbd5e1}
+.raga-input {display:block;width:100%;padding:10px 11px;outline:none;background:#020617;border:1px solid #475569;border-radius:8px;color:#f8fafc;font:inherit;font-size:13px}
+.raga-input:focus {border-color:#eab308}
+.raga-btn {padding:9px 13px;border:1px solid #475569;border-radius:8px;background:#334155;color:white;cursor:pointer;font-size:12px;font-weight:600}
+.raga-btn.primary {background:#eab308;color:#111827;border-color:#eab308}
+.raga-btn.danger {border-color:#9f1239;color:#fecdd3;background:#4c0519}
+.raga-btn:disabled {opacity:.45;cursor:not-allowed}
+.raga-login-error {color:#fda4af;font-size:12px;min-height:22px;margin-top:9px}
+.raga-cloud-backdrop {position:fixed;z-index:100000;inset:0;background:#030712c7;display:none;align-items:center;justify-content:center;padding:12px}
+.raga-cloud-backdrop.open {display:flex}
+.raga-cloud-sheet {background:#0f172a;color:#e2e8f0;border:1px solid #64748b;border-radius:14px;max-width:1100px;width:100%;max-height:92vh;overflow:auto;box-shadow:0 20px 80px #000b;padding:22px}
+.raga-cloud-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.raga-panel {border:1px solid #334155;border-radius:9px;padding:15px;min-width:0;background:#111c30}
+.raga-panel h3 {font-size:14px;font-weight:700;color:#fbbf24;margin-bottom:10px}
+.raga-panel p,.raga-help {color:#94a3b8;font-size:12px;line-height:1.5}
+.raga-actions {display:flex;flex-wrap:wrap;gap:7px;margin:9px 0}
+.raga-cloud-sheet label {display:block;font-size:12px;margin:7px 0 5px}
+.raga-cloud-sheet .raga-input {margin:5px 0}
+.raga-small {font-size:11px;color:#9ca3af}
+.raga-list {display:flex;flex-direction:column;gap:8px;max-height:260px;overflow:auto;margin:9px 0}
+.raga-list-item {border:1px solid #475569;padding:10px;border-radius:8px;background:#0b1220;font-size:12px;overflow-wrap:anywhere}
+.raga-alert {color:#fcd34d;white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:1.5;min-height:20px;margin:10px 0}
+.raga-client-shell {width:min(1260px,100%);margin:auto;padding:18px;display:grid;grid-template-columns:minmax(280px,350px) minmax(0,1fr);gap:18px;align-items:start}
+.raga-client-side {background:#111c30;padding:20px;border:1px solid #475569;border-radius:14px}
+.raga-client-side h2 {color:#fbbf24;font:24px 'Playfair Display',serif;margin-bottom:4px}
+.raga-client-preview {background:#d1d5db;border-radius:12px;padding:16px;min-height:500px;overflow:auto}
+.raga-client-paper {background:white;margin:auto;box-sizing:border-box;max-width:100%;width:680px;min-height:700px;box-shadow:0 12px 45px #1116;display:flex;flex-direction:column}
+.raga-preview-columns {display:grid;grid-template-columns:1fr 1fr;flex:1;min-height:480px;gap:14px}
+.raga-client-form-grid {display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.raga-client-form-grid label {font-size:11px;margin:5px 0 1px}
+.raga-client-form-grid input,.raga-client-form-grid select {width:100%}
+.raga-muted {color:#94a3b8;font-size:12px}
+.raga-rule {height:1px;background:#334155;margin:15px 0}
+.raga-pill {padding:3px 6px;border:1px solid #475569;border-radius:6px;font-size:11px;display:inline-block}
+.raga-client-shell .raga-btn {margin-top:8px}
+.raga-client-shell input[type=color] {height:35px;padding:2px}
+body.ragasaan-locked #ragasaan-auth-root.raga-client-on {display:block;padding:0}
+@media(max-width:770px){.raga-cloud-grid,.raga-client-shell{grid-template-columns:1fr}.raga-cloud-sheet{padding:12px}.raga-client-form-grid{grid-template-columns:1fr 1fr}}
+@media print {#ragasaan-auth-root,.raga-cloud-backdrop{display:none!important}}
+/* Full design gallery shared by staff and clients */
+#rs-theme-gallery {background:#101a2e;border:1px solid #334155;border-radius:12px;padding:15px;color:#e2e8f0;}
+.raga-gallery-head {display:flex;justify-content:space-between;align-items:flex-start;gap:9px;flex-wrap:wrap}
+.raga-gallery-head h3 {font-size:15px;font-weight:700;color:#fbbf24;margin:0}
+.raga-gallery-head p {font-size:11px;color:#9ca3af;margin-top:4px}
+.raga-theme-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding-top:13px}
+.raga-theme-card {display:flex;flex-direction:column;gap:3px;background:#111b2b;color:#f8fafc;border:1px solid #475569;border-radius:10px;padding:8px;text-align:left;cursor:pointer;overflow:hidden}
+.raga-theme-card:hover,.raga-theme-card.active {border-color:#eab308;box-shadow:0 0 0 1px #ca8a04aa}
+.raga-theme-card strong {font-size:11px;margin-top:5px}
+.raga-theme-card>span:last-child {font-size:10px;color:#94a3b8;text-transform:capitalize}
+.raga-theme-swatch {background:white;width:100%;height:93px;border:3px double var(--themeborder);display:flex;align-items:center;justify-content:center;flex-direction:column;color:var(--themetext)}
+.raga-theme-emblem{color:var(--themeaccent);font-size:15px}
+.raga-theme-preview-title{font:700 15px 'Playfair Display',serif;letter-spacing:.1em;color:var(--themeaccent)}
+.raga-theme-preview-line{height:1px;width:54%;background:var(--themeborder);margin:6px 0}
+.raga-theme-preview-dots{font-size:11px}
+.raga-theme-staff-section{min-width:0}
+.raga-frame-corner{position:absolute;font:26px Georgia,serif;line-height:1;background:white;padding:1px 3px;opacity:.86;pointer-events:none}
+.raga-frame-tl{top:-13px;left:-13px}.raga-frame-tr{top:-13px;right:-13px}
+.raga-frame-bl{bottom:-13px;left:-13px}.raga-frame-br{bottom:-13px;right:-13px}
+.raga-cloud-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px}
+.raga-cloud-header h2{font-size:19px;color:#fbbf24;font-family:'Playfair Display',serif}
+.raga-error{color:#fda4af}
+#rs-client-panel{width:100%;min-height:100vh}
+.raga-client-shell{max-width:1340px}
+.raga-client-side{max-height:97vh;overflow:auto}
+.raga-client-side h3.raga-section-title{font-size:14px;color:#eab308;font-weight:700;margin-bottom:7px}
+.raga-client-side label{display:block;font-size:11px;color:#cbd5e1;margin:7px 0 4px}
+.raga-client-themes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;max-height:480px;overflow:auto}
+.raga-client-themes .raga-theme-card{padding:5px}
+.raga-client-themes .raga-theme-swatch{height:74px}
+.raga-client-preview-head{display:flex;justify-content:space-between;align-items:center;gap:15px;padding-bottom:13px;color:#111827}
+.raga-client-preview-head b{font-size:16px}
+.raga-client-preview-head p{font-size:12px;color:#4b5563}
+.raga-client-preview-head .raga-pill{border-color:#cbd5e1;color:#475569}
+.raga-client-paper{height:auto;min-height:710px;padding:30px;display:block}
+.raga-paper-inner{background:#fff;min-height:640px;padding:30px 38px;text-align:center;display:flex;flex-direction:column}
+.raga-paper-inner h1{line-height:1.22;font-weight:700;margin-top:10px}
+.raga-paper-inner h2{text-transform:uppercase;letter-spacing:.1em}
+.raga-paper-meta{font-size:13px;margin:10px 0 16px}
+.raga-paper-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 15px;align-content:start;flex:1}
+.raga-paper-dish{margin:4px 0 10px;font-size:12px;overflow-wrap:anywhere}
+.raga-paper-dish b{display:block}
+.raga-paper-desc{font-size:11px;margin:4px 0}
+.raga-paper-dish small{display:block;font-size:10px;color:#8d2c14;margin-top:3px}
+.raga-paper-welcome{font-style:italic;max-width:390px;margin:6px auto 11px;white-space:pre-wrap}
+.raga-paper-footer{margin-top:18px;border-top:1px solid #d1d5db;padding:13px 0;font-size:10px;color:#666}
+@media(max-width:850px){.raga-theme-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:470px){.raga-theme-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.raga-client-form-grid{grid-template-columns:1fr}}
+@media print{
+ body.raga-print-blocked .print-sheet,body.raga-print-blocked #summary-print-root{display:none!important}
+ body.raga-print-blocked:after{content:'Printing requires a signed-in, approved cloud event.';display:block!important;position:fixed;top:40%;left:15%;width:70%;background:white;color:#000;font-size:24pt;text-align:center}
+}

@@ -1187,6 +1187,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       #sidebar-controls.print-format-compact { width: 270px !important; }
     }
 </style>
+  <style id="ragasaan-login-fail-closed">body.ragasaan-locked > :not(#ragasaan-auth-root):not(script){display:none!important}body.ragasaan-locked #ragasaan-auth-root{display:flex;position:fixed;inset:0;z-index:2147480000;background:#020617;color:#f8fafc;align-items:center;justify-content:center;overflow:auto}</style>
+  <link rel="stylesheet" href="./security.css">
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Google Fonts -->
@@ -1406,7 +1408,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   </style>
 <script src="./github-sync-config.js"></script>
 </head>
-<body class="h-full flex flex-col font-sans antialiased text-slate-100 bg-slate-950 overflow-hidden">
+<body class="ragasaan-locked h-full flex flex-col font-sans antialiased text-slate-100 bg-slate-950 overflow-hidden">
 
   <!-- Top Navigation Bar -->
   <header class="no-print bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shrink-0 shadow-xl z-20">
@@ -1447,6 +1449,9 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <option value="dark">Dark</option><option value="light">Light</option>
         </select>
       </label>
+      <button type="button" id="rs-open-cloud" class="px-3 py-1.5 bg-slate-800 border border-amber-800 text-amber-300 font-semibold rounded-lg text-xs">☁ Cloud Events</button>
+      <span id="rs-user-info" class="text-[10px] text-slate-300"></span>
+      <button type="button" id="rs-logout" class="px-2 py-1.5 bg-slate-800 rounded-lg text-xs text-slate-300">Sign out</button>
       <button onclick="triggerUndo()" id="undo-btn" title="Undo Last Delete/Edit" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-gold-400 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed" disabled>
         <i class="fa-solid fa-rotate-left"></i> Undo
       </button>
@@ -1457,13 +1462,14 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   </header>
 
   <div class="no-print bg-amber-950/80 text-amber-100 text-[11px] px-4 py-1 flex items-center justify-between gap-3 border-b border-amber-800">
-    <span><strong>Web edition:</strong> Data is saved in this browser only — not shared between devices. This site has no server-side login. Back up your data regularly.</span>
+    <span><strong>Web edition:</strong> Browser backups are local. Cloud-saved events and client submissions are shared through Cloudflare D1. GitHub master data uses a separate publishing service.</span>
     <span class="flex gap-2 shrink-0">
       <button type="button" onclick="downloadWebBackup()" class="underline font-semibold" title="Save dishes, venues and design settings as JSON">Backup JSON</button>
       <label class="underline font-semibold cursor-pointer" title="Restore a previously saved JSON backup">Restore JSON<input type="file" accept=".json,application/json" class="hidden" onchange="restoreWebBackup(event)"></label>
     </span>
   </div>
 
+  <div id="rs-security-banner" class="no-print bg-slate-900 px-4 py-1 text-xs text-slate-400">Sign in to access the application.</div>
   <div id="github-db-status" role="status" class="no-print bg-slate-800 text-slate-200 px-4 py-1 text-xs">Loading GitHub allergen database...</div>
 
   <!-- Main App Workspace -->
@@ -1643,6 +1649,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         </div>
 
         <!-- CONTEXTUAL CONTROLS SECTION CONTAINER -->
+        <section id="rs-theme-gallery" class="raga-theme-staff-section"></section>
         <div id="contextual-format-controls" class="space-y-4">
           <!-- Dynamically displayed controls per format selection -->
         </div>
@@ -2360,17 +2367,17 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       eventSessions=eventSessions.filter(s=>s.id!==id);if(currentBuilderSession===id)currentBuilderSession=eventSessions[0].id;updateSessionPicker();onEventRecordsChanged();
     }
     function setEventPartyNo(value){state.event.partyNo=value;saveStyle();renderEventSummary()}
-    function eventSnapshot(){return {format:'ragasaan-event-v2',name:activeEventName,title:state.event.title,date:state.event.date,venue:state.event.venue,partyNo:state.event.partyNo||'',sessions:eventSessions,items:eventRecords,designs:state.designs}}
+    function eventSnapshot(){return {format:'ragasaan-event-v2',name:activeEventName,title:state.event.title,date:state.event.date,venue:state.event.venue,partyNo:state.event.partyNo||'',sessions:eventSessions,items:eventRecords,designs:state.designs,themeId:window.ragaActiveThemeId||''}}
     function restoreEventSnapshot(snapshot){
       if(!snapshot||!Array.isArray(snapshot.sessions)||!Array.isArray(snapshot.items))throw Error('Invalid event file');
-      if(!confirm('Load this event and replace the current event menu and design settings?'))return;
+      if(!confirm('Load this event and replace the current event menu and design settings?'))return false;
       state.event.title=String(snapshot.title||'');state.event.date=String(snapshot.date||'');state.event.venue=String(snapshot.venue||'');state.event.partyNo=String(snapshot.partyNo||'');
       eventSessions=snapshot.sessions.filter(x=>x&&x.id&&x.name).map(x=>({id:String(x.id),name:String(x.name),time:String(x.time||''),courseServices:{...(x.courseServices||{})}}));
       if(!eventSessions.length)eventSessions=[{id:'lunch',name:'Lunch',time:'',courseServices:{}}];
       eventRecords=snapshot.items.filter(x=>x&&x.name).map(x=>({...x,eventUid:x.eventUid||eventUid(),sessionId:x.sessionId||eventSessions[0].id,printFormats:Array.isArray(x.printFormats)?x.printFormats.filter(f=>MENU_FORMATS.includes(f)):[],tagCopies:x.tagCopies||{}}));
       if(snapshot.designs&&typeof snapshot.designs==='object')MENU_FORMATS.forEach(f=>{if(snapshot.designs[f])Object.assign(state.designs[f],snapshot.designs[f])});
-      currentBuilderSession=eventSessions[0].id;state.design=state.designs[state.layout];activeEventName=snapshot.name||'';
-      document.getElementById('cfg-couple').value=state.event.title;document.getElementById('cfg-venue').value=state.event.venue;syncDatePicker();updateSessionPicker();onEventRecordsChanged();renderContextualControls();
+      currentBuilderSession=eventSessions[0].id;state.design=state.designs[state.layout];activeEventName=snapshot.name||'';window.ragaActiveThemeId=snapshot.themeId||'';
+      document.getElementById('cfg-couple').value=state.event.title;document.getElementById('cfg-venue').value=state.event.venue;syncDatePicker();updateSessionPicker();onEventRecordsChanged();renderContextualControls();return true;
     }
     function savedEventLibrary(){try{return JSON.parse(localStorage.getItem(EVENT_STORE_KEY)||'{}')}catch(_){return {}}}
     function refreshSavedEventSelect(){const sel=document.getElementById('saved-event-select');if(!sel)return;const names=Object.keys(savedEventLibrary()).sort();sel.innerHTML=names.map(name=>`<option value="${esc(name)}">${esc(name)}</option>`).join('');if(activeEventName&&names.includes(activeEventName))sel.value=activeEventName}
@@ -2670,7 +2677,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <label class="flex items-start gap-2 text-amber-300"><input type="checkbox" ${d.autoFitText!==false?'checked':''} onchange="state.design.autoFitText=this.checked;renderPreview()"> <span><b>Auto-fit text to the page</b><span class="block text-[10px] text-slate-400">Shrinks all text proportionally when needed. If the minimum readable size is reached, creates extra pages instead of hiding dishes.</span></span></label>
           <label class="block text-slate-400"><input type="checkbox" ${d.showDescription===true?'checked':''} onchange="state.design.showDescription=this.checked;renderPreview()"> Show menu descriptions on this format</label>
           <div class="border-t border-slate-800 pt-3">
-            <label class="block text-slate-400 mb-2">Preset Color Themes (8)</label>
+            <label class="block text-slate-400 mb-2">Quick Color Palettes (9)</label>
             <div class="grid grid-cols-2 gap-2">${themes}</div>
           </div>
         </details>
@@ -3253,7 +3260,9 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         const border = d.borderStyle==='triple' ? 'double' : d.borderStyle;
         const width = d.borderStyle==='triple'?Math.max(2,Number(d.borderWidth)||2):Math.max(.2,Number(d.borderWidth)||2);
         const inset = Math.max(.2,Math.min(.5,Number(d.borderOutsetCm)||.2));
-        return `<div class="frame-overlay" style="inset:${inset}cm;border:${width}mm ${border} ${d.borderColor};${d.borderStyle==='triple'?`outline:1px solid ${d.borderColor};outline-offset:2mm;`:''}"></div>`;
+        const motif=({'none':'','fine-line':'✦','corner-flourish':'❦','art-deco':'◇','botanical':'❧'})[d.frameMotif||'none']||'';
+        const corners=motif?`<span class="raga-frame-corner raga-frame-tl">${motif}</span><span class="raga-frame-corner raga-frame-tr">${motif}</span><span class="raga-frame-corner raga-frame-bl">${motif}</span><span class="raga-frame-corner raga-frame-br">${motif}</span>`:'';
+        return `<div class="frame-overlay" style="inset:${inset}cm;border:${width}mm ${border} ${d.borderColor};color:${d.borderColor};${d.borderStyle==='triple'?`outline:1px solid ${d.borderColor};outline-offset:2mm;`:''}">${corners}</div>`;
       };
       const page = (cls='paper-a4', extra='') => {
         const p=document.createElement('div');
@@ -3385,7 +3394,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         const makeTableFront=(records)=>{
           const p=page('paper-half-a4','flex flex-col'); p.style.padding=`${Math.max(2.3,Number(d.borderOutsetCm)+.25)}cm`; p.style.paddingTop=`${Math.max(0.8, Number(d.borderOutsetCm)+Number(d.borderWidth||1)/10+0.2)}cm`;
           const left=`<div class="text-center flex flex-col justify-between" style="min-width:0;border-right:1px solid ${d.accentColor}55;padding:0 12px 0 0">
-            <div style="padding-top:${Math.min(Number(d.halfTitleTop)||0, 10)}px"><h1 contenteditable="true" oninput="state.event.title=this.innerText" style="color:${d.accentColor};${font(d.titleFontSize)}" class="font-bold">${escText(state.event.title)}</h1>${wedding()}</div>
+            <div style="padding-top:${Math.min(Number(d.halfTitleTop)||0, 10)}px"><h1 contenteditable="true" oninput="state.design.clientCoupleTitle=this.innerText;saveStyle()" style="color:${d.accentColor};${font(d.titleFontSize)}" class="font-bold">${escText(d.clientCoupleTitle||state.event.title)}</h1>${wedding()}${d.clientWelcomeMessage?`<p class="menu-body-font" style="margin:8px auto;color:${d.textColor};${font(d.descFontSize)}">${escText(d.clientWelcomeMessage)}</p>`:''}</div>
             <div class="menu-body-font" style="margin-bottom:${d.halfVenueBottom}px;${font(d.descFontSize)}">
               <p contenteditable="true" oninput="state.event.venue=this.innerText">${escText(state.event.venue)}</p>
               <p contenteditable="true" oninput="state.event.date=this.innerText">${escText(state.event.date)}</p></div>
@@ -3790,5 +3799,67 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     }
 
   </script>
+
+  <!-- Login is a presentation gate. Worker/D1 enforce the actual cloud permissions. -->
+  <div id="ragasaan-auth-root" class="no-print">
+    <form id="rs-login-panel" class="raga-login-card" aria-label="Ragasaan staff login">
+      <div style="font-size:36px;color:#eab308;margin-bottom:12px">✦</div>
+      <h1>Ragasaan Menu Studio</h1>
+      <p>Secure Event Planner &amp; Administrator access</p>
+      <label for="rs-email">Work email</label>
+      <input class="raga-input" id="rs-email" type="email" autocomplete="username" required placeholder="name@example.com">
+      <label for="rs-password">Password</label>
+      <input class="raga-input" id="rs-password" type="password" autocomplete="current-password" required placeholder="Enter your password">
+      <div style="margin-top:20px"><button class="raga-btn primary" type="submit" style="width:100%;font-size:14px;padding:12px">Sign in</button></div>
+      <p id="rs-login-error" class="raga-login-error" role="alert"></p>
+      <small class="raga-muted">Clients use their event-specific invitation link. Admin credentials and passwords are never stored in the GitHub repository.</small>
+    </form>
+    <div id="rs-client-panel" hidden></div>
+  </div>
+
+  <!-- Cloud Events, sharing and approvals; never exposes private tokens in the GitHub repo. -->
+  <div id="ragasaan-cloud" class="raga-cloud-backdrop no-print" role="dialog" aria-modal="true" aria-label="Cloud Events">
+    <div class="raga-cloud-sheet">
+      <header class="raga-cloud-header"><div><h2>Cloud Events &amp; Client Collaboration</h2><p class="raga-help">Secure D1 event storage · restricted client design links · Event Planner approval</p></div><button id="rs-close-cloud" class="raga-btn">Close ×</button></header>
+      <p id="rs-cloud-message" class="raga-alert" role="status"></p>
+      <div class="raga-cloud-grid">
+        <section class="raga-panel">
+          <h3>Cloud Event Library</h3><p>Save the current Event Builder to the shared database. Existing browser Save/Load and backup JSON remain available.</p>
+          <p class="raga-small" id="rs-cloud-event-id">Not yet saved to cloud</p>
+          <div class="raga-actions"><button id="rs-cloud-save" class="raga-btn primary">Save Current Event to Cloud</button><button id="rs-cloud-refresh" class="raga-btn">Refresh Library</button></div>
+          <div id="rs-cloud-events" class="raga-list"></div>
+          <div id="rs-cloud-selected" class="raga-alert"></div>
+          <div class="raga-actions"><button id="rs-load-selected" class="raga-btn">Load Selected into Builder</button></div>
+          <div data-rs-admin><label for="rs-event-planner">Assigned Event Planner (Admin only)</label><select id="rs-event-planner" class="raga-input"><option value="">Not yet assigned</option></select><p class="raga-help">Save the event again to apply a changed assignment.</p></div>
+        </section>
+        <section class="raga-panel">
+          <h3>Client Designer Access Link</h3>
+          <p>Save a cloud event first. The client can design their assigned event only and cannot alter dishes, allergens or other events.</p>
+          <label for="rs-link-label">Link label (optional)</label><input id="rs-link-label" class="raga-input" maxlength="90" placeholder="Bride & groom, client name, etc.">
+          <label for="rs-link-days">Expiry (days: 1–30)</label><input id="rs-link-days" class="raga-input" type="number" min="1" max="30" value="7">
+          <div class="raga-actions"><button id="rs-make-link" class="raga-btn primary">Generate Secure Client Link</button><button id="rs-list-links" class="raga-btn">View / Revoke Links</button></div>
+          <label>Generated link · only visible once</label><div class="raga-actions"><input id="rs-link-output" class="raga-input" style="flex:1;min-width:150px" readonly placeholder="Link appears here"><button id="rs-copy-link" class="raga-btn">Copy</button></div>
+          <div id="rs-links-list" class="raga-list"></div>
+        </section>
+        <section class="raga-panel">
+          <h3>Client Design Submissions</h3>
+          <p>The client submits a theme, per-format fonts/colors/decorative borders and Table Menu Card couple details only. Review here; no JSON exchange is required.</p>
+          <div class="raga-actions"><button id="rs-load-submissions" class="raga-btn">Refresh Submissions</button><button id="rs-approve-print" class="raga-btn primary">Approve Printing</button></div>
+          <p class="raga-help">Only the assigned Event Planner approves submitted designs and printing. Admin has oversight and may print without approval. Approval applies to the last saved cloud event.</p>
+          <div id="rs-submissions-list" class="raga-list"></div><div id="rs-design-inspector" class="raga-help"></div>
+        </section>
+        <section class="raga-panel" data-rs-admin>
+          <h3>Event Planner Accounts · Admin</h3>
+          <p>Create staff accounts. Share initial passwords privately; they are never published to GitHub.</p>
+          <label>Name</label><input id="rs-new-planner-name" class="raga-input" maxlength="100">
+          <label>Email</label><input id="rs-new-planner-email" class="raga-input" type="email" maxlength="254">
+          <label>Initial password (14+ characters)</label><input id="rs-new-planner-password" class="raga-input" type="password" autocomplete="new-password">
+          <div class="raga-actions"><button id="rs-create-planner" class="raga-btn primary">Create Event Planner</button></div>
+          <div id="rs-planner-list" class="raga-list"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+  <script src="./security-app.js"></script>
 </body>
 </html>
