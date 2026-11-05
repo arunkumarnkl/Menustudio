@@ -1199,7 +1199,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <!-- Word export, browser-side. External library required only when downloading DOCX. -->
-  <script src="https://cdn.jsdelivr.net/npm/docx@9.5.1/dist/index.umd.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/docx@9.5.1/dist/index.umd.cjs" defer></script>
   <!-- html2pdf.js for PDF Export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -1431,7 +1431,25 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     @media(max-width:950px){.summary-main-layout{grid-template-columns:1fr}.summary-controls-left{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.summary-preview-right{width:100%}}
     @media(max-width:580px){.summary-controls-left{grid-template-columns:1fr}}
     #tab-btn-summary[hidden], #builder-course-controls[hidden], #builder-course-control[hidden], #builder-session-time-row[hidden]{display:none!important}
-  </style>
+  
+/* Ragasaan simplified planner: advanced controls remain in the DOM and editable. */
+#tab-builder.raga-simple [data-raga-advanced] {display:none !important}
+#tab-builder .raga-mode-switch {display:flex;gap:5px;background:#111827;border:1px solid #475569;padding:3px;border-radius:9px}
+#tab-builder .raga-mode-switch button {padding:6px 11px;font-size:11px;border-radius:6px;color:#cbd5e1}
+#tab-builder .raga-mode-switch button[aria-pressed="true"] {background:#ca8a04;color:#0f172a;font-weight:700}
+#tab-builder .raga-item-detail {margin-top:5px;padding:8px;border:1px solid #334155;border-radius:6px;background:#0b1220}
+#tab-builder .raga-item-detail label{display:block;font-size:10px;color:#cbd5e1;margin:4px 0}
+#tab-builder .raga-item-detail input,#tab-builder .raga-item-detail select,#tab-builder .raga-item-detail textarea{display:block;width:100%;padding:5px;margin-top:3px;color:#f8fafc;background:#172338;border:1px solid #475569;border-radius:4px}
+#tab-builder .raga-item-row{background:#162033;border:1px solid #334155;border-radius:7px;padding:7px;margin-bottom:5px}
+#tab-builder .raga-item-row[draggable="true"]{cursor:grab}
+#tab-builder .raga-item-row.raga-dragover{border-color:#fbbf24;background:#26334a}
+#tab-builder .raga-print-heading-settings input{min-width:0;background:#101827;border:1px solid #475569;border-radius:5px;color:#fff;padding:5px;width:100%}
+#tab-builder .raga-print-heading-settings button{border:1px solid #55637b;border-radius:5px;padding:4px 7px;font-size:10px}
+#tab-builder .raga-selected-counter{font-size:11px;color:#cbd5e1}
+@media(max-width:1100px){#tab-builder .builder-page-grid{grid-template-columns:minmax(220px,260px) minmax(330px,1fr) !important}#tab-builder .builder-selected-column{grid-column:1/-1;position:static}}
+@media(max-width:730px){#tab-builder .builder-page-grid{grid-template-columns:minmax(0,1fr) !important}}
+
+</style>
 <script src="./github-sync-config.js"></script>
 </head>
 <body class="ragasaan-locked h-full flex flex-col font-sans antialiased text-slate-100 bg-slate-950 overflow-hidden">
@@ -1509,7 +1527,10 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       <div id="tab-builder" class="tab-content flex-1 flex flex-col overflow-y-auto p-4 gap-4">
         <div>
           <div class="flex justify-between items-center gap-2"><h2 class="text-sm font-semibold text-slate-200">Event Menu Builder</h2><button onclick="saveNamedEvent()" class="bg-amber-500 text-slate-950 font-bold rounded px-3 py-1.5 text-xs">Save Event</button></div>
-          <p class="text-xs text-slate-400">Plan each meal in its own tab. Choose a course, service type and print formats once; the Event Allergen Summary and all selected menu/tag formats update automatically.</p>
+          <div class="flex items-center justify-between gap-2 flex-wrap mt-2">
+            <p class="text-xs text-slate-400">Select a meal, add dishes, then edit the selected list. Admin defaults are applied automatically.</p>
+            <div class="raga-mode-switch" role="group" aria-label="Planning mode"><button id="raga-mode-simple" type="button" aria-pressed="true" onclick="ragaSetBuilderMode('simple')">Simple</button><button id="raga-mode-advanced" type="button" aria-pressed="false" onclick="ragaSetBuilderMode('advanced')">Advanced</button></div>
+          </div>
         </div>
 
         <div class="builder-page-grid">
@@ -1552,7 +1573,16 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
             <label id="builder-session-time-row" hidden>Meal time <input id="builder-session-time" type="time" onchange="setActiveSessionTime(this.value)" class="ml-1 p-1.5 rounded bg-slate-900 text-white border border-slate-700"></label>
           </div>
           <p id="builder-service-hint" class="text-[11px] text-slate-400"></p>
-          <div id="builder-course-controls" class="bg-slate-900 border border-slate-800 p-3 rounded-lg" hidden>
+          <details class="raga-print-heading-settings rounded-lg border border-slate-800 bg-slate-900 p-2 text-xs">
+            <summary class="text-amber-300 cursor-pointer">Printed headings · Menu / meal name</summary>
+            <div class="grid grid-cols-2 gap-2 mt-2">
+              <label class="text-slate-300">Menu heading<input id="raga-menu-heading-input" type="text" aria-label="Menu print heading" oninput="ragaUpdatePrintHeading('menu',this.value)"></label>
+              <label class="text-slate-300">This meal's heading<input id="raga-session-heading-input" type="text" aria-label="Meal print heading" oninput="ragaUpdatePrintHeading('session',this.value)"></label>
+            </div>
+            <div class="flex gap-2 flex-wrap mt-2"><label><input id="raga-show-menu-heading" type="checkbox" onchange="ragaUpdatePrintHeading('menuVisible',this.checked)"> Show Menu</label><label><input id="raga-show-session-heading" type="checkbox" onchange="ragaUpdatePrintHeading('sessionVisible',this.checked)"> Show meal name</label><button type="button" onclick="ragaResetPrintHeadings()">Reset both headings</button></div>
+            <p class="text-[10px] text-slate-400 mt-1">Hiding or renaming print headings never removes the meal or its dishes.</p>
+          </details>
+          <div id="builder-course-controls" data-raga-advanced class="bg-slate-900 border border-slate-800 p-3 rounded-lg" hidden>
             <h4 class="text-xs font-semibold text-amber-300">Course-wise service and timings</h4>
             <div id="builder-course-service-types" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 mt-2 text-xs"></div>
           </div>
@@ -1569,9 +1599,9 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
             <button id="add-mode-master" onclick="toggleAddMode('master')" class="flex-1 p-2 bg-amber-600 text-slate-950 font-semibold">Master Database</button>
             <button id="add-mode-manual" onclick="toggleAddMode('manual')" class="flex-1 p-2 bg-slate-800 text-slate-200">Manual Entry</button>
           </div>
-          <div class="rounded-lg border border-slate-700 bg-slate-900 p-2 space-y-2">
-            <label for="builder-session-select" class="block text-xs font-semibold text-amber-300">Event session *</label>
-            <div class="flex gap-2"><select id="builder-session-select" onchange="selectBuilderSession(this.value)" class="flex-1 min-w-0 p-2 rounded bg-slate-950 border border-amber-700 text-white text-xs"></select><button type="button" onclick="addEventSession()" class="px-3 rounded bg-slate-700 text-white text-xs">+ Session</button></div>
+          <div data-raga-advanced class="rounded-lg border border-slate-700 bg-slate-900 p-2 space-y-2">
+            <!-- Kept for backward-compatible app state; the meal tabs above are the only visible session selector. -->
+            <div hidden><select id="builder-session-select" aria-hidden="true" tabindex="-1"></select></div>
             <label class="block text-xs font-semibold text-amber-300">Print in these menu formats (multiple allowed)</label>
             <div id="builder-print-formats" class="grid grid-cols-2 gap-1 text-[11px] text-slate-200"></div>
             <p class="text-[10px] text-slate-400">Every dish added here is included automatically in the Event Allergen Summary, even if no print format is selected.</p>
@@ -1592,7 +1622,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           </div>
           <div id="builder-added-feedback" class="builder-status hidden" role="status" aria-live="polite"></div>
           <div id="master-add-controls" class="space-y-2">
-          <div class="flex gap-2">
+          <div data-raga-advanced class="flex gap-2">
             <select id="builder-cat-filter" onchange="filterBuilderDropdown()" class="w-1/3 bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-200">
               <option value="">All Categories</option>
             </select>
@@ -1605,6 +1635,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
               <i class="fa-solid fa-plus"></i> Add Item
             </button>
           </div>
+          <div id="raga-quick-dishes" class="space-y-1 max-h-48 overflow-y-auto" aria-live="polite"></div>
           </div>
           <div id="manual-add-controls" class="hidden space-y-2 text-xs">
             <input id="manual-name" placeholder="Dish name *" aria-label="Dish name" class="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white">
@@ -1627,7 +1658,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
             <h3 class="text-sm font-semibold text-gold-400">Selected Items — <span id="active-format-name">Breakfast</span> (<span id="active-item-count">0</span>)</h3>
             <button onclick="clearActiveSessionItems()" class="text-[11px] text-rose-400 hover:underline">Clear This Meal</button>
           </div>
-          <p class="text-[11px] text-slate-400">Dish names only for the selected meal. Remove a dish with ×; edit courses and print formats using the controls above.</p>
+          <p class="text-[11px] text-slate-400">Drag to reorder. Click Edit to change dish details for this event only; the master database is unchanged.</p>
           <div id="event-items-list" class="flex-1 pr-1"></div>
           </div>
             </div>
@@ -2274,7 +2305,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     const TAG_FORMATS=['a8-grid','foldtags-grid','canape-grid','a6-grid'];
     const EVENT_STORE_KEY='ragasaan_event_library_v1';
     let eventRecords=[];
-    let eventSessions=[{id:'breakfast',name:'Breakfast',time:'08:00',serviceMode:'Buffet'}, {id:'lunch',name:'Lunch',time:'12:30',serviceMode:'Regular Buffet'}, {id:'dinner',name:'Dinner',time:'19:00',serviceMode:'Plated Service'}, {id:'hi-tea',name:'HI Tea',time:'16:00',serviceMode:'Buffet'}, {id:'late-night',name:'Late Night Snack',time:'22:30',serviceMode:'Other'}];
+    let eventSessions=[{id:'breakfast',name:'Breakfast',time:'08:00',serviceMode:'Buffet'}, {id:'lunch',name:'Lunch',time:'12:30',serviceMode:'Buffet'}, {id:'dinner',name:'Dinner',time:'19:00',serviceMode:'Plated Service'}, {id:'hi-tea',name:'HI Tea',time:'16:00',serviceMode:'Buffet'}, {id:'late-night',name:'Late Night Snack',time:'22:30',serviceMode:'Other'}];
     const SERVICE_TYPES=['Buffet','Plated Service','Bowl Food','Canapé','Live Station','Thali','Other'];
     let currentBuilderSession='breakfast';
     const SUMMARY_PREF='ragasaan_include_client_summary_v1';
@@ -2300,7 +2331,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       };
 
       if(kind==='breakfast'||kind==='hi-tea')return filter([['Buffet','Buffet']]);
-      if(kind==='lunch')return filter([['Regular Buffet','Regular Buffet'],['Thali','Thali'],['Plated Service','Plated Service · course-wise']]);
+      if(kind==='lunch')return filter([['Buffet','Buffet · one section'],['Regular Buffet','Regular Buffet (saved events)'],['Thali','Thali · one section'],['Plated Service','Plated Service · course-wise']]);
       if(kind==='dinner')return filter([['Plated Service','Plated Service · course-wise'],['Buffet','Buffet · one section'],['Thali','Thali · one section'],['Bowl Food','Bowl Food · one section']]);
       if(kind==='late-night')return filter([['Other','Other']]);
       return filter([['Buffet','Buffet'],['Plated Service','Plated Service · course-wise'],['Other','Other']]);
@@ -2335,12 +2366,34 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     function serviceTypeOptions(selected,includeDefault=false){
       return (includeDefault?'<option value="" '+(!selected?'selected':'')+'>Use course default</option>':'')+SERVICE_TYPES.map(v=>`<option value="${esc(v)}" ${selected===v?'selected':''}>${esc(v)}</option>`).join('');
     }
+    // Admin settings are applied only to the initial, unsaved event.
+    // Restored cloud/local events retain their existing services, courses and format choices.
+    let ragaRestoredEvent=false;
+    let ragaAdminInitialApplied=false;
+    function applyAdminMealDefaults(config){
+      window.ragaMealDefaults=config;
+      if(ragaAdminInitialApplied||ragaRestoredEvent||activeEventName||eventRecords.length)return;
+      ragaAdminInitialApplied=true;
+      for(const session of eventSessions){
+        const rule=config?.[sessionKind(session)];if(!rule)continue;
+        const valid=sessionChoices(session).map(row=>row[0]);
+        if(valid.includes(rule.service))session.serviceMode=rule.service;
+        if(Array.isArray(rule.formats))session.formatSelection=rule.formats.filter(f=>MENU_FORMATS.includes(f));
+        session.courseServices={...(session.courseServices||{})};
+        for(const [course,setting] of Object.entries(rule.courses||{})){
+          if(setting?.default)session.courseServices[course]=setting.default;
+        }
+      }
+      renderBuilderSessionTabs();renderFormatCheckboxes();
+    }
+    window.ragaApplyMealDefaults=applyAdminMealDefaults;
+    document.addEventListener('ragasaan:meal-defaults',()=>applyAdminMealDefaults(window.ragaMealDefaults));
     function selectedBuilderSession(){return eventSessions.find(s=>s.id===currentBuilderSession)||eventSessions[0]}
     function selectBuilderSession(id){
       if(!eventSessions.some(s=>s.id===id))return;
       currentBuilderSession=id;
       const sel=document.getElementById('builder-session-select');if(sel)sel.value=id;
-      renderBuilderSessionTabs();renderActiveMenuItems();
+      renderBuilderSessionTabs();renderFormatCheckboxes();renderActiveMenuItems();
     }
     function setActiveSessionTime(time){const session=selectedBuilderSession();if(session)editEventSession(session.id,'time',time);}
     function setSessionMode(value){
@@ -2356,8 +2409,10 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     }
     function updateCourseService(sessionId,course,type){
       const session=eventSessions.find(s=>s.id===sessionId);if(!session||!isCourseWise(session))return;
-      const allowed={'Starter':['Plated Service','Buffet'],'Main Course':['Buffet','Plated Service','Bowl Food'],'Dessert':['Buffet','Plated Service']};
-      if(!allowed[course]?.includes(type))return;
+      const standard={'Starter':['Plated Service','Buffet'],'Main Course':['Buffet','Plated Service','Bowl Food'],'Dessert':['Buffet','Plated Service']};
+      const configured=window.ragaMealDefaults?.[sessionKind(session)]?.courses?.[course]?.enabled;
+      const allowed=Array.isArray(configured)?standard[course]?.filter(v=>configured.includes(v)):standard[course];
+      if(!allowed?.includes(type))return;
       ensureSessionServices(session)[course]=type;onEventRecordsChanged();
     }
     function setClientSummaryEnabled(checked){
@@ -2373,6 +2428,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       const holder=document.getElementById('builder-session-tabs');
       if(holder){holder.innerHTML=eventSessions.map(s=>`<button type="button" role="tab" aria-selected="${s.id===session.id?'true':'false'}" class="${s.id===session.id?'active':''}" onclick="selectBuilderSession('${esc(s.id)}')"><strong>${esc(s.name)}</strong><small>${eventRecords.filter(i=>i.sessionId===s.id).length} dishes</small></button>`).join('')+'<button type="button" class="add-session" onclick="addEventSession()">+ Custom Session</button>'}
       const dropdown=document.getElementById('builder-session-select');if(dropdown)dropdown.value=session.id;
+      ragaRefreshHeadingControls();
       const mode=document.getElementById('builder-service-mode');if(mode){mode.innerHTML=sessionChoices(session).map(([v,label])=>`<option value="${esc(v)}" ${sessionMode(session)===v?'selected':''}>${esc(label)}</option>`).join('');}
       const summaryEl=document.getElementById('builder-include-summary');if(summaryEl)summaryEl.checked=includeClientSummary;
       const timeRow=document.getElementById('builder-session-time-row');if(timeRow)timeRow.hidden=!includeClientSummary;
@@ -2382,8 +2438,10 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       if(area){
         const services=ensureSessionServices(session);
         area.innerHTML=['Canapé','Live Station','Starter','Main Course','Dessert'].map(course=>{
-          const allowed=course==='Main Course'?['Plated Service','Buffet','Bowl Food']:(course==='Starter'||course==='Dessert')?['Plated Service','Buffet']:[];
-          const service=allowed.length?`<select aria-label="${esc(course)} service" onchange="updateCourseService('${esc(session.id)}','${esc(course)}',this.value)" class="w-full rounded bg-slate-950 border border-slate-700 p-1 text-white">${allowed.map(v=>`<option value="${esc(v)}" ${services[course]===v?'selected':''}>${esc(v)}</option>`).join('')}</select>`:`<span class="text-slate-400">${esc(normalizeGroupService(session,course))}</span>`;
+          const standard=course==='Main Course'?['Plated Service','Buffet','Bowl Food']:(course==='Starter'||course==='Dessert')?['Plated Service','Buffet']:[];
+          const configured=window.ragaMealDefaults?.[sessionKind(session)]?.courses?.[course]?.enabled;
+          const allowed=Array.isArray(configured)?standard.filter(v=>configured.includes(v)):standard;
+          const service=allowed.length?`<select aria-label="${esc(course)} service" onchange="updateCourseService('${esc(session.id)}','${esc(course)}',this.value)" class="w-full rounded bg-slate-950 border border-slate-700 p-1 text-white">${(allowed.includes(services[course])?allowed:[...allowed,services[course]]).map(v=>`<option value="${esc(v)}" ${services[course]===v?'selected':''}>${esc(v)}${allowed.includes(v)?'':' (saved event)'}</option>`).join('')}</select>`:`<span class="text-slate-400">${esc(normalizeGroupService(session,course))}</span>`;
           const courseTime=includeClientSummary?`<label class="text-[10px]">Course time <input type="time" aria-label="${esc(course)} time" value="${esc(session.courseTimes?.[course]||'')}" onchange="setCourseTime('${esc(session.id)}','${esc(course)}',this.value)" class="w-full mt-1 p-1 rounded bg-slate-950 border border-slate-700 text-white"></label>`:'';
           return `<div class="rounded bg-slate-950 p-2 border border-slate-700"><b class="text-amber-300">${esc(courseDisplay(session,course))}</b><div class="mt-1">${service}</div>${courseTime}</div>`;
         }).join('');
@@ -2422,11 +2480,18 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     }
     function renderFormatCheckboxes(){
       const root=document.getElementById('builder-print-formats');if(!root)return;
-      const chosen=new Set([...root.querySelectorAll('input:checked')].map(x=>x.value));
-      if(!root.dataset.initialised){if(sessionKind(selectedBuilderSession())==='breakfast'){['a4','foldtags-grid','canape-grid'].forEach(f=>chosen.add(f))}else chosen.add(window.ragaAdminChoices?.printFormats?.default||state.layout);root.dataset.initialised='yes'}
+      const session=selectedBuilderSession();if(!session)return;
+      // Each meal has its own print-format selection for subsequently added dishes.
+      const rule=window.ragaMealDefaults?.[sessionKind(session)];
+      const fallback=sessionKind(session)==='breakfast'?['a4','foldtags-grid','canape-grid']:[window.ragaAdminChoices?.printFormats?.default||state.layout];
+      const source=Array.isArray(session.formatSelection)?session.formatSelection:(Array.isArray(rule?.formats)?rule.formats:fallback);
+      const chosen=new Set(source);
       const enabled=window.ragaAdminChoices?.printFormats?.enabled;
-      const formats=Array.isArray(enabled)?MENU_FORMATS.filter(f=>enabled.includes(f)):MENU_FORMATS;
-      root.innerHTML=formats.map(fmt=>`<label class="flex items-center gap-1"><input type="checkbox" value="${esc(fmt)}" ${chosen.has(fmt)?'checked':''}> ${esc(MENU_NAMES[fmt])}</label>`).join('');
+      const available=Array.isArray(enabled)?MENU_FORMATS.filter(f=>enabled.includes(f)):MENU_FORMATS;
+      // A format hidden by Admin remains visible on old events if already selected.
+      const formats=MENU_FORMATS.filter(f=>available.includes(f)||chosen.has(f));
+      root.innerHTML=formats.map(fmt=>`<label class="flex items-center gap-1"><input type="checkbox" value="${esc(fmt)}" ${chosen.has(fmt)?'checked':''}> ${esc(MENU_NAMES[fmt])}${available.includes(fmt)?'':' (saved event)'}</label>`).join('');
+      root.dataset.sessionId=session.id;
       syncRelevantTagCopies();
     }
     function syncRelevantTagCopies(){
@@ -2441,7 +2506,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       if(panel)panel.hidden=!any;
     }
     document.addEventListener('change',event=>{
-      if(event.target.matches('#builder-print-formats input[type="checkbox"]'))syncRelevantTagCopies();
+      if(event.target.matches('#builder-print-formats input[type="checkbox"]')){const session=selectedBuilderSession();if(session)session.formatSelection=selectedPrintFormats();syncRelevantTagCopies();}
     });
     function addEventDish(dish,menuCourse){
       const formats=selectedPrintFormats();
@@ -2469,7 +2534,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     function removeEventRecord(uid){eventRecords=eventRecords.filter(item=>item.eventUid!==uid);onEventRecordsChanged()}
     function addEventSession(){
       const name=prompt('Session name (e.g. Evening Snacks, Breakfast, Lunch):','Evening Snacks');if(!name?.trim())return;
-      const id=eventUid();eventSessions.push({id,name:name.trim(),time:'',courseServices:{}});currentBuilderSession=id;updateSessionPicker();onEventRecordsChanged();
+      const id=eventUid();eventSessions.push({id,name:name.trim(),time:'',courseServices:{}});currentBuilderSession=id;updateSessionPicker();renderFormatCheckboxes();onEventRecordsChanged();
     }
     function editEventSession(id,key,value){
       const row=eventSessions.find(i=>i.id===id);if(!row)return;
@@ -2482,11 +2547,11 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     }
     function setEventPartyNo(value){state.event.partyNo=value;saveStyle();renderEventSummary()}
     function eventSnapshot(){return {format:'ragasaan-event-v2',name:activeEventName,title:state.event.title,date:state.event.date,venue:state.event.venue,partyNo:'',includeClientSummary,sessions:eventSessions,items:eventRecords,designs:state.designs,themeId:window.ragaActiveThemeId||''}}
-    function restoreEventSnapshot(snapshot){
+    function restoreEventSnapshot(snapshot){ragaRestoredEvent=true; 
       if(!snapshot||!Array.isArray(snapshot.sessions)||!Array.isArray(snapshot.items))throw Error('Invalid event file');
       if(!confirm('Load this event and replace the current event menu and design settings?'))return false;
       state.event.title=String(snapshot.title||'');state.event.date=String(snapshot.date||'');state.event.venue=String(snapshot.venue||'');state.event.partyNo='';includeClientSummary=!!snapshot.includeClientSummary;localStorage.setItem(SUMMARY_PREF,String(includeClientSummary));
-      eventSessions=snapshot.sessions.filter(x=>x&&x.id&&x.name&&String(x.name).toLowerCase()!=='reception').map(x=>({id:String(x.id),name:String(x.name),time:String(x.time||''),serviceMode:x.serviceMode,courseTimes:{...(x.courseTimes||{})},courseServices:{...(x.courseServices||{})}}));
+      eventSessions=snapshot.sessions.filter(x=>x&&x.id&&x.name&&String(x.name).toLowerCase()!=='reception').map(x=>({id:String(x.id),name:String(x.name),time:String(x.time||''),serviceMode:x.serviceMode,courseTimes:{...(x.courseTimes||{})},courseServices:{...(x.courseServices||{})},formatSelection:Array.isArray(x.formatSelection)?x.formatSelection:undefined,printHeading:x.printHeading,showPrintHeading:x.showPrintHeading}));
       if(!eventSessions.length)eventSessions=[{id:'lunch',name:'Lunch',time:'',serviceMode:'Regular Buffet',courseServices:{}}];
       eventRecords=snapshot.items.filter(x=>x&&x.name).map(x=>({...x,eventUid:x.eventUid||eventUid(),sessionId:String(x.sessionId)==='reception'?'dinner':(x.sessionId||eventSessions[0].id),printFormats:Array.isArray(x.printFormats)?x.printFormats.filter(f=>MENU_FORMATS.includes(f)):[],tagCopies:x.tagCopies||{}}));
       if(snapshot.designs&&typeof snapshot.designs==='object')MENU_FORMATS.forEach(f=>{if(snapshot.designs[f])Object.assign(state.designs[f],snapshot.designs[f])});
@@ -3342,6 +3407,26 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         return matchesCat && matchesSearch;
       });
       populateBuilderDropdown(filtered);
+      const results=document.getElementById('raga-quick-dishes');
+      if(results){
+        results.replaceChildren();
+        if(search.length>=2){
+          filtered.slice(0,8).forEach(dish=>{
+            const button=document.createElement('button');button.type='button';
+            button.className='w-full flex justify-between gap-2 rounded bg-slate-800 hover:bg-slate-700 px-2 py-1.5 text-left text-xs';
+            const label=document.createElement('span');label.textContent=dish.name+' · '+(dish.category||'Other');
+            const plus=document.createElement('span');plus.className='text-amber-300 font-bold';plus.textContent='+ Add';
+            button.append(label,plus);button.onclick=()=>{
+              const course=selectedMenuCourse();if(!course)return;
+              addEventDish(dish,course);
+              const input=document.getElementById('builder-search-input');if(input)input.value='';
+              results.replaceChildren();
+            };
+            results.appendChild(button);
+          });
+          if(!filtered.length){const note=document.createElement('p');note.className='text-xs text-slate-400';note.textContent='No matching dishes';results.appendChild(note)}
+        }
+      }
     }
 
     const MANUAL_ALLERGENS = ['Celery','Cereals containing gluten','Crustaceans','Eggs','Fish','Lupin','Milk','Molluscs','Mustard','Tree nuts','Peanuts','Sesame','Soya','Sulphites'];
@@ -3403,13 +3488,75 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       addEventDish(dish,menuCourse);
     }
 
+    function ragaSetBuilderMode(mode) {
+      const isAdvanced=mode==='advanced';
+      const builder=document.getElementById('tab-builder');if(!builder)return;
+      builder.classList.toggle('raga-simple',!isAdvanced);
+      document.getElementById('raga-mode-simple')?.setAttribute('aria-pressed',String(!isAdvanced));
+      document.getElementById('raga-mode-advanced')?.setAttribute('aria-pressed',String(isAdvanced));
+      try{localStorage.setItem('ragasaan_builder_mode',isAdvanced?'advanced':'simple')}catch(_){}
+    }
+    function ragaUpdatePrintHeading(kind,value) {
+      const session=selectedBuilderSession();
+      if(kind==='menu')state.designs.a4.menuHeading=value;
+      else if(kind==='session'&&session)session.printHeading=value;
+      else if(kind==='menuVisible')state.designs.a4.showMenuHeading=!!value;
+      else if(kind==='sessionVisible'&&session)session.showPrintHeading=!!value;
+      saveStyle();renderPreview();
+    }
+    function ragaUpdatePrintedMealName(id,value){
+      const session=eventSessions.find(s=>s.id===id);if(!session)return;
+      session.printHeading=String(value||'').trim();saveStyle();ragaRefreshHeadingControls();
+    }
+    function ragaResetPrintHeadings(){
+      const session=selectedBuilderSession();
+      state.designs.a4.menuHeading='Menu';state.designs.a4.showMenuHeading=true;
+      if(session){session.printHeading=session.name;session.showPrintHeading=true}
+      ragaRefreshHeadingControls();saveStyle();renderPreview();
+    }
+    function ragaRefreshHeadingControls(){
+      const session=selectedBuilderSession(),design=state.designs?.a4;
+      if(!session||!design)return;
+      const fields={
+        'raga-menu-heading-input':design.menuHeading??'Menu',
+        'raga-session-heading-input':session.printHeading??session.name,
+        'raga-show-menu-heading':design.showMenuHeading!==false,
+        'raga-show-session-heading':session.showPrintHeading!==false
+      };
+      for(const [id,v]of Object.entries(fields)){const el=document.getElementById(id);if(!el||el===document.activeElement)continue;if(el.type==='checkbox')el.checked=v;else el.value=v;}
+    }
+    let ragaDraggedItemUid='';
+    function ragaDragItem(e,uid){ragaDraggedItemUid=uid;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',uid)}
+    function ragaDropItem(e,uid){
+      e.preventDefault();const from=ragaDraggedItemUid||e.dataTransfer.getData('text/plain');
+      const a=eventRecords.findIndex(x=>x.eventUid===from),b=eventRecords.findIndex(x=>x.eventUid===uid);
+      if(a<0||b<0||a===b||eventRecords[a].sessionId!==eventRecords[b].sessionId)return;
+      const [moved]=eventRecords.splice(a,1);eventRecords.splice(b,0,moved);ragaDraggedItemUid='';onEventRecordsChanged();
+    }
+    function ragaEditSelectedDish(uid,key,value){
+      const row=eventRecords.find(x=>x.eventUid===uid);if(!row)return;
+      if(key==='name'&&!String(value).trim())return;
+      if(key==='allergens'||key==='mayContain')row[key]=String(value).split(',').map(v=>v.trim()).filter(Boolean);
+      else row[key]=value;
+      onEventRecordsChanged();
+    }
     function renderActiveMenuItems(){
       const container=document.getElementById('event-items-list');if(!container)return;
       const session=selectedBuilderSession(),entries=eventRecords.filter(i=>i.sessionId===session?.id);
       const count=document.getElementById('active-item-count');if(count)count.textContent=entries.length;
       const name=document.getElementById('active-format-name');if(name)name.textContent=session?.name||'Meal';
-      container.innerHTML=entries.map((item,i)=>`<div class="flex items-start gap-2 justify-between rounded border border-slate-800 bg-slate-900 px-2 py-1.5 text-xs"><span class="min-w-0">${i+1}. ${esc(item.name)}</span><button type="button" onclick="removeEventRecord('${esc(item.eventUid)}')" aria-label="Remove ${esc(item.name)}" class="text-rose-300 font-semibold" title="Remove item">×</button></div>`).join('')||'<p class="text-slate-400 text-xs py-3">No dishes selected for this meal.</p>';
+      const safe=s=>esc(String(s??''));
+      container.innerHTML=entries.map((item,i)=>`<div class="raga-item-row" draggable="true" ondragstart="ragaDragItem(event,'${safe(item.eventUid)}')" ondragover="event.preventDefault();this.classList.add('raga-dragover')" ondragleave="this.classList.remove('raga-dragover')" ondrop="this.classList.remove('raga-dragover');ragaDropItem(event,'${safe(item.eventUid)}')">
+        <div class="flex items-center gap-2 text-xs"><span title="Drag to reorder" style="cursor:grab;color:#eab308">☷</span><span class="min-w-0 flex-1">${i+1}. ${safe(item.name)}</span><button type="button" onclick="ragaToggleDishEditor('${safe(item.eventUid)}')" class="text-amber-300" aria-label="Edit ${safe(item.name)}">Edit</button><button type="button" onclick="removeEventRecord('${safe(item.eventUid)}')" class="text-rose-300 font-semibold" title="Remove item">×</button></div>
+        <div id="raga-editor-${safe(item.eventUid)}" hidden class="raga-item-detail" draggable="false" ondragstart="event.stopPropagation();event.preventDefault()">
+          <label>Dish name<input value="${safe(item.name)}" onblur="ragaEditSelectedDish('${safe(item.eventUid)}','name',this.value)"></label>
+          <label>Course / category<select onchange="ragaEditSelectedDish('${safe(item.eventUid)}','menuCourse',this.value)">${MENU_COURSES.map(c=>`<option value="${safe(c)}" ${item.menuCourse===c?'selected':''}>${safe(c)}</option>`).join('')}</select></label>
+          <label>Description<textarea rows="2" onblur="ragaEditSelectedDish('${safe(item.eventUid)}','desc',this.value)">${safe(item.desc||'')}</textarea></label>
+          <label>Allergens (comma separated)<input value="${safe(Array.isArray(item.allergens)?item.allergens.join(', '):item.allergens||'')}" onblur="ragaEditSelectedDish('${safe(item.eventUid)}','allergens',this.value)"></label>
+          <label>May contain (comma separated)<input value="${safe(Array.isArray(item.mayContain)?item.mayContain.join(', '):item.mayContain||'')}" onblur="ragaEditSelectedDish('${safe(item.eventUid)}','mayContain',this.value)"></label>
+        </div></div>`).join('')||'<p class="text-slate-400 text-xs py-3">No dishes selected for this meal.</p>';
     }
+    function ragaToggleDishEditor(uid){const el=document.getElementById('raga-editor-'+uid);if(el)el.hidden=!el.hidden}
     function clearActiveSessionItems(){
       const session=selectedBuilderSession();if(!session)return;
       const count=eventRecords.filter(i=>i.sessionId===session.id).length;
@@ -3600,9 +3747,9 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         const makeBuffet=(records,session)=>{
           const p=page(); p.style.padding=`${Math.max(2.5,Number(d.borderOutsetCm)+.5)}cm`; p.style.paddingTop=`${Math.max(0.8, Number(d.borderOutsetCm)+Number(d.borderWidth||1)/10+0.2)}cm`;
           p.classList.add('flex','flex-col','justify-between');
-          const sessionTitle=session?`<h3 class="menu-body-font text-center" style="font-size:calc(15px * var(--ragasaan-fit,1));font-weight:bold;color:${d.accentColor};margin:6px 0">${escText(session.name)}</h3>`:'';
+          const sessionTitle=session&&session.showPrintHeading!==false?`<h3 contenteditable="true" title="Edit the printed meal heading" onblur="ragaUpdatePrintedMealName('${esc(session.id)}',this.innerText)" class="menu-body-font text-center" style="font-size:calc(15px * var(--ragasaan-fit,1));font-weight:bold;color:${d.accentColor};margin:6px 0">${escText(session.printHeading??session.name)}</h3>`:'';
           const collectionHtml=session&&!isCourseWise(session)?records.map(({item,idx})=>`<div style="margin:0 0 9px">${itemBlock(item,idx)}</div>`).join(''):tableCardCollection(records);
-          p.innerHTML=`${frame()}${bodyHeader()}${formatHeading(d.menuHeading||'Menu','buffet')}${sessionTitle}<div data-auto-fit-area class="menu-body-font" style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;padding:8px 0"><div data-auto-fit-flow style="flex:0 0 auto;margin:auto 0">${collectionHtml}</div></div><div class="text-center" style="padding-top:12px">${brand()}</div>`;
+          p.innerHTML=`${frame()}${bodyHeader()}${d.showMenuHeading!==false?formatHeading(d.menuHeading??'Menu','buffet'):''}${sessionTitle}<div data-auto-fit-area class="menu-body-font" style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;padding:8px 0"><div data-auto-fit-flow style="flex:0 0 auto;margin:auto 0">${collectionHtml}</div></div><div class="text-center" style="padding-top:12px">${brand()}</div>`;
           return p;
         };
         const groups=eventSessions.map(session=>({session,rows:visibleItems.filter(row=>row.item.sessionId===session.id)})).filter(group=>group.rows.length);
@@ -4212,6 +4359,13 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <div id="rs-choices-editor"></div>
           <button id="rs-save-choices" type="button" class="raga-btn primary">Save Shared Defaults</button>
           <p id="rs-choices-status" role="status" class="raga-help"></p>
+
+          <hr style="margin:14px 0;border-color:#334155">
+          <h4 class="raga-section-title">Defaults by Event Session</h4>
+          <p class="raga-help">Used for new event sessions only. Existing saved events retain their own services, courses and print formats.</p>
+          <div id="rs-meal-defaults-editor"></div>
+          <button id="rs-save-meal-defaults" type="button" class="raga-btn primary">Save Meal Defaults to D1</button>
+          <p id="rs-meal-defaults-status" role="status" class="raga-help"></p>
           <div class="raga-actions"><button id="rs-manage-venues" type="button" class="raga-btn">Open Venue Management</button><button id="rs-manage-registry" type="button" class="raga-btn">Open Master Allergen Registry</button></div>
           <hr style="margin:12px 0;border-color:#334155">
           <h4 class="raga-section-title">Client Designer — Permitted Print Formats</h4>
@@ -4236,6 +4390,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       if(typeof renderBuilderSessionTabs==='function')renderBuilderSessionTabs();
     });
     document.addEventListener('DOMContentLoaded',()=>{
+      ragaSetBuilderMode(localStorage.getItem('ragasaan_builder_mode')==='advanced'?'advanced':'simple');
       const grid=document.querySelector('#tab-builder .builder-page-grid');
       const selected=document.querySelector('#tab-builder .selected-events-panel');
       if(grid&&selected&&!grid.querySelector('.builder-selected-column')){
