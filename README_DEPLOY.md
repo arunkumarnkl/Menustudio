@@ -1,52 +1,23 @@
-# Ragasaan Menu Studio — November 4 update (requirements from ccc.docx + follow-ups)
+# Ragasaan Menu Studio — Admin Rules release (5 Nov 2026)
 
-## This update replaces four existing GitHub files
+Scope: ONLY the `Menustudio` repository and the `ragasaan-security-api` Cloudflare Worker. Do not modify the separate Purchase Order repository or `ragasaan-allergen-sync`.
 
-Open repository: https://github.com/arunkumarnkl/Menustudio
+## Why both updates?
+The new Admin Printing Rules endpoint is server-backed. Deploying the HTML alone will not enable it. Existing D1 `app_settings` already exists; **no SQL migration is needed**.
 
-In the repository root, replace:
-1. `index.html`
-2. `security-app.js`
-3. `security.css`
+## Install safely
+1. Back up the current `ragasaan-security-api` Worker code (and note the current deployed version). Save a local copy of your current GitHub website files.
+2. In Cloudflare Workers & Pages > `ragasaan-security-api` > Edit code, replace the code with `worker.js` from this release and Deploy. Preserve the `DB` D1 binding, `ALLOWED_ORIGIN`, and Admin credentials. Do NOT modify `ragasaan-allergen-sync`.
+3. Check `/health` and re-test Admin login. Health does not verify new settings endpoints; the Admin settings tab will do that.
+4. Replace ONLY these `Menustudio` repo files, preserving paths: `index.html`, `security-app.js`. `security.css` and `themes/gallery.json` are included for completeness and may be left unchanged if already matching.
+5. Wait for your live host deployment. If using the Cloudflare Workers-hosted `menustudio.arunkumarnkl.workers.dev`, confirm that service has the new site files too; publishing GitHub Pages does not automatically update an independently deployed Cloudflare Worker website.
+6. Sign in Admin > Cloud Events > Admin Settings. Under **1. Meal Defaults** set enabled services, default service, per-course services, and default print formats. Under **2. Printing Rules** set print destinations and A4 companion tags. Save each section separately.
+7. Test a NEW dummy event. Verify Breakfast A4/FoldTags/Canapé, Lunch A4, Dinner Plated Table Menu Card (no canapés), Dinner Buffet-Selective course outputs, Admin permissions, existing saved event, and Cloud Save/Load.
 
-Inside `themes/`, replace:
-4. `themes/gallery.json`
-
-**Do not replace** `github-sync-config.js`, `database/allergens.json`, any asset/logo files, or any of your Cloudflare Workers. No new database tables or D1 migration is needed for this version. Upload all four files and commit them; wait for GitHub Pages deployment to finish and hard-refresh with Ctrl+Shift+R.
-
-## What changed
-
-- Meal sessions default to Breakfast (single buffet), Lunch (regular buffet or Thali), Dinner (course-wise Table Service), HI Tea (single buffet), and Late Night Snack (single Other). Reception session removed. Prior Reception dishes are moved into Dinner on migration; check their course assignments.
-- Dinner Buffet **now combines all dishes into one section** (latest decision); Dinner Table Service remains course-wise. Dinner Thali and Bowl Food also use one section.
-- Fixed Canapé and Live Station service types; Main Course choices Table Service/ Buffet / Bowl Food; Dessert choices Table Service / Buffet.
-- A4 Client Summary is optional via checkbox in Meal-wise Planning. Course/meal times appear for data entry only if that report is selected. Course-wise meals have per-course timing fields.
-- Summary Party No input removed, report prints `PARTY NO:` with no value even for legacy saved events.
-- A4 summary: compact read-only meal-grouped item list on left; live two-column A4 preview on right; Print/PDF and editable Word .docx button. Word may paginate differently from browser A4 preview. Internet connection required for the Word DOCX library.
-- Twenty built-in theme presets: 10 bold and 10 mild, both professional and wedding styles. Quick Color Palette controls removed; theme gallery remains.
-- FoldTags logo width default 100px for new settings; previously saved custom width remains in effect.
-- Table Menu Card: event date directly beneath event/couple title; couple logo centered nearby; venue placed just above Ragasaan logo.
-- Venues tab hidden for Event Planner; existing Admin can access. Authorization on backend D1 remains unchanged.
-- Cloud save is compacted to avoid 'Request too large': base64 image duplication stripped, small logos stored once; large embedded images stay local. Existing GitHub company logo still auto-loads. Never store extra secrets in GitHub.
-- Existing cloud event authentication, Client Designer links, submitted designs and planner approval code is retained; existing GitHub allergen sync files untouched.
-
-## Test before using real clients
-
-1. Log in as the existing Admin. Verify all five meal sessions and all 20 themes.
-2. Select Dinner → Buffet: all dishes should be in one section. Then select Table Service: course choices and course service appear.
-3. Turn A4 Client Summary ON. Enter course times, add dishes, open Summary; verify Party No blank, read-only items at left, A4 preview at right, print and Word buttons.
-4. Save a **dummy** event to Cloud Events. The compact event payload should avoid previous HTTP 413. If it still fails, check the D1 Worker log and the displayed error; do not delete the tables.
-5. Use a dummy client link to verify Client Designer submissions and Event Planner approvals. Test a planner cannot access Venues.
-6. Keep a backup of your original four GitHub files before replacement. Do not overwrite your company/allergen data.
-
-## Validation completed here
-
-- JavaScript syntax check (`node --check`) passed for app and security scripts.
-- Headless Chromium mocked-login navigation tested meal mode switches, summary toggle, summary preview, 20 themes, and save-cloud request, with no JavaScript exceptions.
-- A test event's serialized cloud-save request was around 10 KB (worker limit is much larger). Live Cloudflare D1 was not modified or tested from this environment.
-- Word export code is implemented; full Word library download and live export cannot be verified in this offline test environment, and exported Word pages may paginate differently from the A4 HTML preview.
-
-## Known constraints
-
-- Static GitHub Pages assets and the public allergen JSON are publicly retrievable. Cloudflare API permissions protect D1 records; hiding a UI control is not a security boundary for local browser data or printing via native browser functions.
-- Cloud snapshots omit large embedded local images, especially large rear-page image files; use GitHub company logo and keep backups of local designs. Small embedded logos below 125,000 characters are preserved once.
-- Browser print to PDF is the best match to the exact one-page A4 summary preview. Word export is editable but may use more than one Word page if content is unusually large.
+## Behavior
+- Settings are stored in existing Cloudflare D1 `app_settings` (`meal_defaults_v1`, `printing_rules_v1`).
+- Only Admin may save shared rules; Event Planners can read them.
+- New, empty events accept updated defaults. Events saved in this version persist their own print-routing snapshot. Older saved events without a snapshot continue using the legacy print rules.
+- Existing D1 event data, personal credentials, allergen master, venue records and PO repo are not modified by this release.
+- The GitHub source files and publicly served allergen JSON remain public; frontend hiding alone is not a security boundary.
+- New export format templates still require code; the Admin interface configures existing print destinations, not arbitrary new page designs.
