@@ -110,6 +110,56 @@ async function saveChoiceOptions(){if(s.user?.role!=='admin'||!loadedChoiceOptio
  try{await call('/settings/choices','PUT',{settings:values});msg('Shared choices and defaults saved in Cloudflare D1.');await loadChoiceOptions();}
  catch(err){msg(err.message,'error');}
 }
+
+const MEAL_NAMES={breakfast:'Breakfast',lunch:'Lunch',dinner:'Dinner','hi-tea':'HI Tea','late-night':'Late Night Snack'};
+const MEAL_FORMATS=['a4','a4-live','half-a4','a8-grid','foldtags-grid','a6-grid','canape-grid'];
+let mealConfigResponse=null;
+async function loadMealDefaults(){
+ if(!s.user)return;
+ try{
+  mealConfigResponse=await call('/settings/meal-defaults');
+  window.ragaMealDefaults=mealConfigResponse.settings;
+  document.dispatchEvent(new CustomEvent('ragasaan:meal-defaults'));
+  renderMealDefaultsEditor();
+ }catch(err){const el=$('rs-meal-defaults-status');if(el)el.textContent='Could not load meal defaults: '+err.message;}
+}
+function renderMealDefaultsEditor(){
+ const root=$('rs-meal-defaults-editor');if(!root||!mealConfigResponse||s.user?.role!=='admin')return;
+ const cfg=mealConfigResponse.settings,specs=mealConfigResponse.available.mealSpecs;
+ root.innerHTML=Object.entries(specs).map(([kind,spec])=>{
+  const item=cfg[kind];if(!item)return '';
+  const svc=`<label>Default Service<select class="raga-input" data-meal-service="${e(kind)}">${spec.services.map(v=>`<option value="${e(v)}" ${v===item.service?'selected':''}>${e(v)}</option>`).join('')}</select></label>`;
+  const fmt=`<div class="raga-small">Print formats for new dishes</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px">${MEAL_FORMATS.map(v=>`<label class="raga-small"><input type="checkbox" data-meal-format="${e(kind)}" value="${e(v)}" ${item.formats.includes(v)?'checked':''}> ${e(CHOICE_LABELS[v])}</label>`).join('')}</div>`;
+  const courses=Object.entries(spec.courses).map(([course,opts])=>{
+    const value=item.courses?.[course]||{enabled:opts,default:opts[0]};
+    return `<div style="padding:8px;border:1px solid #475569;border-radius:6px;margin-top:6px"><b>${e(course)}</b><div>${opts.map(v=>`<label class="raga-small" style="display:inline-block;margin-right:9px"><input type="checkbox" data-meal-course-enabled="${e(kind)}" data-course="${e(course)}" value="${e(v)}" ${value.enabled.includes(v)?'checked':''}> ${e(v)}</label>`).join('')}</div><label class="raga-small">Course default<select class="raga-input" data-meal-course-default="${e(kind)}" data-course="${e(course)}">${opts.map(v=>`<option value="${e(v)}" ${v===value.default?'selected':''}>${e(v)}</option>`).join('')}</select></label></div>`;
+  }).join('');
+  return `<fieldset class="raga-list-item"><legend><b>${e(MEAL_NAMES[kind])}</b></legend>${svc}<p class="raga-small">Grouping: <b data-meal-group-label="${e(kind)}">${item.service==='Plated Service'?'Course-wise':'Single section'}</b> (automatically follows the service)</p>${fmt}${courses?`<div class="raga-small" style="margin-top:8px"><b>Course options · used when Plated Service is selected</b></div>${courses}`:''}</fieldset>`;
+ }).join('');
+ root.querySelectorAll('[data-meal-service]').forEach(el=>el.addEventListener('change',()=>{const target=root.querySelector(`[data-meal-group-label="${el.dataset.mealService}"]`);if(target)target.textContent=el.value==='Plated Service'?'Course-wise':'Single section';}));
+}
+async function saveMealDefaults(){
+ if(s.user?.role!=='admin'||!mealConfigResponse)return;
+ const specs=mealConfigResponse.available.mealSpecs;const settings={};
+ for(const [kind,spec] of Object.entries(specs)){
+  const service=document.querySelector(`[data-meal-service="${kind}"]`)?.value;
+  const formats=[...document.querySelectorAll(`[data-meal-format="${kind}"]:checked`)].map(el=>el.value);
+  if(!spec.services.includes(service)||!formats.length)return msg('Choose a valid service and at least one format for '+MEAL_NAMES[kind],'error');
+  const courses={};
+  for(const [course,allowed] of Object.entries(spec.courses)){
+    const enabled=[...document.querySelectorAll(`[data-meal-course-enabled="${kind}"][data-course="${course}"]:checked`)].map(el=>el.value);
+    const defaultChoice=document.querySelector(`[data-meal-course-default="${kind}"][data-course="${course}"]`)?.value;
+    if(!enabled.length||!enabled.includes(defaultChoice))return msg('Course default must be enabled: '+MEAL_NAMES[kind]+' '+course,'error');
+    courses[course]={enabled:allowed.filter(v=>enabled.includes(v)),default:defaultChoice};
+  }
+  settings[kind]={service,group:service==='Plated Service'?'course':'single',formats,courses};
+ }
+ try{
+  await call('/settings/meal-defaults','PUT',{settings});
+  const status=$('rs-meal-defaults-status');if(status)status.textContent='Saved to Cloudflare D1. Applies to new events only.';
+  await loadMealDefaults();
+ }catch(err){const status=$('rs-meal-defaults-status');if(status)status.textContent='Save failed: '+err.message;}
+}
 function gateStatus(){const label=$('rs-user-info');if(label)label.textContent=s.user?`${s.user.name} · ${s.user.role==='admin'?'Administrator':'Event Planner'}`:'Not signed in';}
 async function login(evt){evt?.preventDefault();onLoginError('Signing in…');try{
  const result=await call('/login','POST',{email:$('rs-email').value.trim(),password:$('rs-password').value},false);
@@ -126,7 +176,7 @@ function showAuthenticated(){gateStatus();
 document.querySelectorAll('[data-rs-admin]').forEach(n=>n.hidden=s.user?.role!=='admin');
   document.querySelectorAll('[data-rs-staff]').forEach(n=>n.hidden=!s.user);
   const banner=$('rs-security-banner');if(banner)banner.textContent='Cloud events are shared through D1. Browser backups remain local. GitHub master publishing uses separate Admin authentication.';
-  renderThemeGallery();refreshCloudList().catch(x=>msg(x.message,'error'));loadChoiceOptions();
+  renderThemeGallery();refreshCloudList().catch(x=>msg(x.message,'error'));loadChoiceOptions();loadMealDefaults();
   // Existing local master UI is not an authorization boundary; publication is still checked by the separate GitHub Worker.
   {const master=$('tab-master');if(master)master.querySelectorAll('button[onclick*="requestMasterAuthorization"], #github-save-button').forEach(b=>b.hidden=s.user?.role!=='admin');}
 }
@@ -370,6 +420,7 @@ function attach(){
  $('rs-company-publish')?.addEventListener('click',()=>publishCompanyLogo(false));
  $('rs-company-remove')?.addEventListener('click',()=>publishCompanyLogo(true));
  $('rs-save-choices')?.addEventListener('click',saveChoiceOptions);
+ $('rs-save-meal-defaults')?.addEventListener('click',saveMealDefaults);
  $('rs-manage-venues')?.addEventListener('click',()=>{if(s.user?.role==='admin'){closeCloud();window.switchTab?.('venues');}});
  $('rs-manage-registry')?.addEventListener('click',()=>{if(s.user?.role==='admin'){closeCloud();window.switchTab?.('master');}});
  $('rs-save-client-formats')?.addEventListener('click',saveAdminClientFormats);
