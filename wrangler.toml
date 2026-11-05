@@ -1,0 +1,7 @@
+# Deployment configuration for the static Menu Studio frontend only.
+# Authentication, Admin Rules and D1 remain in the separate ragasaan-security-api Worker.
+name = "menustudio"
+compatibility_date = "2026-11-05"
+
+[assets]
+directory = "./dist/menustudio"
