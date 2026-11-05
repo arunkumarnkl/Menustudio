@@ -23,7 +23,7 @@ async function call(path,method='GET',body,auth=true){
   let res;
   try{res=await fetch(API+path,{method,headers,cache:'no-store',body:body===undefined?undefined:JSON.stringify(body)});}catch(err){throw Error('Cannot connect to Security API. Check internet, Worker deployment and ALLOWED_ORIGIN.');}
   const json=await res.json().catch(()=>({}));
-  if(!res.ok){if(res.status===401&&auth){s.token=null;s.user=null;sessionStorage.removeItem('raga_session');document.body.classList.add('ragasaan-locked');onLoginError('Session expired. Please sign in again.');}
+  if(!res.ok){if(res.status===401&&auth&&s.token){s.token=null;s.user=null;sessionStorage.removeItem('raga_session');onLoginError('Admin session expired. Sign in again for Admin Settings.');showPublic();}
     throw Error(json.error||`HTTP ${res.status}`);}
   return json;
 }
@@ -77,7 +77,7 @@ async function publishCompanyLogo(remove=false){if(s.user?.role!=='admin')return
  if(!image)window.ragaClearPublishedCompanyLogo?.();await fetchCompanyLogo();msg(image?'Company logo published.':'GitHub company logo restored.');}
  catch(err){msg(err.message,'error');}
 }
-async function loadChoiceOptions(){if(!s.user)return;
+async function loadChoiceOptions(){
  try{const r=await call('/settings/choices');const out={};
  for(const [key,all] of Object.entries(r.available||{})){const configured=r.settings?.[key];const enabled=Array.isArray(configured?.enabled)?all.filter(v=>configured.enabled.includes(v)):all.slice();
  out[key]={enabled:enabled.length?enabled:all.slice(),default:enabled.includes(configured?.default)?configured.default:(all[0]||'')};}
@@ -115,7 +115,6 @@ const MEAL_NAMES={breakfast:'Breakfast',lunch:'Lunch',dinner:'Dinner','hi-tea':'
 const MEAL_FORMATS=['a4','a4-live','half-a4','a8-grid','foldtags-grid','a6-grid','canape-grid'];
 let mealConfigResponse=null;
 async function loadMealDefaults(){
- if(!s.user)return;
  try{
   mealConfigResponse=await call('/settings/meal-defaults');
   window.ragaMealDefaults=mealConfigResponse.settings;
@@ -130,11 +129,17 @@ function renderMealDefaultsEditor(){
   const item=cfg[kind];if(!item)return '';
   const svc=`<div class="raga-small" style="margin-top:7px">Available service styles — select the styles planners may use for this meal</div><div style="display:flex;flex-wrap:wrap;gap:7px">${spec.services.map(v=>`<label class="raga-small" style="display:inline-flex;align-items:center;gap:4px"><input type="checkbox" data-meal-service-enabled="${e(kind)}" value="${e(v)}" ${(item.enabledServices||spec.services).includes(v)?'checked':''}> ${e(v)}</label>`).join('')}</div><label>Default Service<select class="raga-input" data-meal-service="${e(kind)}">${spec.services.map(v=>`<option value="${e(v)}" ${v===item.service?'selected':''}>${e(v)}</option>`).join('')}</select></label>`;
   const fmt=`<div class="raga-small">Print formats for new dishes</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px">${MEAL_FORMATS.map(v=>`<label class="raga-small"><input type="checkbox" data-meal-format="${e(kind)}" value="${e(v)}" ${item.formats.includes(v)?'checked':''}> ${e(CHOICE_LABELS[v])}</label>`).join('')}</div>`;
+  const categoryOptions=mealConfigResponse.available.categoryFormats||{};
+  const categoryPrint=`<details class="raga-list-item" style="margin-top:8px"><summary><b>Category-wise print defaults (Canapé / Starter / Main / Dessert / Live Station)</b></summary><p class="raga-small">Only matching formats are offered to planners; event-specific selections remain editable.</p>${Object.entries(categoryOptions).map(([cat,allowed])=>{
+    const defaults=item.categoryFormats?.[cat];
+    // Empty indicates 'use serving-style automatic defaults' so pre-existing D1 records remain compatible.
+    return `<fieldset style="margin:8px 0;padding:8px;border:1px solid #475569;border-radius:8px"><legend><b>${e(cat)}</b></legend><label class="raga-small"><input type="checkbox" data-meal-cat-override="${e(kind)}" data-course="${e(cat)}" ${Array.isArray(defaults)?'checked':''}> Override this category's default</label><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:5px">${allowed.map(f=>`<label class="raga-small"><input type="checkbox" data-meal-category-format="${e(kind)}" data-course="${e(cat)}" value="${e(f)}" ${Array.isArray(defaults)&&defaults.includes(f)?'checked':''}> ${e(CHOICE_LABELS[f]||f)}</label>`).join('')}</div></fieldset>`;
+  }).join('')}</details>`;
   const courses=Object.entries(spec.courses).map(([course,opts])=>{
     const value=item.courses?.[course]||{enabled:opts,default:opts[0]};
     return `<div style="padding:8px;border:1px solid #475569;border-radius:6px;margin-top:6px"><b>${e(course)}</b><div>${opts.map(v=>`<label class="raga-small" style="display:inline-block;margin-right:9px"><input type="checkbox" data-meal-course-enabled="${e(kind)}" data-course="${e(course)}" value="${e(v)}" ${value.enabled.includes(v)?'checked':''}> ${e(v)}</label>`).join('')}</div><label class="raga-small">Course default<select class="raga-input" data-meal-course-default="${e(kind)}" data-course="${e(course)}">${opts.map(v=>`<option value="${e(v)}" ${v===value.default?'selected':''}>${e(v)}</option>`).join('')}</select></label></div>`;
   }).join('');
-  return `<fieldset class="raga-list-item"><legend><b>${e(MEAL_NAMES[kind])}</b></legend>${svc}<p class="raga-small">Grouping: <b data-meal-group-label="${e(kind)}">${['Plated Service','Buffet-Selective'].includes(item.service)?'Course-wise':'Single section'}</b> (automatically follows the service)</p>${fmt}${courses?`<div class="raga-small" style="margin-top:8px"><b>Course options · used when Plated Service is selected</b></div>${courses}`:''}</fieldset>`;
+  return `<fieldset class="raga-list-item"><legend><b>${e(MEAL_NAMES[kind])}</b></legend>${svc}<p class="raga-small">Grouping: <b data-meal-group-label="${e(kind)}">${['Plated Service','Buffet-Selective'].includes(item.service)?'Course-wise':'Single section'}</b> (automatically follows the service)</p>${fmt}${categoryPrint}${courses?`<div class="raga-small" style="margin-top:8px"><b>Course options · used when Plated Service is selected</b></div>${courses}`:''}</fieldset>`;
  }).join('');
  root.querySelectorAll('[data-meal-service]').forEach(el=>el.addEventListener('change',()=>{const target=root.querySelector(`[data-meal-group-label="${el.dataset.mealService}"]`);if(target)target.textContent=['Plated Service','Buffet-Selective'].includes(el.value)?'Course-wise':'Single section';}));
 }
@@ -154,7 +159,15 @@ async function saveMealDefaults(){
     if(!enabled.length||!enabled.includes(defaultChoice))return msg('Course default must be enabled: '+MEAL_NAMES[kind]+' '+course,'error');
     courses[course]={enabled:allowed.filter(v=>enabled.includes(v)),default:defaultChoice};
   }
-  settings[kind]={service,enabledServices,group:['Plated Service','Buffet-Selective'].includes(service)?'course':'single',formats,courses};
+  const categoryFormats={};
+  for(const [course,allowed] of Object.entries(mealConfigResponse.available.categoryFormats||{})){
+    const override=document.querySelector(`[data-meal-cat-override="${kind}"][data-course="${course}"]`);
+    if(!override?.checked)continue;
+    const chosen=[...document.querySelectorAll(`[data-meal-category-format="${kind}"][data-course="${course}"]:checked`)].map(el=>el.value);
+    if(!chosen.length||chosen.some(v=>!allowed.includes(v)))return msg('Choose valid category formats for '+MEAL_NAMES[kind]+' / '+course,'error');
+    categoryFormats[course]=allowed.filter(v=>chosen.includes(v));
+  }
+  settings[kind]={service,enabledServices,group:['Plated Service','Buffet-Selective'].includes(service)?'course':'single',formats,courses,categoryFormats};
  }
  try{
   await call('/settings/meal-defaults','PUT',{settings});
@@ -172,7 +185,7 @@ const PRINT_RULE_FIELD_LABELS={
   a4Companions:'Any A4 Buffet dish → additional tag layouts'
 };
 let loadedPrintingRules=null;
-async function loadPrintingRules(){if(!s.user)return;
+async function loadPrintingRules(){
  try{
    loadedPrintingRules=await call('/settings/printing-rules');
    window.ragaPrintingRules=loadedPrintingRules.settings;
@@ -205,6 +218,18 @@ async function savePrintingRules(){
    await loadPrintingRules();
  }catch(err){const status=$('rs-print-rules-status');if(status)status.textContent='Save failed: '+err.message;}
 }
+function showPublic(){
+ document.body.classList.remove('ragasaan-locked');
+ $('ragasaan-auth-root')?.classList.remove('raga-client-on');
+ const form=$('rs-login-form');if(form)form.hidden=false;
+ for(const id of ['rs-logout','rs-open-admin-qr','tab-btn-master','tab-btn-venues']){const el=$(id);if(el)el.hidden=true;}
+ const btn=$('rs-admin-login');if(btn)btn.hidden=false;
+ document.querySelectorAll('[data-rs-admin],[data-rs-staff]').forEach(n=>n.hidden=true);
+ const info=$('rs-user-info');if(info)info.textContent='Public event planning';
+ loadChoiceOptions();loadMealDefaults();loadPrintingRules();
+ refreshCloudList().catch(err=>msg('Unable to load shared events: '+err.message,'error'));
+}
+window.ragaOpenAdminLogin=function(){document.body.classList.add('ragasaan-locked');};
 function gateStatus(){const label=$('rs-user-info');if(label)label.textContent=s.user?`${s.user.name} · ${s.user.role==='admin'?'Administrator':'Event Planner'}`:'Not signed in';}
 async function login(evt){evt?.preventDefault();onLoginError('Signing in…');try{
  const result=await call('/login','POST',{email:$('rs-email').value.trim(),password:$('rs-password').value},false);
@@ -214,8 +239,8 @@ async function login(evt){evt?.preventDefault();onLoginError('Signing in…');tr
  showAuthenticated();
  }catch(err){onLoginError(err.message);}
 }
-async function logout(){try{if(s.token)await call('/logout','POST',{},true)}catch(_){}finally{s.token=null;s.user=null;s.cloudEvent=null;sessionStorage.removeItem('raga_session');document.body.classList.add('ragasaan-locked');onLoginError('Signed out.');}}
-function showAuthenticated(){gateStatus();
+async function logout(){try{if(s.token)await call('/logout','POST',{},true)}catch(_){}finally{s.token=null;s.user=null;s.cloudEvent=null;sessionStorage.removeItem('raga_session');onLoginError('Signed out.');showPublic();}}
+function showAuthenticated(){gateStatus();const adminLogin=$('rs-admin-login');if(adminLogin)adminLogin.hidden=true;const logoutBtn=$('rs-logout');if(logoutBtn)logoutBtn.hidden=false;const masterBtn=$('tab-btn-master');if(masterBtn)masterBtn.hidden=s.user?.role!=='admin';
   const venueButton=$('tab-btn-venues');if(venueButton)venueButton.hidden=true; // Managed through Admin Settings
   const venueTab=$('tab-venues');if(venueTab&&s.user?.role!=='admin')venueTab.hidden=true;
 document.querySelectorAll('[data-rs-admin]').forEach(n=>n.hidden=s.user?.role!=='admin');
@@ -225,19 +250,20 @@ document.querySelectorAll('[data-rs-admin]').forEach(n=>n.hidden=s.user?.role!==
   // Existing local master UI is not an authorization boundary; publication is still checked by the separate GitHub Worker.
   {const master=$('tab-master');if(master)master.querySelectorAll('button[onclick*="requestMasterAuthorization"], #github-save-button').forEach(b=>b.hidden=s.user?.role!=='admin');}
 }
-function openCloud(){if(!s.user)return; $('ragasaan-cloud').classList.add('open');refreshCloudList().catch(err=>msg(err.message,'error'));}
+function openCloud(){ $('ragasaan-cloud').classList.add('open');refreshCloudList().catch(err=>msg(err.message,'error'));}
 function closeCloud(){$('ragasaan-cloud').classList.remove('open');}
 function opt(rows,idKey='id',labelKey='name'){return rows.map(r=>`<option value="${escAttr(r[idKey])}">${e(r[labelKey])}</option>`).join('');}
-async function refreshCloudList(){if(!s.user)return;
- const r=await call('/events');s.events=r.events||[];
+async function refreshCloudList(){
+ const r=await call(s.user?'/events':'/public/events','GET',undefined,!!s.user);s.events=r.events||[];
  const list=$('rs-cloud-events');if(!list)return;
- list.innerHTML=s.events.length?s.events.map(x=>`<div class="raga-list-item"><strong>${e(x.name)}</strong> <span class="raga-pill">${e(x.status)}</span><div class="raga-small">${e(x.eventDate||'Date not set')} · ${e(x.venue||'No venue')}</div><div class="raga-actions"><button class="raga-btn" data-load-cloud="${e(x.id)}">Load</button><button class="raga-btn" data-manage-cloud="${e(x.id)}">Manage</button></div></div>`).join(''):'<p class="raga-help">No cloud events yet. Save the event in your current builder using “Save to Cloud”.</p>';
+ const folder={};for(const x of s.events){const day=String(x.eventDate||'No date').slice(0,10),planner=String(x.eventData?.plannerName||'General planner').slice(0,100);(folder[day]??={})[planner]??=[];folder[day][planner].push(x);}
+ list.innerHTML=s.events.length?Object.entries(folder).map(([day,planners])=>`<details class="raga-list-item" open><summary><b>📅 ${e(day)}</b></summary>${Object.entries(planners).map(([planner,events])=>`<details class="raga-list-item" open><summary>👤 ${e(planner)} · ${events.length} events</summary>${events.map(x=>`<div class="raga-list-item"><strong>${e(x.name)}</strong> <span class="raga-pill">${e(x.status)}</span><div class="raga-small">${e(x.eventDate||'Date not set')} · ${e(x.venue||'No venue')}</div><div class="raga-actions"><button class="raga-btn" data-load-cloud="${e(x.id)}">Load</button><button class="raga-btn" data-manage-cloud="${e(x.id)}">Manage</button></div></div>`).join('')}</details>`).join('')}</details>`).join(''):'<p class="raga-help">No cloud events yet. Save the event in your current builder using “Save to Cloud”.</p>';
  list.querySelectorAll('[data-load-cloud]').forEach(b=>b.onclick=()=>loadCloud(b.dataset.loadCloud));
  list.querySelectorAll('[data-manage-cloud]').forEach(b=>b.onclick=()=>selectCloud(b.dataset.manageCloud));
  const current=s.cloudEvent&&s.events.find(x=>x.id===s.cloudEvent.id);
  if(current)s.cloudEvent=current;
  drawSelected();
- if(s.user.role==='admin')await refreshPlanners();
+ if(s.user?.role==='admin')await refreshPlanners();
 }
 async function refreshPlanners(){
  const [plannersResult,accountsResult]=await Promise.all([call('/users/planners'),call('/users')]);
@@ -257,7 +283,7 @@ function selectCloud(id){s.cloudEvent=s.events.find(x=>x.id===id)||null;drawSele
 function drawSelected(){const el=$('rs-cloud-selected');if(!el)return;
  const x=s.cloudEvent;
  el.innerHTML=x?`<b>${e(x.name)}</b> <span class="raga-pill">${e(x.status)}</span><div class="raga-small">Cloud ID: ${e(x.id)}</div>`:'No cloud event selected';
- const sel=$('rs-event-planner');if(sel&&x)sel.value=x.plannerUserId||'';
+ const sel=$('rs-event-planner');if(sel&&x)sel.value=x.plannerUserId||''; const guestName=$('rs-public-planner-name');if(guestName&&x)guestName.value=String(x.eventData?.plannerName||'');
  $('rs-cloud-event-id').textContent=x?'Selected: '+x.name:'Not yet saved to cloud';
  const enabled=!!x;
  ['rs-make-link','rs-load-submissions','rs-list-links','rs-approve-print','rs-load-selected'].forEach(id=>{const b=$(id);if(b)b.disabled=!enabled});
@@ -287,17 +313,17 @@ function compactCloudSnapshot(raw){
  if(bytes>480000)throw Error('Event is still too large ('+Math.ceil(bytes/1024)+' KB). Reduce the number of items or descriptions before saving. Images remain browser-local.');
  return cleaned;
 }
-async function saveCloud(){if(!s.user)throw Error('Sign in first');
+async function saveCloud(){
  const snapshot=compactCloudSnapshot(eventSnapshot()),current=s.cloudEvent;
  const chosenName=String(snapshot.name||snapshot.title||'Event').trim();
  const payload={name:chosenName,eventDate:snapshot.date||'',venue:snapshot.venue||'',partyNo:snapshot.partyNo||'',eventData:snapshot};
- if(s.user.role==='admin'){const planner=$('rs-event-planner');payload.plannerUserId=planner?.value||null;}
- if(!current){const r=await call('/events','POST',payload);s.cloudEvent={id:r.id,...payload,status:'draft'};msg('Cloud event created. You can now make a client access link.');}
+ if(s.user?.role==='admin'){const planner=$('rs-event-planner');payload.plannerUserId=planner?.value||null;}
+ if(!current){const r=await call(s.user?'/events':'/public/events','POST',payload,!!s.user);s.cloudEvent={id:r.id,...payload,status:'draft'};msg('Shared event created.');}
  else {const confirmed=confirm('Overwrite the selected cloud event with the current builder snapshot? This resets print approval.');if(!confirmed)return;
- await call('/events/'+current.id,'PUT',payload);msg('Cloud event saved; printing approval has been reset.');}
+ await call((s.user?'/events/':'/public/events/')+current.id,'PUT',payload,!!s.user);msg('Shared event updated.');}
  await refreshCloudList();
 }
-async function loadCloud(id){const x=await call('/events/'+id);if(!x.event)throw Error('Cloud event not found');
+async function loadCloud(id){const x=await call((s.user?'/events/':'/public/events/')+id,'GET',undefined,!!s.user);if(!x.event)throw Error('Cloud event not found');
  // Loading a cloud snapshot also loads its approved client design. Keep local browser copy intact until confirmed.
  const remote=data(x.event.eventData);for(const fmt of FMT){if(remote.designs?.[fmt]){for(const k of ['logoUrl','coupleLogoUrl']){const v=remote.sharedImages?.[k==='logoUrl'?'companyLogo':'coupleLogo'];if(v&&!remote.designs[fmt][k])remote.designs[fmt][k]=v;}if(state.designs?.[fmt])for(const k of ['logoUrl','coupleLogoUrl','halfBackLeftImageUrl','halfBackRightImageUrl'])if(!remote.designs[fmt][k]&&state.designs[fmt][k])remote.designs[fmt][k]=state.designs[fmt][k];}}
  if(restoreEventSnapshot(remote)!==true)return;s.cloudEvent=x.event;s.activeTheme=x.event.eventData?.themeId||'';renderThemeGallery();s.loadedSnapshot=JSON.stringify(compactCloudSnapshot(eventSnapshot()));s.loadedRemote=JSON.stringify(x.event.eventData);
@@ -317,7 +343,7 @@ async function listLinks(){if(!s.cloudEvent)return;const r=await call('/events/'
  root.querySelectorAll('[data-revoke]').forEach(b=>b.onclick=async()=>{if(!confirm('Revoke this client link now?'))return;try{await call('/events/'+s.cloudEvent.id+'/client-links/'+b.dataset.revoke+'/revoke','POST',{});await listLinks();}catch(err){msg(err.message,'error');}});
 }
 async function loadSubmissions(){if(!s.cloudEvent)return;try{const r=await call('/events/'+s.cloudEvent.id+'/submissions');
- const root=$('rs-submissions-list');root.innerHTML=(r.submissions||[]).map(x=>`<div class="raga-list-item"><b>Design revision ${x.revision}</b> · <span class="raga-pill">${e(x.status)}</span><div class="raga-small">Submitted ${e(x.submitted_at)} · Theme: ${e(x.design?.themeId||'Custom')}</div><div class="raga-actions"><button class="raga-btn" data-preview-rev="${e(x.id)}">View settings</button>${s.user.role==='planner'&&x.status==='submitted'?`<button class="raga-btn primary" data-review="${e(x.id)}" data-review-status="approved">Approve design</button><button class="raga-btn" data-review="${e(x.id)}" data-review-status="changes_requested">Request changes</button><button class="raga-btn danger" data-review="${e(x.id)}" data-review-status="rejected">Reject</button>`:''}</div></div>`).join('')||'<p class="raga-help">No submissions yet. Create a client link above.</p>';
+ const root=$('rs-submissions-list');root.innerHTML=(r.submissions||[]).map(x=>`<div class="raga-list-item"><b>Design revision ${x.revision}</b> · <span class="raga-pill">${e(x.status)}</span><div class="raga-small">Submitted ${e(x.submitted_at)} · Theme: ${e(x.design?.themeId||'Custom')}</div><div class="raga-actions"><button class="raga-btn" data-preview-rev="${e(x.id)}">View settings</button>${s.user?.role==='planner'&&x.status==='submitted'?`<button class="raga-btn primary" data-review="${e(x.id)}" data-review-status="approved">Approve design</button><button class="raga-btn" data-review="${e(x.id)}" data-review-status="changes_requested">Request changes</button><button class="raga-btn danger" data-review="${e(x.id)}" data-review-status="rejected">Reject</button>`:''}</div></div>`).join('')||'<p class="raga-help">No submissions yet. Create a client link above.</p>';
  root.querySelectorAll('[data-preview-rev]').forEach(b=>b.onclick=()=>{const item=(r.submissions||[]).find(x=>x.id===b.dataset.previewRev);if(item)showSubmissionDesign(item);});
  root.querySelectorAll('[data-review]').forEach(b=>b.onclick=async()=>{const note=b.dataset.reviewStatus==='approved'?'':(prompt('Review note (optional):')??'');if(!confirm(`Mark this design ${b.dataset.reviewStatus.replace('_',' ')}?`))return;
  try{await call('/events/'+s.cloudEvent.id+'/submissions/'+b.dataset.review+'/review','POST',{status:b.dataset.reviewStatus,note});msg('Submission '+b.dataset.reviewStatus+'. Approved designs are merged into the cloud event; load it again to preview.');await loadSubmissions();await refreshCloudList();}catch(err){msg(err.message,'error');}});
@@ -330,22 +356,12 @@ async function createPlanner(){if(s.user?.role!=='admin')return;
  try{await call('/users/planners','POST',{email,name,password});$('rs-new-planner-password').value='';msg('Event Planner created. Share their initial password through a secure channel.');await refreshPlanners();}catch(err){msg(err.message,'error');}}
 // The public HTML can be bypassed; this guard provides operational UI workflow protection only.
 // The backend independently authorizes cloud event, client link, submission, approval and print-status calls.
-async function canPrint(){if(!s.user){alert('Please sign in to print.');return false;}
- if(s.user.role==='admin')return true;
- if(!s.cloudEvent){alert('Select a saved cloud event before printing. The Event Planner must approve printing.');openCloud();return false;}
- try{const check=await call('/events/'+s.cloudEvent.id+'/print-status');if(!check.allowed){alert('Printing not approved for this cloud event. Review the latest design and approve printing.');openCloud();return false;}
- // Ensure local working draft matches the cloud approved snapshot, rather than an unsaved edit.
- const latest=await call('/events/'+s.cloudEvent.id);
- if(!s.loadedSnapshot||!s.loadedRemote||JSON.stringify(compactCloudSnapshot(eventSnapshot()))!==s.loadedSnapshot||JSON.stringify(latest.event?.eventData)!==s.loadedRemote){
-   alert('Your browser contains unsaved changes, or the approved cloud event was updated. Load the approved cloud event before printing.');return false;
- }
- return true;
- }catch(err){alert('Unable to verify printing approval: '+err.message);return false;}}
-function lockMaster(){if(s.user?.role!=='admin'){alert('Only the Admin can modify the master allergen database.');return false;}return true;}
+async function canPrint(){return true;}
+ function lockMaster(){if(s.user?.role!=='admin'){alert('Only the Admin can modify the master allergen database.');return false;}return true;}
 const nativeRequestMaster=window.requestMasterAuthorization;
 window.requestMasterAuthorization=function(label,callback){if(!lockMaster())return;return nativeRequestMaster(label,callback);};
 const originalSwitchTab=window.switchTab;
-if(typeof originalSwitchTab==='function')window.switchTab=function(name){if(name==='venues'&&s.user?.role!=='admin')return;return originalSwitchTab.apply(this,arguments);};
+if(typeof originalSwitchTab==='function')window.switchTab=function(name){if(['venues','master'].includes(name)&&s.user?.role!=='admin'){window.ragaOpenAdminLogin();return;}return originalSwitchTab.apply(this,arguments);};
 const originalMasterRender=window.renderMasterDB;
 if(typeof originalMasterRender==='function')window.renderMasterDB=function(...args){const result=originalMasterRender.apply(this,args);if(s.user?.role!=='admin')document.querySelectorAll('#tab-master button[onclick*="requestMasterAuthorization"]').forEach(b=>b.hidden=true);return result;};
 for(const fn of ['publishMasterToGitHub','saveDishModal','deleteDish','openDishModal','importExcel']){
@@ -355,7 +371,7 @@ for(const fn of ['triggerPrint','downloadPDF','printEventSummary','exportClientS
  const native=window[fn];if(typeof native==='function')window[fn]=async function(...args){if(!(await canPrint()))return;return native.apply(this,args);};
 }
 // A browser's Ctrl+P cannot be server-authorized. Reduce accidental bypass with a beforeprint warning.
-window.addEventListener('beforeprint',()=>{if(!s.user||s.user.role==='planner'&&!s.cloudEvent)document.body.classList.add('raga-print-blocked');});
+// Public previews and print are permitted. Only Admin and Master editing are protected.
 window.addEventListener('afterprint',()=>document.body.classList.remove('raga-print-blocked'));
 function savedThemes(){try{const d=JSON.parse(localStorage.getItem('ragasaan_custom_themes_v1')||'[]');return Array.isArray(d)?d:[];}catch{return [];}}
 function validTheme(input){if(!input||typeof input!=='object')return null;
@@ -475,6 +491,7 @@ function attach(){
 
  $('rs-close-cloud')?.addEventListener('click',closeCloud);
  $('rs-logout')?.addEventListener('click',logout);
+ $('rs-admin-login')?.addEventListener('click',window.ragaOpenAdminLogin);
  $('rs-cloud-save')?.addEventListener('click',()=>saveCloud().catch(x=>msg(x.message,'error')));
  $('rs-cloud-refresh')?.addEventListener('click',()=>refreshCloudList().catch(x=>msg(x.message,'error')));
  $('rs-make-link')?.addEventListener('click',createLink);
@@ -491,8 +508,8 @@ function attach(){
  if(initClient())return;
  const stored=JSON.parse(sessionStorage.getItem('raga_session')||'null');
  if(stored?.token && new Date(stored.expiresAt)>new Date()){
- s.token=stored.token;call('/me').then(u=>{s.user=u;document.body.classList.remove('ragasaan-locked');showAuthenticated();}).catch(err=>{onLoginError('Please sign in: '+err.message);document.body.classList.add('ragasaan-locked');});
- }else{sessionStorage.removeItem('raga_session');}
+ s.token=stored.token;call('/me').then(u=>{s.user=u;document.body.classList.remove('ragasaan-locked');showAuthenticated();}).catch(err=>{onLoginError('Admin session expired: '+err.message);showPublic();});
+ }else{sessionStorage.removeItem('raga_session');showPublic();}
 }
 // Export only specific event handlers to the global namespace for CSP-compatible markup callbacks.
 Object.assign(window,{
