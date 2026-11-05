@@ -1439,6 +1439,14 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       padding:5mm; box-sizing:border-box; overflow:hidden; position:relative; }
     .paper-canape-single { border-color:var(--label-border, #ca8a04); }
     .print-sheet { flex-shrink:0; position:relative; }
+    /* A single small meal name sits outside label borders without joining the label grid. */
+    .raga-tag-sheet-session {
+      position:absolute; top:1.5mm; right:5mm; z-index:8;
+      font:normal 7pt/1 Arial,Helvetica,sans-serif!important;
+      color:#000!important; letter-spacing:0!important;
+      pointer-events:none; white-space:nowrap;
+    }
+
     .print-sheet .menu-body-font { font-family:var(--body-family, 'Cormorant Garamond',serif) !important; }
     .print-sheet .frame-overlay { position:absolute; pointer-events:none; z-index:1; box-sizing:border-box; }
     .print-sheet [contenteditable="true"] { overflow-wrap:anywhere; }
@@ -4053,8 +4061,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         const perPage=fmt==='a8-grid'?10:fmt==='a6-grid'?4:8;
         const pageClass=fmt==='a8-grid'?'paper-a8-grid':fmt==='foldtags-grid'?'paper-foldtags-grid':fmt==='a6-grid'?'paper-a6-grid':'paper-canape-grid';
         const cardClass=fmt==='a8-grid'?'paper-a8-single':fmt==='foldtags-grid'?'paper-foldtags-single':fmt==='a6-grid'?'paper-a6-single':'paper-canape-single';
-        const tagGroups=eventSessions.map(session=>visibleItems.filter(row=>row.item.sessionId===session.id)).filter(rows=>rows.length);
-        for(const tagRows of (tagGroups.length?tagGroups:[[]])) {
+        const tagGroups=eventSessions.map(session=>({session,rows:visibleItems.filter(row=>row.item.sessionId===session.id)})).filter(group=>group.rows.length);
+        for(const {session:tagSession,rows:tagRows} of (tagGroups.length?tagGroups:[{session:null,rows:[]}])) {
         const n=Math.max(1,Math.ceil(tagRows.length/perPage));
         for(let j=0;j<n;j++) {
           const sheet=page(pageClass,j?'page-break':'');
@@ -4062,6 +4070,14 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           // A sheet-wide frame would cut across labels and the 20mm cutting gutters.
           // Individual label frames are used for small-format stationery instead.
           sheet.innerHTML='';
+          if(fmt!=='a6-grid' && tagSession) {
+            const identifier=document.createElement('span');
+            identifier.className='raga-tag-sheet-session';
+            const mealName=String(tagSession.name||'').trim();
+            identifier.textContent=mealName.replace(/\s+/g,''); // One unbold word, once per printed sheet.
+            identifier.setAttribute('aria-label','Meal session: '+mealName);
+            sheet.append(identifier); // Positioned outside each label; does not alter tag grid layout.
+          }
           for(let k=0;k<perPage;k++) {
             const record=tagRows[j*perPage+k];
             if(!record) continue; // Skip unused slots without drawing ghost labels.
