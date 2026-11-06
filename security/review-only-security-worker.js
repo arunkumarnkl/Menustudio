@@ -257,7 +257,7 @@ async function handle(req,env){
     const body=await jsonBody(req),link=await getClientLink(env,body.token);
     if(!link)return error('Client link invalid or expired',403);
     return reply({event:clientEvent(link),clientFormats:await allowedClientFormats(env),
-      permissions:['design','couple-details','couple-logo','table-welcome'],
+      permissions:['design','couple-details','couple-logo','table-welcome','print-preview'],canPrint:link.status==='approved',
       expiresAt:link.expires_at});
   }
   if(path==='/client/submit'&&method==='POST'){
@@ -283,52 +283,32 @@ async function handle(req,env){
     await audit(env,'client_design_immediately_applied',null,link.event_id,{target_type:'design',target_id:submissionId,revision});
     return reply({submitted:true,applied:true,pendingReview:true,id:submissionId,revision,status:'submitted'},201);
   }
-  // Ordinary cloud event storage is open by explicit owner request.
-  // Admin settings, user management, master allergen editing, and client approval
-  // endpoints remain behind the authenticated routes below.
-  if(path==='/public/events'&&method==='GET'){
-    const rows=await env.DB.prepare('SELECT * FROM events ORDER BY COALESCE(updated_at,created_at) DESC,created_at DESC LIMIT 500').all();
-    return reply({events:(rows.results||[]).map(publicEvent)});
-  }
-  if(path==='/public/events'&&method==='POST'){
-    const body=await jsonBody(req),name=cleanString(body.name,200);
-    if(!name)return error('Event name required');
-    const snapshot=body.eventData&&typeof body.eventData==='object'&&!Array.isArray(body.eventData)?body.eventData:{};
-    if(JSON.stringify(snapshot).length>500000)return error('Event payload too large',413);
-    const guestId='00000000-0000-4000-8000-00000000f001';
-    // Never make this account active or generate a session. It exists solely to satisfy
-    // legacy D1 event attribution constraints without rewriting existing records.
-    await env.DB.prepare(`INSERT OR IGNORE INTO users(id,email,display_name,role,password_hash,password_salt,password_iterations,active)
-      VALUES(?,?,'Public Event Builder','planner',?,?,310000,0)`)
-      .bind(guestId,'public-builder@invalid.local',rand(),rand()).run();
-    const eventId=id();
-    await env.DB.prepare(`INSERT INTO events(id,name,event_date,venue,party_no,planner_user_id,event_json,created_by,updated_by)
-      VALUES(?,?,?,?,?,NULL,?,?,?)`).bind(eventId,name,cleanString(body.eventDate,40),cleanString(body.venue,200),'',JSON.stringify(snapshot),guestId,guestId).run();
-    await audit(env,'public_event_created',null,eventId,{target_type:'event',target_id:eventId});
-    return reply({id:eventId,created:true},201);
-  }
-  const publicEventId=path.match(/^\/public\/events\/([0-9a-f-]{36})$/);
-  if(publicEventId&&['GET','PUT'].includes(method)){
-    const event=await env.DB.prepare('SELECT * FROM events WHERE id=?').bind(publicEventId[1]).first();
-    if(!event)return error('Event unavailable',404);
-    if(method==='GET')return reply({event:publicEvent(event)});
-    const body=await jsonBody(req),name=cleanString(body.name??event.name,200);
-    if(!name)return error('Event name required');
-    const data=body.eventData&&typeof body.eventData==='object'&&!Array.isArray(body.eventData)?body.eventData:parsedJson(event.event_json,{});
-    if(JSON.stringify(data).length>500000)return error('Event payload too large',413);
-    const guestId='00000000-0000-4000-8000-00000000f001';
-    // Keep the original creator and assigned planner for historical attribution.
-    // Editing the menu invalidates prior client design approvals.
-    await env.DB.prepare("UPDATE design_submissions SET status='changes_requested',review_note='Event menu changed; submit updated design' WHERE event_id=? AND status='submitted'").bind(event.id).run();
-    await env.DB.prepare(`UPDATE events SET name=?,event_date=?,venue=?,event_json=?,updated_by=NULL,status='draft',updated_at=CURRENT_TIMESTAMP WHERE id=?`)
-      .bind(name,cleanString(body.eventDate??event.event_date,40),cleanString(body.venue??event.venue,200),JSON.stringify(data),event.id).run();
-    await audit(env,'public_event_updated',null,event.id,{target_type:'event',target_id:event.id});
-    return reply({updated:true,status:'draft'});
-  }
+  // Public cloud event routes must not bypass the client-only design scope.
+  // Staff must authenticate to read or modify shared events.
+  if(path==='/public/events'||path.startsWith('/public/events/'))
+    return error('Event library requires Event Planner or Admin sign-in',401);
   const who=await actor(req,env);
   // GET-only rule catalogs do not contain secrets; Admin PUT stays protected.
   if(!who&&!(method==='GET'&&['/settings/choices','/settings/meal-defaults','/settings/printing-rules'].includes(path)))return error('Login required',401);
   if(path==='/me'&&method==='GET')return reply({id:who.id,email:who.email,name:who.display_name,role:who.role});
+
+  if(path==='/admin/feedback-copy'&&method==='GET'){
+    if(who.role!=='admin')return error('Administrator only',403);
+    const row=await env.DB.prepare("SELECT value_json FROM app_settings WHERE key='feedback_copy'").first();
+    const data=parsedJson(row?.value_json,{});
+    return reply({title:typeof data.title==='string'?data.title:'We Value Your Feedback',
+      message:typeof data.message==='string'?data.message:'Thank you for celebrating with us. Please scan the QR code below to share your experience.'});
+  }
+  if(path==='/admin/feedback-copy'&&method==='PUT'){
+    if(who.role!=='admin')return error('Administrator only',403);
+    const input=await jsonBody(req);
+    const title=cleanString(input.title,120),message=cleanString(input.message,700);
+    if(!title||!message)return error('Feedback heading and message are required');
+    await env.DB.prepare("INSERT INTO app_settings(key,value_json,updated_at,updated_by) VALUES('feedback_copy',?,CURRENT_TIMESTAMP,?) ON CONFLICT(key) DO UPDATE SET value_json=excluded.value_json,updated_at=CURRENT_TIMESTAMP,updated_by=excluded.updated_by")
+      .bind(JSON.stringify({title,message}),who.id).run();
+    await audit(env,'feedback_copy_updated',who,null,{target_type:'app_settings',target_id:'feedback_copy'});
+    return reply({updated:true,title,message});
+  }
   if(path==='/admin/feedback-qr'&&method==='PUT'){
     if(who.role!=='admin')return error('Administrator only',403);
     const body=await jsonBody(req);
