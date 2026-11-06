@@ -10,7 +10,7 @@ const enc = new TextEncoder();
 const MAX_JSON = 750_000;
 const TOKEN_TTL_HOURS = 8;
 const ITERATIONS = 100000; // Cloudflare Workers WebCrypto PBKDF2 maximum
-const corsMethods = 'GET, POST, PUT, OPTIONS';
+const corsMethods = 'GET, POST, PUT, DELETE, OPTIONS';
 const STYLE_FORMATS=new Set(['a4','a4-live','half-a4','a8-grid','foldtags-grid','a6-grid','canape-grid']);
 const CLIENT_PRINT_FORMATS=['a4','a6-grid','a4-live','half-a4'];
 
