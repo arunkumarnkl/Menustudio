@@ -64,6 +64,34 @@ try{
  await client.context.close();
  console.log('PASS Browser client token is isolated to design/preview, print disabled before approval');
 
+ // Staff design theme: exercise the real gallery click and the visible A4 preview.
+ const themeTest=await setupPage(true);
+ const tp=themeTest.page;
+ await tp.evaluate(()=>switchTab('design'));
+ await tp.locator('#rs-theme-gallery .raga-theme-card').first().waitFor({state:'visible',timeout:30000});
+ const themeBefore=await tp.evaluate(()=>({
+  saveExposed:typeof window.saveStyle,
+  color:state.designs.a4.accentColor,
+  previewCount:document.querySelectorAll('#paper-render-target .print-sheet').length
+ }));
+ await tp.locator('#rs-theme-gallery .raga-theme-card').nth(1).click();
+ const themeAfter=await tp.evaluate(()=>({
+  active:window.ragaActiveThemeId,
+  activeCard:document.querySelector('#rs-theme-gallery .raga-theme-card.active')?.innerText,
+  color:state.designs.a4.accentColor,
+  saved:JSON.parse(localStorage.getItem('ragasaan_style_v3')||'{}').designs?.a4?.accentColor,
+  previewText:document.querySelector('#paper-render-target')?.innerHTML.slice(0,15000)
+ }));
+ console.log('STAFF THEME DIAGNOSTICS',JSON.stringify({before:themeBefore,after:{...themeAfter,previewText:themeAfter.previewText?.includes(themeAfter.color)}}));
+ assert.notEqual(themeAfter.color,themeBefore.color,'Theme selection changes the print accent colour');
+ assert.equal(themeAfter.saved,themeAfter.color,'Theme selection persists the print accent colour');
+ assert.ok(themeAfter.previewText.includes(themeAfter.color),'Preview uses the newly selected accent colour');
+ await tp.reload({waitUntil:'domcontentloaded'});
+ await tp.waitForTimeout(500);
+ assert.equal(await tp.evaluate(()=>state.designs.a4.accentColor),themeAfter.color,'Selected theme survives browser reload');
+ console.log('PASS Staff gallery click changes preview and persists across reload');
+ await themeTest.context.close();
+
  // Approved client route: click a theme and download an actual PDF.
  clientApproved=true;
  const approved=await setupPage(false,'#client='+token);
