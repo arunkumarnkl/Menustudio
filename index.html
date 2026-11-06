@@ -1187,7 +1187,9 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       #sidebar-controls.print-format-compact { width: 270px !important; }
     }
 </style>
-  <style id="ragasaan-login-fail-closed">body.ragasaan-locked > :not(#ragasaan-auth-root):not(script){display:none!important}body.ragasaan-locked #ragasaan-auth-root{display:flex;position:fixed;inset:0;z-index:2147480000;background:#020617;color:#f8fafc;align-items:center;justify-content:center;overflow:auto}</style>
+  <style id="ragasaan-login-fail-closed">body.ragasaan-locked:not(.raga-client-pdf-active) > :not(#ragasaan-auth-root):not(script){display:none!important}body.ragasaan-locked #ragasaan-auth-root{display:flex;position:fixed;inset:0;z-index:2147480000;background:#020617;color:#f8fafc;align-items:center;justify-content:center;overflow:auto}
+body.ragasaan-locked.raga-client-pdf-active > :not(#ragasaan-auth-root):not(script):not(#raga-client-pdf-export):not(.html2pdf__container){display:none!important}
+</style>
   <link rel="stylesheet" href="./security.css">
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
