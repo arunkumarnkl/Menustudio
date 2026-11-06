@@ -4700,11 +4700,11 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         </section>
         <section class="raga-panel" data-rs-admin id="rs-admin-company">
           <h3>Official Company Logo · Admin</h3>
-          <p class="raga-help">Publish a logo to D1 for all users. The existing GitHub logo remains the fallback. PNG/JPG/WebP, up to 150 KB.</p>
+          <p class="raga-help">Publish one company logo to all users through D1. Select PNG, JPG or WebP; larger images up to 12 MB will be automatically resized to meet the server's 150 KB limit. The existing GitHub logo remains the fallback.</p>
           <input id="rs-company-upload" type="file" class="raga-input" accept="image/png,image/jpeg,image/webp">
           <div class="raga-actions"><button id="rs-company-publish" type="button" class="raga-btn primary">Publish Company Logo</button><button id="rs-company-remove" type="button" class="raga-btn danger">Use GitHub Logo Instead</button></div>
           <img id="rs-company-image" hidden alt="Current company logo" style="max-width:180px;max-height:100px;object-fit:contain;background:white;margin-top:8px;padding:5px">
-          <p id="rs-company-status" class="raga-help"></p>
+          <p id="rs-company-status" class="raga-help" role="status" aria-live="polite"></p>
         </section>
         <section class="raga-panel" data-rs-admin id="rs-admin-options">
           <h3>Meal Defaults &amp; Printing Rules · Admin</h3>
