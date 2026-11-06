@@ -4315,10 +4315,12 @@ body.ragasaan-locked.raga-client-pdf-active > :not(#ragasaan-auth-root):not(scri
         const makeBuffet=(records,session,stationName='')=>{
           const p=page(); p.style.padding=`${Math.max(2.5,Number(d.borderOutsetCm)+.5)}cm`; p.style.paddingTop=`${Math.max(0.8, Number(d.borderOutsetCm)+Number(d.borderWidth||1)/10+0.2)}cm`;
           p.classList.add('flex','flex-col','justify-between');
+          // html2canvas must retain real flex layout even if utility styles are missing in its clone.
+          p.style.display='flex';p.style.flexDirection='column';p.style.justifyContent='space-between';
           const sessionTitle=session&&session.showPrintHeading!==false?`<h3 contenteditable="true" title="Edit the printed meal heading" onblur="ragaUpdatePrintedMealName('${esc(session.id)}',this.innerText)" class="menu-body-font text-center" style="font-size:calc(15px * var(--ragasaan-fit,1));font-weight:bold;color:${d.accentColor};margin:6px 0">${escText(session.printHeading??session.name)}</h3>`:'';
           const stationTitle=stationName?`<h4 class="menu-body-font text-center" style="font-weight:700;color:${d.accentColor};font-size:calc(17px * var(--ragasaan-fit,1));margin:10px 0">${escText(stationName)}</h4>`:'';
           const collectionHtml=session&&!isCourseWise(session)?records.map(({item,idx})=>`<div style="margin:0 0 9px">${itemBlock(item,idx)}</div>`).join(''):tableCardCollection(records);
-          p.innerHTML=`${frame()}${bodyHeader()}${d.showMenuHeading!==false?formatHeading(d.menuHeading??'Menu','buffet'):''}${sessionTitle}${stationTitle}<div data-auto-fit-area class="menu-body-font" style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;padding:8px 0"><div data-auto-fit-flow style="flex:0 0 auto;margin:auto 0">${collectionHtml}</div></div><div class="text-center" style="padding-top:12px">${brand()}</div>`;
+          p.innerHTML=`${frame()}${bodyHeader()}${d.showMenuHeading!==false?formatHeading(d.menuHeading??'Menu','buffet'):''}${sessionTitle}${stationTitle}<div data-auto-fit-area class="menu-body-font" style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;padding:8px 0"><div data-auto-fit-flow style="flex:0 0 auto;margin:auto 0">${collectionHtml}</div></div><div class="text-center" data-page-footer-logo style="padding-top:12px;flex-shrink:0;margin-top:auto;display:flex;justify-content:center">${brand()}</div>`;
           return p;
         };
         const groups=[];
@@ -4340,6 +4342,8 @@ body.ragasaan-locked.raga-client-pdf-active > :not(#ragasaan-auth-root):not(scri
           const p=page();p.style.padding=`${Math.max(2.5,Number(d.borderOutsetCm)+.5)}cm`;
           p.style.paddingTop=`${Math.max(0.8,Number(d.borderOutsetCm)+Number(d.borderWidth||1)/10+0.2)}cm`;
           p.classList.add('flex','flex-col','justify-between');
+          // html2canvas must retain real flex layout even if utility styles are missing in its clone.
+          p.style.display='flex';p.style.flexDirection='column';p.style.justifyContent='space-between';
           const stationTitle=stationName?`<h3 class="menu-body-font text-center" contenteditable="true" spellcheck="false" data-live-title="true" data-session="${esc(session?.id||'')}" data-station="${esc(stationId||'')}" onblur="ragaEditLiveStationTitle(this)" title="Click to edit this station title" style="color:${d.accentColor};font-weight:700;font-size:calc(17px * var(--ragasaan-fit,1));margin:10px 0">${escText(stationName)}</h3>`:'';
           const collection=records.length?records.map(({item,idx})=>`<div style="margin-bottom:13px">${itemBlock(item,idx,1.12)}</div>`).join(''):`<p contenteditable="true" data-preview-text="emptyLiveMessage">${escText(d.emptyLiveMessage ?? 'Add menu items for Live Station')}</p>`;
           p.innerHTML=`${frame()}${bodyHeader()}${stationTitle}
@@ -4905,7 +4909,8 @@ body.ragasaan-locked.raga-client-pdf-active > :not(#ragasaan-auth-root):not(scri
         // Preserve each page's original CSS display (grid/flex/block). Forcing
         // display:block here destroys A8/A6/FoldTag and Canape grid alignment.
         page.style.cssText+=';width:210mm!important;min-height:297mm;height:297mm;box-sizing:border-box;transform:none!important;margin:0!important;break-inside:avoid';
-        if(i<sheets.length-1){const br=document.createElement('div');br.className='html2pdf__page-break';page.after(br);}
+        // Each sheet is already precisely A4. An extra forced page-break inserts
+        // an entirely blank sheet when html2pdf also paginates at 297mm.
       });
       if(!sheets.length){exportRoot.remove();if(status)status.textContent='Nothing to save: choose a menu with pages first.';return false;}
       window.__lastPdfExportMetrics={sheets:sheets.length,width:exportRoot.getBoundingClientRect().width,height:exportRoot.getBoundingClientRect().height,sheetWidth:sheets[0].getBoundingClientRect().width,sheetHeight:sheets[0].getBoundingClientRect().height,sheetDisplay:getComputedStyle(sheets[0]).display};
@@ -4915,7 +4920,7 @@ body.ragasaan-locked.raga-client-pdf-active > :not(#ragasaan-auth-root):not(scri
           image:{type:'jpeg',quality:.98},
           html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',scrollX:0,scrollY:0},
           jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
-          pagebreak:{mode:['css','legacy']}
+          pagebreak:{mode:[]}
         }).from(exportRoot).save();
         if(status)status.textContent='PDF saved. Printing was not started.';
         return true;
