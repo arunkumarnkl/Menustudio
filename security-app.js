@@ -256,8 +256,22 @@ function opt(rows,idKey='id',labelKey='name'){return rows.map(r=>`<option value=
 async function refreshCloudList(){
  const r=await call(s.user?'/events':'/public/events','GET',undefined,!!s.user);s.events=r.events||[];
  const list=$('rs-cloud-events');if(!list)return;
- const folder={};for(const x of s.events){const day=String(x.eventDate||'No date').slice(0,10),planner=String(x.eventData?.plannerName||'General planner').slice(0,100);(folder[day]??={})[planner]??=[];folder[day][planner].push(x);}
- list.innerHTML=s.events.length?Object.entries(folder).map(([day,planners])=>`<details class="raga-list-item" open><summary><b>📅 ${e(day)}</b></summary>${Object.entries(planners).map(([planner,events])=>`<details class="raga-list-item" open><summary>👤 ${e(planner)} · ${events.length} events</summary>${events.map(x=>`<div class="raga-list-item"><strong>${e(x.name)}</strong> <span class="raga-pill">${e(x.status)}</span><div class="raga-small">${e(x.eventDate||'Date not set')} · ${e(x.venue||'No venue')}</div><div class="raga-actions"><button class="raga-btn" data-load-cloud="${e(x.id)}">Load</button><button class="raga-btn" data-manage-cloud="${e(x.id)}">Manage</button></div></div>`).join('')}</details>`).join('')}</details>`).join(''):'<p class="raga-help">No cloud events yet. Save the event in your current builder using “Save to Cloud”.</p>';
+ // Display the latest five by default while retaining all server-returned records.
+ const plannerOf=x=>String(x.eventData?.plannerName||x.plannerName||'Unassigned planner').trim()||'Unassigned planner';
+ const planners=[...new Set(s.events.map(plannerOf))].sort((a,b)=>a.localeCompare(b));
+ const selected=String(s.cloudPlannerFilter||'');
+ const relevant=s.events.filter(x=>!selected||plannerOf(x)===selected);
+ const sorted=[...relevant].sort((a,b)=>{
+   const timestamp=x=>Date.parse(x.updatedAt||x.updated_at||x.createdAt||x.created_at||x.eventDate||'')||0;
+   return timestamp(b)-timestamp(a);
+ });
+ const visible=s.cloudShowArchive?sorted:sorted.slice(0,5);
+ const folder={};for(const x of visible){const day=String(x.eventDate||'No date').slice(0,10),planner=String(x.eventData?.plannerName||'General planner').slice(0,100);(folder[day]??={})[planner]??=[];folder[day][planner].push(x);}
+ list.innerHTML='<div class="raga-list-item"><label class="raga-small">Filter by planner <select id="rs-cloud-planner-filter" class="raga-input"><option value="">All planners</option>'+planners.map(p=>'<option value="'+e(p)+'" '+(selected===p?'selected':'')+'>'+e(p)+'</option>').join('')+'</select></label><div class="raga-actions"><span class="raga-small">Showing '+visible.length+' of '+relevant.length+' matching events</span><button type="button" class="raga-btn" id="rs-cloud-archive-toggle">'+(s.cloudShowArchive?'Show latest five':'View older events')+'</button></div></div>'+(visible.length?Object.entries(folder).map(([day,planners])=>`<details class="raga-list-item" open><summary><b>📅 ${e(day)}</b></summary>${Object.entries(planners).map(([planner,events])=>`<details class="raga-list-item" open><summary>👤 ${e(planner)} · ${events.length} events</summary>${events.map(x=>`<div class="raga-list-item"><strong>${e(x.name)}</strong> <span class="raga-pill">${e(x.status)}</span><div class="raga-small">${e(x.eventDate||'Date not set')} · ${e(x.venue||'No venue')}</div><div class="raga-actions"><button class="raga-btn" data-load-cloud="${e(x.id)}">Load</button><button class="raga-btn" data-manage-cloud="${e(x.id)}">Manage</button></div></div>`).join('')}</details>`).join('')}</details>`).join(''):'<p class="raga-help">No matching cloud events. Choose All planners, or save a new event.</p>');
+ const f=list.querySelector('#rs-cloud-planner-filter');
+ if(f)f.onchange=()=>{s.cloudPlannerFilter=f.value;refreshCloudList().catch(err=>msg(err.message,'error'));};
+ const archive=list.querySelector('#rs-cloud-archive-toggle');
+ if(archive)archive.onclick=()=>{s.cloudShowArchive=!s.cloudShowArchive;refreshCloudList().catch(err=>msg(err.message,'error'));};
  list.querySelectorAll('[data-load-cloud]').forEach(b=>b.onclick=()=>loadCloud(b.dataset.loadCloud));
  list.querySelectorAll('[data-manage-cloud]').forEach(b=>b.onclick=()=>selectCloud(b.dataset.manageCloud));
  const current=s.cloudEvent&&s.events.find(x=>x.id===s.cloudEvent.id);
