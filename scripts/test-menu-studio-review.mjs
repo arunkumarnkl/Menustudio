@@ -285,7 +285,7 @@ console.log('REVIEW CHECKS COMPLETE. Real browser, D1 and Word/PDF layout checks
 // Regression checks: production client PDF and persisted staff design themes.
 pass('Client PDF uses visible normal-flow capture rather than offscreen fixed position',
   client.includes("root.style.cssText='position:relative;display:block;width:210mm") &&
-  client.includes("document.body.appendChild(root);") &&
+  client.includes("$('rs-client-panel').appendChild(root);") &&
   !client.includes("left:-20000px"));
 pass('Staff theme selection persists to local style and updates preview',
   client.includes("if(typeof window.saveStyle==='function')window.saveStyle();") &&
