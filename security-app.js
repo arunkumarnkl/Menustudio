@@ -575,7 +575,7 @@ function attach(){
  $('rs-cloud')?.addEventListener('click',evt=>{if(evt.target===evt.currentTarget)closeCloud();});
  loadThemeGallery();
  // QR fetch is independent of staff login so client links show the exact printed QR.
- fetchFeedbackQR();fetchCompanyLogo();
+ fetchFeedbackQR();fetchCompanyLogo().catch(()=>{});
  if(initClient())return;
  const stored=JSON.parse(sessionStorage.getItem('raga_session')||'null');
  if(stored?.token && new Date(stored.expiresAt)>new Date()){
