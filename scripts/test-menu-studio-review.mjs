@@ -18,15 +18,55 @@ new vm.Script(client,{filename:'security-app.js'});
 new vm.Script(worker.replace('export default {','const stagedWorker = {'),{filename:'worker reference'});
 pass('JavaScript syntax: '+inlineCount+' inline scripts, client and Worker reference',inlineCount>=5);
 
-// Validate selected pure functions against realistic input data.
-const courseSrc=section('function courseDisplay(session,course){','function normalizeGroupService(session,course){');
-const course=vm.runInNewContext('('+courseSrc.trim()+')',{isCourseWise:s=>!!s.courseWise});
-assert.equal(course({courseWise:false},'Main Course'),'Mains Menu');
-assert.equal(course({courseWise:false},'Dessert'),'Desserts');
-pass('Non-plated main and dessert labels are independent',true);
-pass('Redundant General / Buffet Items removed',!html.includes('General / Buffet Items'));
-pass('A4 non-plated menu has distinct printed headings',html.includes('const collectionHtml=session&&!isCourseWise(session)?records.map'));
-pass('Plated and Buffet-Selective print restrictions exist',html.includes("if(mode==='Plated Service')allowed=['half-a4']")&&html.includes("if(mode==='Buffet-Selective'&&normalizeGroupService(session,category)==='Plated Service')allowed=['half-a4']"));
+// Evaluate real serving-style and print-routing functions without a browser.
+const modelCode=section('const RAGA_SESSION_MODES=','function defaultServiceTypes(session){');
+const routingCode=section('function ragaAllowedFormats(session,course){','function selectedEventSession(){');
+const modelCtx={
+  sessionKind:session=>session.kind||'custom',
+  eventRecords:[],
+  eventSessions:[],
+  state:{formatMenus:{},layout:'a4',event:{}},
+  MENU_FORMATS:['a4','a4-live','half-a4','a8-grid','foldtags-grid','a6-grid','canape-grid'],
+  ensureSessionServices:session=>session.courseServices||{},
+};
+vm.runInNewContext(modelCode+routingCode+ 'globalThis.rules={sessionChoices,sessionMode,availableCourses,courseDisplay,ragaEnsureStations,ragaRouteSessionItems,ragaAllowedFormats,ragaInitialFormats,effectiveItemFormats,normalizeEventFormatRecords};',modelCtx);
+const rules=modelCtx.rules;
+const offered=Array.from(rules.sessionChoices({id:'breakfast'}),row=>row[0]);
+assert.deepEqual(offered,['Buffet','Thali','Multi Stations','Plated Service','Bowl Food','Canapé','Live Station','Other']);
+pass('Every meal session offers all serving styles',true);
+for(const mode of ['Buffet','Thali']){
+  const session={id:'any-meal',serviceMode:mode,kind:'custom'};
+  assert.deepEqual(Array.from(rules.availableCourses(session)),['Other']);
+  assert.equal(rules.courseDisplay(session,'Other'),'General / Buffet Items');
+  assert.deepEqual(Array.from(rules.ragaInitialFormats(session,'Other')),['a4','foldtags-grid']);
+}
+pass('Buffet and Thali: one General section, A4 and FoldTags defaults',true);
+const stationSession={id:'lunch',serviceMode:'Regular Buffet',kind:'lunch'};
+assert.equal(rules.sessionMode(stationSession),'Multi Stations');
+assert.equal(rules.availableCourses(stationSession).length,6);
+assert.deepEqual(Array.from(rules.ragaInitialFormats(stationSession,'station:station-1')),['a4','foldtags-grid']);
+pass('Legacy Regular Buffet becomes six editable Multi Stations, each A4+FoldTags',true);
+const plated={id:'dinner',serviceMode:'Plated Service',kind:'dinner',courseServices:{Starter:'Plated Service','Main Course':'Buffet',Dessert:'Thali'}};
+assert.deepEqual(Array.from(rules.availableCourses(plated)),['Canapé','Live Station','Starter','Main Course','Dessert']);
+assert.deepEqual(Array.from(rules.ragaInitialFormats(plated,'Canapé')),['foldtags-grid']);
+assert.deepEqual(Array.from(rules.ragaAllowedFormats(plated,'Starter')),['half-a4']);
+assert.deepEqual(Array.from(rules.ragaInitialFormats(plated,'Main Course')),['a4','foldtags-grid']);
+assert.deepEqual(Array.from(rules.ragaInitialFormats(plated,'Live Station')),['a4-live']);
+pass('Plated courses route correctly: Table Menu Card, Canapé FoldTags, buffet A4/FoldTags and Live A4',true);
+modelCtx.eventSessions=[plated];
+modelCtx.eventRecords=[{eventUid:'1',sessionId:'dinner',name:'Starter One',menuCourse:'Starter',printFormats:['half-a4']},{eventUid:'2',sessionId:'dinner',name:'Main Two',menuCourse:'Main Course',printFormats:['a4','foldtags-grid']}];
+assert.equal(rules.ragaRouteSessionItems(plated,'Multi Stations'),true);
+assert.equal(modelCtx.eventRecords.length,2);
+assert.ok(modelCtx.eventRecords.every(row=>row.menuCourse.startsWith('station:')));
+assert.ok(modelCtx.eventRecords.every(row=>row.printFormats.includes('a4')&&row.printFormats.includes('foldtags-grid')));
+assert.equal(rules.ragaRouteSessionItems(plated,'Plated Service'),true);
+assert.equal(modelCtx.eventRecords[0].menuCourse,'Starter');
+assert.equal(modelCtx.eventRecords[1].menuCourse,'Main Course');
+pass('Switching meal style keeps dishes, restores plated categories and resets format defaults',true);
+pass('Unlimited station controls are present',html.includes("act==='add-station'")&&html.includes("act==='remove-station'")&&html.includes('function ragaAddCardStation')&&html.includes('function ragaRemoveCardStation'));
+pass('A4 and Word pages separate Multi Stations',html.includes("stationName:station.name")&&html.includes('fitPaginated(rows,subset=>makeBuffet(subset,session,stationName))')&&html.includes("if(stationName)parts.push(w.paragraph(stationName"));
+pass('Live Station A4 grouped and auto-paginated',html.includes('const makeLiveStation=')&&html.includes('fitPaginated(group.rows,subset=>makeLiveStation'));
+pass('Tag sheets separated by station/course',html.includes("if(isMultiStationMode(session)||isCourseWise(session))")&&html.includes('tagGroups.push({session,rows,course})'));
 
 pass('Allergen tick editors and confirmation present',html.includes('function ragaTickMarkup')&&html.includes('function ragaCardTicks')&&html.includes('data-raga-manual-check')&&html.includes('data-summary-allergen-field'));
 pass('Dish font 15 and allergen font 12 defaults',html.includes('dishNameFontSize:15, descFontSize:10, allergenFontSize:12'));
@@ -134,4 +174,13 @@ await publishContext.publish(false);
 assert.match(logoStatus.textContent,/Please select a company logo/);
 assert.equal(apiCalls,0);
 pass('Actual publisher displays status for expired/insufficient permissions and missing upload',true);
+// Repository audit safety checks: the browser build must exclude non-site source.
+const manifest=fs.readFileSync('scripts/build-menustudio.mjs','utf8');
+const pagesWorkflow=fs.readFileSync('.github/workflows/deploy-pages.yml','utf8');
+pass('Pages workflow publishes curated output only',pagesWorkflow.includes('path: dist/menustudio')&&!pagesWorkflow.includes('path: .\\n'));
+pass('Build excludes Python and reference Worker',manifest.includes("'index.html'")&&manifest.includes("'assets/company-logo.png'")&&!manifest.includes("'app.py'")&&!manifest.includes("'security/review-only-security-worker.js'"));
+pass('PO app source retained separately',fs.existsSync('app.py')&&fs.existsSync('requirements.txt'));
+pass('Old contradictory root release notes removed',!fs.existsSync('DEPLOY_README.md')&&!fs.existsSync('README_DEPLOY.md')&&!fs.existsSync('READ_ME_FIRST.txt')&&!fs.existsSync('README_UPDATE.txt'));
+pass('Repo audit and canonical README present',fs.existsSync('docs/REPOSITORY_AUDIT.md')&&fs.existsSync('README.md'));
+pass('App UI scrollbar size and larger controls scoped to screen',html.includes('id="raga-ux-scale-2026"')&&html.includes('width:4mm !important')&&html.includes('font-size:20px !important'));
 console.log('REVIEW CHECKS COMPLETE. Real browser, D1 and Word/PDF layout checks are required before production deployment.');
