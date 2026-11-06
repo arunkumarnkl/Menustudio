@@ -4826,26 +4826,29 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       }
       const summaryVisible=document.getElementById('tab-summary')&&!document.getElementById('tab-summary').classList.contains('hidden');
       if(summaryVisible)renderSummaryPaper();else renderPreview();
-      const source=summaryVisible?document.getElementById('summary-print-root'):document.getElementById('paper-render-target');
-      const originals=source?[...source.querySelectorAll('.print-sheet')]:[];
-      if(!originals.length){if(status)status.textContent='Nothing to save: choose a menu with pages first.';return false;}
-      const exportRoot=document.createElement('div');exportRoot.className='ragasaan-pdf-only';exportRoot.style.cssText='width:210mm;max-width:210mm;background:#fff;margin:0;padding:0;display:block';
-      originals.forEach((page,i)=>{
-        const copy=page.cloneNode(true);
-        copy.querySelectorAll('.no-print,[contenteditable]').forEach(n=>{
+      const exportRoot=document.createElement('div');
+      exportRoot.className='ragasaan-pdf-only';
+      exportRoot.style.cssText='position:fixed;left:0;top:0;z-index:2147483647;pointer-events:none;width:210mm;max-width:210mm;background:#fff;margin:0;padding:0;display:block';
+      document.body.appendChild(exportRoot);
+      // Render outside the hidden preview tab: its source sheets can measure 0x0.
+      if(summaryVisible){
+        const source=document.getElementById('summary-print-root');
+        for(const page of source?.querySelectorAll('.print-sheet')||[])exportRoot.appendChild(page.cloneNode(true));
+      }else{
+        renderPreview(exportRoot);
+      }
+      const sheets=[...exportRoot.querySelectorAll('.print-sheet')];
+      sheets.forEach((page,i)=>{
+        page.querySelectorAll('.no-print,[contenteditable]').forEach(n=>{
           if(n.classList.contains('no-print'))n.remove();
           else n.removeAttribute('contenteditable');
         });
-        copy.classList.remove('raga-preview-only-hidden');
-        copy.style.cssText+=';width:210mm!important;min-height:297mm;height:297mm;box-sizing:border-box;transform:none!important;display:block!important;margin:0!important;break-inside:avoid';
-        exportRoot.appendChild(copy);
-        if(i<originals.length-1){const br=document.createElement('div');br.className='html2pdf__page-break';exportRoot.appendChild(br);}
+        page.classList.remove('raga-preview-only-hidden');
+        page.style.cssText+=';width:210mm!important;min-height:297mm;height:297mm;box-sizing:border-box;transform:none!important;display:block!important;margin:0!important;break-inside:avoid';
+        if(i<sheets.length-1){const br=document.createElement('div');br.className='html2pdf__page-break';page.after(br);}
       });
-      // html2canvas cannot reliably rasterise elements positioned far outside the viewport.
-      // Keep the temporary export root in the viewport, behind the visible UI, while capturing.
-      exportRoot.style.position='fixed';exportRoot.style.left='0';exportRoot.style.top='0';
-      exportRoot.style.zIndex='2147483647';exportRoot.style.pointerEvents='none';
-      document.body.appendChild(exportRoot);
+      if(!sheets.length){exportRoot.remove();if(status)status.textContent='Nothing to save: choose a menu with pages first.';return false;}
+      window.__lastPdfExportMetrics={sheets:sheets.length,width:exportRoot.getBoundingClientRect().width,height:exportRoot.getBoundingClientRect().height,sheetWidth:sheets[0].getBoundingClientRect().width,sheetHeight:sheets[0].getBoundingClientRect().height};
       try{
         await window.html2pdf().set({
           margin:0,filename:(String(state.event.title||'Ragasaan_Menu').replace(/[^a-z0-9_-]+/gi,'_')||'Ragasaan_Menu')+'_'+(summaryVisible?'Event_Summary':state.layout)+'.pdf',
