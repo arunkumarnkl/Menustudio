@@ -56,6 +56,32 @@ async function publishFeedbackQR(remove=false){
     if(status)status.textContent=remove?'Official QR removed from all menu cards.':'Official QR published for all menu cards.';
   }catch(err){if(status)status.textContent='QR update failed: '+err.message;}
 }
+
+async function loadFeedbackCopy(){
+ if(s.user?.role!=='admin')return;
+ const content=await call('/admin/feedback-copy');
+ const cfg=state?.designs?.['half-a4'];if(cfg){
+   cfg.feedbackTitle=content.title||'We Value Your Feedback';
+   cfg.feedbackMessage=content.message||'Thank you for celebrating with us. Please scan the QR code below to share your experience.';
+   window.ragaSyncFeedbackCopyEditor?.();
+   if(state.layout==='half-a4')window.renderPreview?.();
+ }
+ const status=$('rs-feedback-copy-status');if(status)status.textContent='Shared guest feedback wording loaded.';
+}
+async function saveFeedbackCopy(){
+ const status=$('rs-feedback-copy-status');
+ if(s.user?.role!=='admin'){if(status)status.textContent='Administrator sign-in required.';return;}
+ const title=String($('raga-feedback-title-input')?.value||'').trim();
+ const message=String($('raga-feedback-message-input')?.value||'').trim();
+ if(!title||!message){if(status)status.textContent='Heading and message cannot be empty.';return;}
+ try{
+   const result=await call('/admin/feedback-copy','PUT',{title,message});
+   if(result?.updated!==true)throw Error('Security API did not confirm the saved wording');
+   if(status)status.textContent='Guest feedback wording saved to D1 and all menus.';
+   const cfg=state?.designs?.['half-a4'];if(cfg){cfg.feedbackTitle=title;cfg.feedbackMessage=message;}
+   window.renderPreview?.();
+ }catch(err){if(status)status.textContent='Feedback wording save failed: '+err.message;}
+}
 const CHOICE_NAMES={serviceModes:'Service types',mealSessions:'Meal sessions',menuCategories:'Menu categories',printFormats:'Menu / tag formats'};
 const CHOICE_LABELS={'a4':'Buffet Menu A4','a4-live':'Live Station A4','half-a4':'Table Menu Card','a8-grid':'A8 Tags','foldtags-grid':'FoldTags','a6-grid':'A6 Tags','canape-grid':'Canapé Labels'};
 let loadedChoiceOptions=null;
@@ -327,6 +353,9 @@ async function savePrintingRules(){
 }
 function showPublic(){
  closeAdminSettings();
+ // Shared event storage is staff-only. Client token holders must not be able
+ // to switch to the unrestricted Event Planner by removing URL fragments.
+ if(s.clientToken){document.body.classList.add('ragasaan-locked');return;}
  document.body.classList.remove('ragasaan-locked');
  $('ragasaan-auth-root')?.classList.remove('raga-client-on');
  const form=$('rs-login-form');if(form)form.hidden=false;
@@ -335,7 +364,7 @@ function showPublic(){
  document.querySelectorAll('[data-rs-admin],[data-rs-staff]').forEach(n=>n.hidden=true);
  const info=$('rs-user-info');if(info)info.textContent='Public event planning';
  loadChoiceOptions();loadMealDefaults();loadPrintingRules();
- refreshCloudList().catch(err=>msg('Unable to load shared events: '+err.message,'error'));
+ const list=$('rs-cloud-events');if(list)list.innerHTML='<p class="raga-help">Sign in as Event Planner or Admin to access shared cloud events. Local menu design remains available.</p>';
 }
 window.ragaOpenAdminLogin=function(){document.body.classList.add('ragasaan-locked');};
 function gateStatus(){const label=$('rs-user-info');if(label)label.textContent=s.user?`${s.user.name} · ${s.user.role==='admin'?'Administrator':'Event Planner'}`:'Not signed in';}
@@ -444,7 +473,8 @@ function renderCloudList(){
  drawSelected();ragaPendingClientDesigns();
 }
 async function refreshCloudList(){
- const path=(s.user?'/events':'/public/events')+(s.user&&s.cloudIncludeDeleted?'?includeArchived=1':'');
+ if(!s.user){const list=$('rs-cloud-events');if(list)list.innerHTML='<p class="raga-help">Event Planner or Admin sign-in required to view shared records.</p>';s.events=[];ragaPendingClientDesigns();return;}
+ const path='/events'+(s.cloudIncludeDeleted?'?includeArchived=1':'');
  const result=await call(path,'GET',undefined,!!s.user);
  s.events=Array.isArray(result.events)?result.events:[];
  renderCloudList();
@@ -499,16 +529,18 @@ function compactCloudSnapshot(raw){
  return cleaned;
 }
 async function saveCloud(){
+ if(!s.user||!['admin','planner'].includes(s.user.role)){msg('Sign in as Event Planner or Admin before saving to the shared D1 library.','error');return;}
  const snapshot=compactCloudSnapshot(eventSnapshot()),current=s.cloudEvent;
  const chosenName=String(snapshot.name||snapshot.title||'Event').trim();
  const payload={name:chosenName,eventDate:snapshot.date||'',venue:snapshot.venue||'',partyNo:snapshot.partyNo||'',eventData:snapshot};
  if(s.user?.role==='admin'){const planner=$('rs-event-planner');payload.plannerUserId=planner?.value||null;}
- if(!current){const r=await call(s.user?'/events':'/public/events','POST',payload,!!s.user);s.cloudEvent={id:r.id,...payload,status:'draft'};msg('Shared event created.');}
+ if(!current){const r=await call('/events','POST',payload,true);s.cloudEvent={id:r.id,...payload,status:'draft'};msg('Shared event created.');}
  else {const confirmed=confirm('Overwrite the selected cloud event with the current builder snapshot? This resets print approval.');if(!confirmed)return;
- await call((s.user?'/events/':'/public/events/')+current.id,'PUT',payload,!!s.user);msg('Shared event updated.');}
+ await call('/events/'+current.id,'PUT',payload,true);msg('Shared event updated.');}
  await refreshCloudList();
 }
-async function loadCloud(id){const x=await call((s.user?'/events/':'/public/events/')+id,'GET',undefined,!!s.user);if(!x.event)throw Error('Cloud event not found');
+async function loadCloud(id){if(!s.user)throw Error('Event Planner or Admin sign-in required.');
+ const x=await call('/events/'+id,'GET',undefined,true);if(!x.event)throw Error('Cloud event not found');
  // Loading a cloud snapshot also loads its approved client design. Keep local browser copy intact until confirmed.
  const remote=data(x.event.eventData);for(const fmt of FMT){if(remote.designs?.[fmt]){for(const k of ['logoUrl','coupleLogoUrl']){const v=remote.sharedImages?.[k==='logoUrl'?'companyLogo':'coupleLogo'];if(v&&!remote.designs[fmt][k])remote.designs[fmt][k]=v;}if(state.designs?.[fmt])for(const k of ['logoUrl','coupleLogoUrl','halfBackLeftImageUrl','halfBackRightImageUrl'])if(!remote.designs[fmt][k]&&state.designs[fmt][k])remote.designs[fmt][k]=state.designs[fmt][k];}}
  if(restoreEventSnapshot(remote)!==true)return;s.cloudEvent=x.event;s.activeTheme=x.event.eventData?.themeId||'';renderThemeGallery();s.loadedSnapshot=JSON.stringify(compactCloudSnapshot(eventSnapshot()));s.loadedRemote=JSON.stringify(x.event.eventData);
@@ -615,7 +647,12 @@ function exportThemes(){const blob=new Blob([JSON.stringify(savedThemes(),null,2
 async function importThemes(ev){const f=ev.target.files?.[0];if(!f)return;try{const raw=JSON.parse(await f.text());if(!Array.isArray(raw))throw Error('Expected a JSON array');const got=raw.map(validTheme).filter(Boolean),map=new Map(savedThemes().map(x=>[x.id,x]));for(const t of got)map.set(t.id,t);localStorage.setItem('ragasaan_custom_themes_v1',JSON.stringify([...map.values()]));renderThemeGallery();alert(`Imported ${got.length} valid themes`);}catch(err){alert('Theme import failed: '+err.message);}finally{ev.target.value='';}}
 function initClient(){const fragment=location.hash.match(/(?:^#|&)client=([a-f0-9]{64})/i);
  if(!fragment){$('rs-login-form').hidden=false;return false;}
- s.clientToken=fragment[1];$('ragasaan-auth-root').classList.add('raga-client-on');$('rs-login-form').hidden=true;$('rs-client-panel').hidden=false;openClient().catch(err=>{$('rs-client-panel').innerHTML=`<div class="raga-login-card"><h2>Client link unavailable</h2><p>${e(err.message)}</p></div>`;});return true;
+ s.clientToken=fragment[1];
+ // Fail closed before asynchronous /client/view: no staff navbar, cloud button,
+ // Admin interface or event builder may be visible on the client invitation URL.
+ document.body.classList.add('ragasaan-locked');
+ $('ragasaan-cloud')?.classList.remove('open');
+ $('ragasaan-admin')?.classList.remove('open');$('ragasaan-auth-root').classList.add('raga-client-on');$('rs-login-form').hidden=true;$('rs-client-panel').hidden=false;openClient().catch(err=>{$('rs-client-panel').innerHTML=`<div class="raga-login-card"><h2>Client link unavailable</h2><p>${e(err.message)}</p></div>`;});return true;
 }
 async function openClient(){const result=await call('/client/view','POST',{token:s.clientToken},false);s.clientEvent=result.event;
  s.clientAllowed=CLIENT_PRINT_FORMATS.filter(f=>Array.isArray(result.clientFormats)?result.clientFormats.includes(f):true);
@@ -670,7 +707,7 @@ async function clientLogo(evt){const file=evt.target.files?.[0];if(!file)return;
 async function submitClient(){if(!s.clientToken)return;
  const btn=$('rs-submit-design');btn.disabled=true;$('rs-client-notice').textContent='Submitting design…';
  try{const payload=data(s.clientDesign);if(!payload.coupleTitle){const couple=[payload.brideName,payload.groomName].filter(Boolean).join(' & ');payload.coupleTitle=couple||s.clientEvent.name||'';}const result=await call('/client/submit','POST',{token:s.clientToken,design:payload},false);
- $('rs-client-notice').textContent='Submitted successfully (revision stored). Your Event Planner can now review the design.';
+ $('rs-client-notice').textContent=result.applied===true?'Design saved immediately to the shared event. Your planner has an in-app review task; printing requires approval.':'Submission recorded. Your planner can review it; shared updates require the latest Security API.';
  }catch(err){$('rs-client-notice').textContent='Submission failed: '+err.message;}
  finally{btn.disabled=false;}
 }
