@@ -19,13 +19,14 @@ const mockEvents=Array.from({length:26},(_,i)=>({
  eventData:{plannerName:i%2?'Planner Two':'Planner One',items:[],sessions:[]}
 }));
 const errors=[];
+let clientApproved=false;
 function json(route,obj,status=200){return route.fulfill({status,contentType:'application/json',body:JSON.stringify(obj),headers:{'access-control-allow-origin':origin,'access-control-allow-headers':'*'}});}
 async function network(route){
  const request=route.request(),url=new URL(request.url()),path=url.pathname;
  if(url.pathname.endsWith('/html2pdf.bundle.min.js'))return route.fulfill({status:200,contentType:'application/javascript',body:readFileSync('node_modules/html2pdf.js/dist/html2pdf.bundle.min.js')});
  if(url.origin===origin)return route.continue();
  if(url.hostname==='ragasaan-security-api.arunkumarnkl.workers.dev'){
-   if(path==='/client/view')return json(route,{event:{name:'Private wedding',venue:'Event venue',eventDate:'2026-11-18',menu:[],sessions:[],items:[]},clientFormats:['half-a4','a4'],expiresAt:'2027-11-01T00:00:00Z',canPrint:false});
+   if(path==='/client/view')return json(route,{event:{name:'Private wedding',venue:'Event venue',eventDate:'2026-11-18',menu:[],sessions:[],items:[]},clientFormats:['half-a4','a4'],expiresAt:'2027-11-01T00:00:00Z',canPrint:clientApproved});
    if(path==='/me')return json(route,{id:'admin-1',email:'admin@test.invalid',name:'Test Admin',role:'admin'});
    if(path==='/events')return json(route,{events:mockEvents});
    if(path==='/users/planners'&&request.method()==='POST')return json(route,{id:'planner-created',role:'planner'},201);
@@ -63,6 +64,28 @@ try{
  await client.context.close();
  console.log('PASS Browser client token is isolated to design/preview, print disabled before approval');
 
+ // Approved client route: click a theme and download an actual PDF.
+ clientApproved=true;
+ const approved=await setupPage(false,'#client='+token);
+ await approved.page.locator('#rs-client-save-pdf').waitFor({state:'visible',timeout:30000});
+ assert.equal(await approved.page.locator('#rs-client-save-pdf').isEnabled(),true,'Approved client can download PDF');
+ const clientThemes=approved.page.locator('#rs-client-themes .raga-theme-card');
+ assert.ok(await clientThemes.count()>1,'Client theme presets rendered');
+ await clientThemes.nth(1).click();
+ assert.ok(await clientThemes.nth(1).evaluate(n=>n.classList.contains('active')),'Client theme click updates active style');
+ const clientSheets=await approved.page.locator('#rs-client-paper .print-sheet').count();
+ assert.ok(clientSheets>0,'Approved client has menu preview sheets');
+ const [clientDownload]=await Promise.all([
+   approved.page.waitForEvent('download',{timeout:120000}),
+   approved.page.locator('#rs-client-save-pdf').click()
+ ]);
+ const clientBytes=readFileSync(await clientDownload.path());
+ assert.ok(clientBytes.subarray(0,5).toString('ascii')==='%PDF-','Client PDF has correct file signature');
+ assert.ok(clientBytes.length>10000,'Client PDF may be blank: '+clientBytes.length+' bytes');
+ console.log('PASS Approved client changes theme and downloads actual PDF:',clientBytes.length,'bytes');
+ await approved.context.close();
+ clientApproved=false;
+
  const staff=await setupPage(true);
  const page=staff.page;
  await page.locator('#rs-open-cloud').click();
@@ -84,6 +107,24 @@ try{
  console.log('PASS Browser: Create Event Planner returns explicit confirmation');
  await page.locator('#rs-close-admin').click();
  console.log('PASS Browser: latest 20 cloud events, planner filter and standalone Admin settings');
+
+ // Staff theme click must update all print designs, persist in localStorage and survive reload.
+ await page.locator('#tab-btn-builder').click();
+ const staffThemes=page.locator('#rs-theme-gallery .raga-theme-card');
+ await staffThemes.first().waitFor({state:'visible',timeout:20000});
+ assert.ok(await staffThemes.count()>1,'Staff theme presets rendered');
+ await staffThemes.nth(1).click();
+ const savedTheme=await page.evaluate(()=>{
+   const saved=JSON.parse(localStorage.getItem('ragasaan_style_v3')||'{}');
+   return {selected:window.ragaActiveThemeId,design:saved.designs?.a4,current:state.designs.a4};
+ });
+ assert.ok(savedTheme.selected,'Selected theme recorded');
+ assert.equal(savedTheme.design.borderColor,savedTheme.current.borderColor,'Theme styling saved to local storage');
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.waitForTimeout(850);
+ const storedTheme=await page.evaluate(()=>JSON.parse(localStorage.getItem('ragasaan_style_v3')||'{}').designs?.a4?.borderColor);
+ assert.equal(storedTheme,savedTheme.current.borderColor,'Theme style persists after page reload');
+ console.log('PASS Staff theme selection updates format style and persists after reload');
 
  await page.evaluate(()=>{window.__printCount=0;window.print=()=>{window.__printCount++};});
  await page.evaluate(()=>{
