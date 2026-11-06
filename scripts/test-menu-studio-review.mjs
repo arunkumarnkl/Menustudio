@@ -108,4 +108,30 @@ pass('Expired Admin sessions receive visible response on publish',
 pass('Logo selection reports filename and size next to the button',
   client.includes("Selected '+file.name+' (") &&
   client.includes("Click Publish Company Logo to save for all users."));
+// Execute the actual publisher against mocked UI/auth data, not just source text.
+const publisherStart=client.indexOf('async function publishCompanyLogo(remove=false){');
+const publisherEnd=client.indexOf('async function loadChoiceOptions(){',publisherStart);
+assert.ok(publisherStart>=0&&publisherEnd>publisherStart,'Logo publishing function found');
+const logoStatus={textContent:''}, logoPublishBtn={disabled:false}, logoRemoveBtn={disabled:false};
+let apiCalls=0;
+const elements={'rs-company-status':logoStatus,'rs-company-publish':logoPublishBtn,'rs-company-remove':logoRemoveBtn,'rs-company-upload':{files:[]}};
+const publishContext={
+  s:{user:{role:'planner'}},
+  $:id=>elements[id],
+  msg(){},
+  confirm:()=>true,
+  ragaOptimiseCompanyLogo:async()=>{throw Error('Must not optimise for a planner');},
+  call:async()=>{apiCalls++;return {updated:true}},
+  fetchCompanyLogo:async()=>'',
+  window:{ragaClearPublishedCompanyLogo(){}},
+};
+vm.runInNewContext(client.slice(publisherStart,publisherEnd)+'globalThis.publish=publishCompanyLogo;',publishContext);
+await publishContext.publish(false);
+assert.match(logoStatus.textContent,/Only a signed-in Administrator/);
+assert.equal(apiCalls,0);
+publishContext.s.user.role='admin';
+await publishContext.publish(false);
+assert.match(logoStatus.textContent,/Please select a company logo/);
+assert.equal(apiCalls,0);
+pass('Actual publisher displays status for expired/insufficient permissions and missing upload',true);
 console.log('REVIEW CHECKS COMPLETE. Real browser, D1 and Word/PDF layout checks are required before production deployment.');
