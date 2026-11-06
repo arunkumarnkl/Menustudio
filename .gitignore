@@ -11,6 +11,8 @@
 *.json
 !database/
 !database/*.json
+!themes/
+!themes/*.json
 
 # Temporary / generated files
 .venv/
@@ -28,3 +30,11 @@ __pycache__/
 backups/
 backup/
 private/
+
+# Generated website/runtime files; never commit compiled release artefacts.
+dist/
+node_modules/
+coverage/
+.wrangler/
+.dev.vars
+.dev.vars.*
