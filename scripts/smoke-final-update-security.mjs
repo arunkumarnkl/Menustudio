@@ -1,6 +1,7 @@
 // Browser-only release checks for new access and export UX. The API is mocked.
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
+import {execFileSync} from 'node:child_process';
 
 const base=process.env.MENUSTUDIO_URL||'http://127.0.0.1:8765/';
 const chrome=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox']});
@@ -101,6 +102,31 @@ try{
  });
  assert.ok(bounds.visible&&bounds.right>bounds.left*2,'Final Preview uses most of the screen: '+JSON.stringify(bounds));
  console.log('PASS Browser: independent PDF download, no Print dialog, preview right pane',bounds);
+ // Generate an actual editable DOCX, inspect its OOXML to catch corrupted or
+ // misaligned column tables before any production publishing.
+ await page.evaluate(()=>{
+   const dinner=eventSessions.find(row=>row.id==='dinner')||eventSessions[0];
+   eventRecords.push({id:'docx-test',eventUid:'docx-test',sessionId:dinner.id,menuCourse:'Main Course',
+     name:'Test Wedding Pasta',desc:'Fresh Italian herbs',allergens:['Milk'],mayContain:['Eggs'],
+     printFormats:['half-a4'],tagCopies:{},manual:true});
+   normalizeEventFormatRecords();
+ });
+ const [wordDownload]=await Promise.all([
+   page.waitForEvent('download',{timeout:30000}),
+   page.evaluate(()=>window.RagasaanWordActions.exportFormatWord('half-a4'))
+ ]);
+ const wordPath=await wordDownload.path();
+ assert.ok(wordPath,'DOCX download available to browser');
+ const xml=execFileSync('unzip',['-p',wordPath,'word/document.xml'],{encoding:'utf8'});
+ assert.match(xml,/<w:document /);
+ assert.match(xml,/<w:tblLayout w:type="fixed"\/>/);
+ assert.match(xml,/<w:trHeight w:val="13100" w:hRule="atLeast"\/>/);
+ assert.match(xml,/<w:vAlign w:val="center"\/>/);
+ assert.match(xml,/<w:vAlign w:val="top"\/>/);
+ assert.match(xml,/Test Wedding Pasta/);
+ assert.match(xml,/Milk/);
+ assert.equal((xml.match(/<w:tbl>/g)||[]).length,2,'Table Menu front and reverse have two balanced tables');
+ console.log('PASS Browser-generated Word document opens as valid OOXML and includes aligned front/back table cards');
  await staff.context.close();
  // API mocks do not verify live Worker/D1, only browser presentation and contract usage.
  if(errors.length)console.log('Browser captured script exceptions:',errors.slice(0,6));
