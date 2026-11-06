@@ -4234,7 +4234,17 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         const perPage=fmt==='a8-grid'?10:fmt==='a6-grid'?4:8;
         const pageClass=fmt==='a8-grid'?'paper-a8-grid':fmt==='foldtags-grid'?'paper-foldtags-grid':fmt==='a6-grid'?'paper-a6-grid':'paper-canape-grid';
         const cardClass=fmt==='a8-grid'?'paper-a8-single':fmt==='foldtags-grid'?'paper-foldtags-single':fmt==='a6-grid'?'paper-a6-single':'paper-canape-single';
-        const tagGroups=eventSessions.map(session=>({session,rows:visibleItems.filter(row=>row.item.sessionId===session.id)})).filter(group=>group.rows.length);
+        const tagGroups=[];
+        eventSessions.forEach(session=>{
+          const mealRows=visibleItems.filter(row=>row.item.sessionId===session.id);
+          if(!mealRows.length)return;
+          if(isMultiStationMode(session)||isCourseWise(session)){
+            for(const course of availableCourses(session)){
+              const rows=mealRows.filter(row=>row.item.menuCourse===course);
+              if(rows.length)tagGroups.push({session,rows,course});
+            }
+          }else tagGroups.push({session,rows:mealRows,course:'Other'});
+        });
         for(const {session:tagSession,rows:tagRows} of (tagGroups.length?tagGroups:[{session:null,rows:[]}])) {
         const n=Math.max(1,Math.ceil(tagRows.length/perPage));
         for(let j=0;j<n;j++) {
