@@ -90,6 +90,7 @@ try{
   previewCount:document.querySelectorAll('#paper-render-target .print-sheet').length
  }));
  await tp.locator('#rs-theme-gallery .raga-theme-card').nth(1).click();
+ await tp.waitForFunction(()=>document.getElementById('raga-theme-status')?.textContent.includes('applied')&&document.querySelector('#paper-render-target')?.innerHTML.includes(state.designs.a4.accentColor));
  const themeAfter=await tp.evaluate(()=>({
   active:window.ragaActiveThemeId,
   activeCard:document.querySelector('#rs-theme-gallery .raga-theme-card.active')?.innerText,
