@@ -1,15 +1,22 @@
 name: Menu Studio review checks (no deployment)
 on:
-  push:
-    branches:
-      - menu-studio-completion-2026-11-06
   pull_request:
     paths:
       - index.html
       - security-app.js
       - security/**
-      - scripts/test-menu-studio-review.mjs
+      - scripts/**
+      - .github/workflows/**
+      - wrangler.toml
+      - .gitignore
+      - docs/**
+      - README.md
   workflow_dispatch:
+
+# Avoid redundant push + pull-request runs and cancel stale checks.
+concurrency:
+  group: menustudio-review-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
