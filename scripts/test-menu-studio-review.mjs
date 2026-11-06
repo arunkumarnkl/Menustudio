@@ -289,6 +289,8 @@ pass('Client PDF uses visible normal-flow capture rather than offscreen fixed po
   client.includes("root.id='raga-client-pdf-export'") &&
   securityCss.includes('body.ragasaan-locked > #raga-client-pdf-export.raga-client-pdf-export') &&
   !client.includes("left:-20000px"));
-pass('Staff theme selection persists to local style and updates preview',
-  client.includes("if(typeof window.saveStyle==='function')window.saveStyle();") &&
-  client.includes("renderContextualControls();renderPreview();renderThemeGallery();"));
+pass('Staff theme selection persists compact styles and schedules preview rendering reliably',
+  client.includes("window.saveThemeStyles()") &&
+  client.includes("markThemeSelected($('rs-theme-gallery'),id)") &&
+  client.includes("staffThemeFrame=requestAnimationFrame(") &&
+  client.includes("renderContextualControls();renderPreview();"));
