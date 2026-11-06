@@ -42,6 +42,7 @@ jobs:
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 --directory dist/menustudio >/tmp/menustudio-http.log 2>&1 &
           node scripts/smoke-menu-studio-browser.mjs
+          node scripts/smoke-final-update-security.mjs
       - name: Save browser screenshots for release review
         if: always()
         uses: actions/upload-artifact@v4
