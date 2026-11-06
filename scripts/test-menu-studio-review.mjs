@@ -183,4 +183,52 @@ pass('PO app source retained separately',fs.existsSync('app.py')&&fs.existsSync(
 pass('Old contradictory root release notes removed',!fs.existsSync('DEPLOY_README.md')&&!fs.existsSync('README_DEPLOY.md')&&!fs.existsSync('READ_ME_FIRST.txt')&&!fs.existsSync('README_UPDATE.txt'));
 pass('Repo audit and canonical README present',fs.existsSync('docs/REPOSITORY_AUDIT.md')&&fs.existsSync('README.md'));
 pass('App UI scrollbar size and larger controls scoped to screen',html.includes('id="raga-ux-scale-2026"')&&html.includes('width:4mm !important')&&html.includes('font-size:20px !important'));
+
+// One official colourful light app theme, with separate menu-design themes.
+const securityCss=fs.readFileSync('security.css','utf8');
+pass('The dark application theme selector is removed and old dark settings are ignored',
+  !html.includes('id="header-app-theme"') &&
+  html.includes('class="app-light h-full') &&
+  html.includes("state.appTheme='light'") &&
+  html.includes("applySharedLogos(); applyAppTheme('light')"));
+pass('The same colourful light UI extends across staff, admin, cloud and client panels',
+  securityCss.includes('SINGLE COLORFUL APPLICATION THEME') &&
+  securityCss.includes('body.app-light #tab-builder') &&
+  securityCss.includes('body.app-light #tab-export') &&
+  securityCss.includes('body.app-light .raga-login-card') &&
+  securityCss.includes('body.app-light .raga-cloud-sheet'));
+
+// Test actual title/sentence/case logic; keep allergen database strings untouched.
+const caseFunctions=section('const RAGA_CASE_OPTIONS=', 'function showStartupLogos() {');
+const caseContext={state:{layout:'a4',designs:{a4:{
+ dishTextCase:'title',descriptionTextCase:'sentence',allergenTextCase:'upper'
+}}}};
+vm.runInNewContext(caseFunctions+'globalThis.textCase={ragaFormatTypography,ragaDisplayText};',caseContext);
+assert.equal(caseContext.textCase.ragaFormatTypography('MILK and egg','title'),'Milk And Egg');
+assert.equal(caseContext.textCase.ragaFormatTypography('MILK and egg','upper'),'MILK AND EGG');
+assert.equal(caseContext.textCase.ragaFormatTypography('MILK and egg','lower'),'milk and egg');
+assert.equal(caseContext.textCase.ragaFormatTypography('MILK and egg','original'),'MILK and egg');
+assert.equal(caseContext.textCase.ragaFormatTypography('milk and EGGS. may CONTAIN sesame','sentence'),
+  'Milk and eggs. May contain sesame');
+assert.equal(caseContext.textCase.ragaDisplayText('Milk and Eggs','allergen'),'MILK AND EGGS');
+pass('Real capitalization formatter supports all five choices per print format',true);
+pass('Manual item forms apply chosen casing while checkboxes retain canonical allergen values',
+  html.includes("ragaDisplayText(get('manual-name'),'dish')") &&
+  html.includes("ragaDisplayText(get('name')?.value.trim()||'','dish')") &&
+  html.includes("value=\"'+safe(v)+'\"") &&
+  html.includes("safe(ragaDisplayText(v,'allergen'))"));
+pass('Allergen print/preview uses bold, dark-red #8B1E20 and separate amber may-contain',
+  html.includes('class="raga-declared-allergens"') &&
+  html.includes('style="color:#8B1E20;font-weight:800"') &&
+  html.includes('class="raga-maycontain-allergens"') &&
+  html.includes('style="color:#704600;font-weight:650"') &&
+  html.includes('id="ragasaan-allergen-print-emphasis"') &&
+  html.includes('print-color-adjust:exact'));
+pass('A4 event summary and client preview also use bold dark-red allergen styling',
+  html.includes('.summary-item-allergens{color:#8B1E20;font-weight:800}') &&
+  securityCss.includes('color:#8B1E20;font-weight:800'));
+pass('Editable Word menus and summary export emphasize allergens in dark red',
+  html.includes("w.paragraph(a.join(', '),{bold:true,color:'8B1E20'") &&
+  html.includes("w.paragraph(m.join(', '),{bold:true,color:'704600'") &&
+  html.includes("color:allergens.length?'8B1E20':'555555'"));
 console.log('REVIEW CHECKS COMPLETE. Real browser, D1 and Word/PDF layout checks are required before production deployment.');
