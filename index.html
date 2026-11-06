@@ -1833,13 +1833,13 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <div id="raga-quick-dishes" class="space-y-1 max-h-48 overflow-y-auto" aria-live="polite"></div>
           </div>
           <div id="manual-add-controls" class="hidden space-y-2 text-xs">
-            <input id="manual-name" placeholder="Dish name *" aria-label="Dish name" class="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white">
+            <input id="manual-name" placeholder="Dish name *" aria-label="Dish name" onblur="ragaFormatManualField(this,'dish')" class="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white">
             <div class="grid grid-cols-2 gap-2">
               <input id="manual-category" list="manual-categories" placeholder="Source category (optional)" class="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white">
               <datalist id="manual-categories"><option value="Starter"><option value="Main Course"><option value="Dessert"><option value="Canapés"><option value="Other"></datalist>
               <input id="manual-subcategory" placeholder="Sub-category (optional)" class="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white">
             </div>
-            <textarea id="manual-description" rows="2" placeholder="Description (optional)" class="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white"></textarea>
+            <textarea id="manual-description" rows="2" placeholder="Description (optional)" onblur="ragaFormatManualField(this,'description')" class="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white"></textarea>
             <button type="button" onclick="addManualDishToMenu()" class="w-full py-2.5 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shadow"><i class="fa-solid fa-plus mr-1"></i> Add Item to This Meal</button>
             <p id="manual-add-feedback" role="status" aria-live="polite" class="text-[11px] text-emerald-400 hidden"></p>
             <details class="border border-slate-800 rounded-lg p-2" open><summary class="cursor-pointer text-amber-400 font-semibold">Allergens (UK 14)</summary><div id="manual-allergens" class="grid grid-cols-2 gap-1 pt-2"></div></details>
@@ -3134,6 +3134,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       // Each dimension receives its own settings, not merely a shared A4 width slider.
       state.designs = Object.fromEntries(MENU_FORMATS.map(fmt => [fmt, {
         ...template, titleFontSize:10, dishNameFontSize:15, descFontSize:10, allergenFontSize:12, autoFitText:true,
+        dishTextCase:'title',descriptionTextCase:'sentence',allergenTextCase:'title',
         logoWidth: 110, menuHeading:'Menu', feedbackTitle:'We Value Your Feedback', feedbackMessage:'Thank you for celebrating with us. Please scan the QR code below to share your experience.',
         coupleLogoWidth: 100, borderOutsetCm:0.2, coupleOffsetX:0, coupleOffsetY:0, showDescription:false,
         foldTagsBottomHeightCm:3, foldTagsDividerWidthMm:0.3, foldTagsDividerColor:'#8f8572', foldTagsPanelInsetMm:2.5, foldTagsLogoWidth:100,
@@ -3263,7 +3264,33 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       document.body.classList.add('app-light');
       saveStyle();
     }
-    function showStartupLogos() { document.getElementById('startup-logos')?.classList.remove('hidden'); }
+
+    // Presentation only: never alter canonical allergen identities or master-database values.
+    const RAGA_CASE_OPTIONS=['title','upper','sentence','lower','original'];
+    function ragaFormatTypography(value,mode='title'){
+      const str=String(value??'');
+      const lower=str.toLocaleLowerCase('en-GB');
+      switch(mode){
+        case 'upper':return str.toLocaleUpperCase('en-GB');
+        case 'lower':return lower;
+        case 'sentence':return lower.replace(/(^|[.!?]\s+|\n+)(\s*['"“‘(]*)(\p{L})/gu,(_,prefix,punct,letter)=>prefix+punct+letter.toLocaleUpperCase('en-GB'));
+        case 'title':return lower.replace(/(^|[\s/()\-–—:;,.!?])(\p{L})/gu,(_,prefix,letter)=>prefix+letter.toLocaleUpperCase('en-GB'));
+        default:return str;
+      }
+    }
+    function ragaTypographyMode(kind,format=state.layout){
+      const design=state.designs?.[format]||state.design||{};
+      const prop=kind==='dish'?'dishTextCase':kind==='allergen'?'allergenTextCase':'descriptionTextCase';
+      const fallback=kind==='description'?'sentence':'title';
+      return RAGA_CASE_OPTIONS.includes(design[prop])?design[prop]:fallback;
+    }
+    function ragaDisplayText(value,kind='dish',format=state.layout){
+      return ragaFormatTypography(value,ragaTypographyMode(kind,format));
+    }
+    function ragaFormatManualField(field,kind='dish'){
+      if(field&&typeof field.value==='string')field.value=ragaDisplayText(field.value,kind);
+    }
+        function showStartupLogos() { document.getElementById('startup-logos')?.classList.remove('hidden'); }
     function closeStartupLogos() { document.getElementById('startup-logos')?.classList.add('hidden'); localStorage.setItem('ragasaan_initial_setup_v1','1'); saveStyle(); }
     function syncFormatLabels() {
       const label = document.getElementById('preview-format-label');
@@ -3340,6 +3367,12 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
             ${fontSlider('descFontSize','Description Size')}
             ${fontSlider('allergenFontSize','Allergen Text Size')}
           </div>
+          <div class="grid grid-cols-2 gap-3">
+            ${[['dishTextCase','Dish Name Capitalization'],['descriptionTextCase','Description Capitalization'],['allergenTextCase','Allergen Text Capitalization']].map(([key,title])=>`<label class="text-slate-400">${title}<select class="w-full mt-1 bg-slate-900 border border-slate-700 rounded p-2 text-white" onchange="state.design['${key}']=this.value;renderPreview();window.ragaRenderMealCards?.()">
+              ${[['title','Title Case'],['upper','UPPERCASE'],['sentence','Sentence case'],['lower','lowercase'],['original','As entered']].map(([value,name])=>`<option value="${value}" ${(d[key]|| (key==='descriptionTextCase'?'sentence':'title'))===value?'selected':''}>${name}</option>`).join('')}
+            </select></label>`).join('')}
+          </div>
+          <p class="text-[10px] text-slate-500">This menu-format setting changes displayed letters only. Declared and may-contain allergen identities stay unchanged.</p>
           <label class="flex items-start gap-2 text-amber-300"><input type="checkbox" ${d.autoFitText!==false?'checked':''} onchange="state.design.autoFitText=this.checked;renderPreview()"> <span><b>Auto-fit text to the page</b><span class="block text-[10px] text-slate-400">Shrinks all text proportionally when needed. If the minimum readable size is reached, creates extra pages instead of hiding dishes.</span></span></label>
           <label class="block text-slate-400"><input type="checkbox" ${d.showDescription===true?'checked':''} onchange="state.design.showDescription=this.checked;renderPreview()"> Show menu descriptions on this format</label>
 
