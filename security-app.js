@@ -410,12 +410,12 @@ function ragaCanDeleteCloud(x){
  return s.user.role==='planner'&&(x.plannerUserId===s.user.id||x.createdBy===s.user.id);
 }
 function ragaPendingClientDesigns(){
- const pending=s.events.filter(row=>row.status==='review'&&!row.deletedAt);
+ const pending=s.events.filter(row=>(row.status==='review'||(row.status==='approved'&&row.clientDesignUpdatedAt))&&!row.deletedAt);
  const badge=$('rs-client-pending-badge');
- if(badge){badge.hidden=!s.user||!pending.length;badge.textContent='Design tasks: '+pending.length;}
+ if(badge){badge.hidden=!s.user||!pending.length;badge.textContent='Client designs: '+pending.length;}
  const pane=$('rs-pending-designs');if(!pane)return;
  pane.innerHTML=pending.length?pending.map(x=>
-  '<div class="raga-list-item raga-pending-task"><div class="raga-cloud-one-line"><strong>'+e(x.name)+'</strong><small>'+e(ragaPlannerName(x))+' · Pending client review</small></div><div class="raga-actions"><button type="button" class="raga-btn" data-pending-review="'+e(x.id)+'">Review Design</button><button type="button" class="raga-btn primary" data-pending-print="'+e(x.id)+'">Review &amp; Print</button></div></div>'
+  '<div class="raga-list-item raga-pending-task"><div class="raga-cloud-one-line"><strong>'+e(x.name)+'</strong><small>'+e(ragaPlannerName(x))+' · '+(x.status==='approved'?'Ready to print':'Pending client review')+'</small></div><div class="raga-actions"><button type="button" class="raga-btn" data-pending-review="'+e(x.id)+'">Review Design</button><button type="button" class="raga-btn primary" data-pending-print="'+e(x.id)+'">Review &amp; Print</button></div></div>'
  ).join(''):'<p class="raga-help">No pending client designs.</p>';
  pane.querySelectorAll('[data-pending-review]').forEach(button=>button.onclick=async()=>{
    selectCloud(button.dataset.pendingReview);await loadSubmissions();
