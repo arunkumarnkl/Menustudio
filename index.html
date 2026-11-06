@@ -1239,10 +1239,12 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     }
     function pageBreak(){return '<w:p><w:r><w:br w:type="page"/></w:r></w:p>';}
     function table(columns, opts={}){
-      const width=Math.floor((opts.width||9800)/columns.length);
+      const total=opts.width||9800,width=Math.floor(total/columns.length);
       const grid=columns.map(()=>`<w:gridCol w:w="${width}"/>`).join('');
-      const cells=columns.map(body=>`<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="dxa"/><w:vAlign w:val="top"/><w:tcMar><w:top w:w="80" w:type="dxa"/><w:left w:w="140" w:type="dxa"/><w:bottom w:w="80" w:type="dxa"/><w:right w:w="140" w:type="dxa"/></w:tcMar></w:tcPr>${body||paragraph(' ')} </w:tc>`).join('');
-      return `<w:tbl><w:tblPr><w:tblW w:w="${opts.width||9800}" w:type="dxa"/><w:tblLayout w:type="fixed"/>${opts.border?'<w:tblBorders><w:insideV w:val="single" w:sz="4" w:color="D9C7AA"/></w:tblBorders>':''}</w:tblPr><w:tblGrid>${grid}</w:tblGrid><w:tr>${cells}</w:tr></w:tbl>`;
+      const valign=Array.isArray(opts.alignVertical)?opts.alignVertical:[];
+      const cells=columns.map((body,i)=>`<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="dxa"/><w:vAlign w:val="${['top','center','bottom'].includes(valign[i])?valign[i]:'top'}"/><w:tcMar><w:top w:w="125" w:type="dxa"/><w:left w:w="180" w:type="dxa"/><w:bottom w:w="125" w:type="dxa"/><w:right w:w="180" w:type="dxa"/></w:tcMar></w:tcPr>${body||paragraph(' ')}</w:tc>`).join('');
+      const height=Number(opts.minHeightTwips)||0;
+      return `<w:tbl><w:tblPr><w:tblW w:w="${total}" w:type="dxa"/><w:tblInd w:w="0" w:type="dxa"/><w:tblLayout w:type="fixed"/><w:tblCellSpacing w:w="0" w:type="dxa"/>${opts.border?'<w:tblBorders><w:insideV w:val="single" w:sz="4" w:color="D9C7AA"/></w:tblBorders>':''}</w:tblPr><w:tblGrid>${grid}</w:tblGrid><w:tr><w:trPr><w:cantSplit/>${height?'<w:trHeight w:val="'+height+'" w:hRule="atLeast"/>':''}</w:trPr>${cells}</w:tr></w:tbl>`;
     }
     function image(dataUrl, widthPx=160, heightPx=160){
       const matched=String(dataUrl||'').match(/^data:image\/(png|jpe?g);base64,([A-Za-z0-9+/=]+)$/i);
@@ -1677,7 +1679,49 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   #summary-print-root .summary-item-may {color:#704600!important;font-weight:650!important;}
 }
 </style>
-</head>
+
+<style id="raga-final-export-layout">
+@media screen and (min-width:850px){
+ body:has(#tab-export:not(.hidden)) #sidebar-controls.print-format-compact{width:20%!important;flex:0 0 20%!important;min-width:240px!important;max-width:27%!important;border-right:1px solid #cbd5e1!important}
+ body:has(#tab-export:not(.hidden)) #preview-main-panel{width:80%!important;flex:1 1 80%!important;min-width:0!important}
+ body:has(#tab-export:not(.hidden)) #preview-scroll-area{padding:14px!important}
+}
+@media screen and (max-width:849px){
+ body:has(#tab-export:not(.hidden)) #sidebar-controls.print-format-compact{width:35%!important;min-width:180px!important;max-width:35%!important;flex:0 0 35%!important}
+ body:has(#tab-export:not(.hidden)) #preview-main-panel{flex:1 1 65%!important;min-width:0!important}
+ body:has(#tab-export:not(.hidden)) #preview-scroll-area{padding:6px!important}
+}
+@media screen{
+ #tab-export{gap:7px!important}
+ #tab-export .grid.grid-cols-2.gap-1.pt-0{display:flex!important;flex-wrap:wrap!important;justify-content:flex-start!important;gap:7px!important}
+ #tab-export button[onclick*="downloadPDF"],#tab-export button[onclick*="triggerPrint"]{width:1cm!important;height:.5cm!important;min-width:1cm!important;min-height:.5cm!important;max-width:1cm!important;max-height:.5cm!important;padding:0!important;font-size:0!important;line-height:1!important;position:relative!important;overflow:visible!important}
+ #tab-export button[onclick*="downloadPDF"] i,#tab-export button[onclick*="triggerPrint"] i{font-size:10px!important;line-height:.5cm!important;margin:0!important}
+ #tab-export button[onclick*="downloadPDF"]::after,#tab-export button[onclick*="triggerPrint"]::after{content:'';position:absolute;inset:-7px -3px}
+ #raga-print-studio-preview-controls{background:#eaf4ff!important;color:#273853!important;border-color:#abc2dd!important;padding:6px!important;gap:5px!important}
+ #raga-print-studio-preview-controls strong{color:#4c397f!important}
+ #raga-print-studio-preview-controls small{color:#405574!important;font-size:10px!important}
+ #raga-print-studio-preview-controls .raga-page-button{padding:3px 6px!important;font-size:11px!important}
+ #preview-main-panel,#preview-scroll-area{background:#f8f6ff!important}
+}
+@media print{#ragasaan-admin,#ragasaan-cloud,#raga-print-studio-preview-controls{display:none!important}}
+</style>
+<style id="raga-library-final-styles">
+@media screen{
+ .raga-cloud-record{border:1px solid #d4daec!important;background:#fff!important;padding:0!important;margin-bottom:5px!important}
+ .raga-cloud-record>summary{cursor:pointer;list-style:disclosure-closed;padding:7px 10px;min-height:30px}
+ .raga-cloud-record[open]>summary{border-bottom:1px solid #dae0ef;background:#f5f5ff!important}
+ .raga-cloud-one-line{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:nowrap;font-size:12px;color:#304163!important}
+ .raga-cloud-one-line>strong{flex:1 1 36%;min-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .raga-cloud-one-line>span,.raga-cloud-one-line>small{flex:0 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .raga-cloud-details{padding:10px 12px;background:#fff}
+ .raga-cloud-filters{background:#f4f3ff!important}
+ .raga-cloud-filters label{font-size:13px}
+ .raga-pending-task{border-left:3px solid #7859ae!important}
+ #rs-client-pending-badge{background:#f2e8ff;border:1px solid #a28bd9;color:#39236b;cursor:pointer;font-size:11px;font-weight:700;border-radius:8px;padding:7px}
+ #ragasaan-admin .raga-cloud-sheet{max-width:1300px}
+ #ragasaan-admin .raga-panel{scroll-margin-top:15px}
+}
+</style></head>
 <body class="app-light h-full flex flex-col font-sans antialiased overflow-hidden">
 
   <!-- Top Navigation Bar -->
@@ -1714,6 +1758,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 
     <!-- Quick Actions -->
     <div class="flex items-center gap-2">
+      <button type="button" id="rs-client-pending-badge" class="raga-btn" hidden aria-label="Pending client designs">Design tasks</button>
       <button type="button" id="rs-open-cloud" class="px-3 py-1.5 bg-slate-800 border border-amber-800 text-amber-300 font-semibold rounded-lg text-xs">☁ Cloud Events</button>
       <button type="button" data-rs-admin hidden id="rs-open-admin-qr" class="px-3 py-1.5 bg-slate-800 border border-amber-800 text-amber-300 font-semibold rounded-lg text-xs">⚙ Admin Settings</button>
       <span id="rs-user-info" class="text-[10px] text-slate-300"></span>
@@ -1932,7 +1977,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 
 
       <!-- TAB 3: PRINT & EXPORT STUDIO -->
-      <div id="tab-export" class="tab-content hidden flex-1 flex flex-col overflow-y-auto p-2 gap-2">
+      <div id="tab-export" class="tab-content hidden flex-1 flex flex-col overflow-y-auto p-2 gap-2"><p id="raga-pdf-status" class="raga-small no-print" role="status" aria-live="polite"></p>
         <div>
           <h2 class="text-sm font-semibold text-slate-200">Print & Downloads</h2>
           <p class="text-xs text-slate-400">Print, save as PDF, or download editable Word for A4 Buffet and Table Menu Card</p>
@@ -1948,17 +1993,6 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           </div>
           <small style="color:#cbd5e1">Choose a page to inspect. Print/PDF includes all pages regardless of selection.</small>
         </section>
-        <details id="raga-feedback-copy-editor" class="no-print bg-slate-950 px-3 py-2 rounded-lg border border-slate-800 space-y-2">
-          <summary class="text-xs font-semibold text-gold-400 cursor-pointer">Table Menu Card — Edit Guest Feedback Text</summary>
-          <p class="text-[11px] text-slate-400">These fields are editable even before an Admin QR is published. The back-page preview and Word export use this wording.</p>
-          <label class="block text-xs text-slate-300">Heading
-            <input id="raga-feedback-title-input" type="text" oninput="ragaUpdateFeedbackCopy('feedbackTitle',this.value)" class="block w-full mt-1 p-2 bg-slate-900 border border-slate-700 rounded text-white">
-          </label>
-          <label class="block text-xs text-slate-300">Message
-            <textarea id="raga-feedback-message-input" rows="3" oninput="ragaUpdateFeedbackCopy('feedbackMessage',this.value)" class="block w-full mt-1 p-2 bg-slate-900 border border-slate-700 rounded text-white"></textarea>
-          </label>
-          <button type="button" onclick="setLayout('half-a4')" class="raga-page-button">Preview Table Menu Card</button>
-        </details>
         <!-- Buffet Menu (A4) -->
         <div class="bg-slate-950 px-2 py-2 rounded-lg border border-slate-800 space-y-1">
           <div class="flex items-center justify-between">
@@ -2519,12 +2553,19 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       const sidebar = document.getElementById('sidebar-controls');
       const master = document.getElementById('tab-master');
       // Full-page meal planning. Only Styling & Graphics displays the live canvas beside controls.
-      sidebar.classList.remove('print-format-compact');
-      sidebar.classList.toggle('workspace-wide', tabId === 'builder' || tabId === 'export');
+      sidebar.classList.toggle('print-format-compact',tabId==='export');
+      sidebar.classList.toggle('workspace-wide', tabId === 'builder');
       sidebar.classList.toggle('hidden', tabId === 'master' || tabId === 'venues' || tabId === 'summary');
       master.classList.toggle('master-preview-split', tabId === 'master');
       previewMain.classList.toggle('hidden', tabId !== 'design' && tabId !== 'export');
-      if(tabId==='export')ragaSyncFeedbackCopyEditor();
+      if(tabId==='export')requestAnimationFrame(()=>{
+        const area=document.getElementById('preview-scroll-area'),sheet=document.querySelector('#paper-render-target .print-sheet');
+        if(area&&sheet){
+          state.zoom=Math.min(.98,Math.max(.32,(area.clientWidth-46)/(sheet.offsetWidth||794)));
+          document.getElementById('print-canvas-wrapper').style.transform='scale('+state.zoom+')';
+          const label=document.getElementById('zoom-level-text');if(label)label.textContent=Math.round(state.zoom*100)+'%';
+        }
+      });
       if (tabId === 'master') renderMasterDB();
       else if (tabId === 'venues') renderVenueDB();
       else if (tabId === 'summary') {if(!includeClientSummary){setClientSummaryEnabled(true);}renderEventSummary();}
@@ -2868,18 +2909,22 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     
     function ragaAllowedFormats(session,course){
       const mode=sessionMode(session);
+      let formats;
       if(mode==='Plated Service'){
-        if(course==='Canapé')return ['canape-grid','a8-grid','a6-grid','foldtags-grid'];
-        if(course==='Live Station')return ['a4-live'];
-        return normalizeGroupService(session,course)==='Plated Service'?['half-a4']:['a4','foldtags-grid','a8-grid','a6-grid','canape-grid'];
-      }
-      if(mode==='Canapé')return ['canape-grid','a8-grid','a6-grid','foldtags-grid'];
-      if(mode==='Live Station')return ['a4-live'];
-      return [...RAGA_LABEL_FORMATS];
+        if(course==='Canapé')formats=['canape-grid','a8-grid','a6-grid','foldtags-grid'];
+        else if(course==='Live Station')formats=['a4-live'];
+        else formats=normalizeGroupService(session,course)==='Plated Service'?['half-a4']:['a4','foldtags-grid','a8-grid','a6-grid','canape-grid'];
+      }else if(mode==='Canapé')formats=['canape-grid','a8-grid','a6-grid','foldtags-grid'];
+      else if(mode==='Live Station')formats=['a4-live'];
+      else formats=[...RAGA_LABEL_FORMATS];
+      // Table Menu Card is an optional EXTRA for Dinner regardless of serving style;
+      // adding it here must not silently make it a default for Buffet/Thali/Stations.
+      if(sessionKind(session)==='dinner'&&!formats.includes('half-a4'))formats.push('half-a4');
+      return formats;
     }
     function ragaInitialFormats(session,course){
       const allowed=ragaAllowedFormats(session,course);
-      if(allowed.includes('half-a4'))return ['half-a4'];
+      if(sessionMode(session)==='Plated Service'&&['Starter','Main Course','Dessert'].includes(course)&&normalizeGroupService(session,course)==='Plated Service')return ['half-a4'];
       if(allowed.includes('a4-live'))return ['a4-live'];
       if(sessionMode(session)==='Canapé'||course==='Canapé')return ['foldtags-grid'];
       return ['a4','foldtags-grid'].filter(fmt=>allowed.includes(fmt));
@@ -3421,7 +3466,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
               <label class="block text-slate-400"><input type="checkbox" ${d.showCoupleLogo?'checked':''} onchange="state.design.showCoupleLogo=this.checked;renderPreview()"> Display Logo</label>
               ${compactNumber('coupleLogoWidth','Bride/Groom Logo Width (px)',100,400)}
               ${compactNumber('coupleOffsetX','Horizontal position (px)',-120,120)}
-              ${compactNumber('coupleOffsetY','Vertical position (px)',-100,100)}
+              ${compactNumber('coupleOffsetY','Vertical position (px)',0,200)}
             </div>` : ''}
         </details>
         ${state.layout==='foldtags-grid'?`<details data-compact="foldtags" class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-3 text-xs">
@@ -4233,13 +4278,13 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           groups.forEach(({session,rows,stationName})=>fitPaginated(rows,subset=>makeBuffet(subset,session,stationName)));
         }else fitPaginated([],subset=>makeBuffet(subset,null));
       } else if(fmt==='a4-live') {
-        const makeLiveStation=(records,session,stationName)=>{
+        const makeLiveStation=(records,session,stationName,stationId)=>{
           const p=page();p.style.padding=`${Math.max(2.5,Number(d.borderOutsetCm)+.5)}cm`;
           p.style.paddingTop=`${Math.max(0.8,Number(d.borderOutsetCm)+Number(d.borderWidth||1)/10+0.2)}cm`;
           p.classList.add('flex','flex-col','justify-between');
-          const stationTitle=stationName?`<h3 class="menu-body-font text-center" style="color:${d.accentColor};font-weight:700;font-size:calc(17px * var(--ragasaan-fit,1));margin:10px 0">${escText(stationName)}</h3>`:'';
+          const stationTitle=stationName?`<h3 class="menu-body-font text-center" contenteditable="true" spellcheck="false" data-live-title="true" data-session="${esc(session?.id||'')}" data-station="${esc(stationId||'')}" onblur="ragaEditLiveStationTitle(this)" title="Click to edit this station title" style="color:${d.accentColor};font-weight:700;font-size:calc(17px * var(--ragasaan-fit,1));margin:10px 0">${escText(stationName)}</h3>`:'';
           const collection=records.length?records.map(({item,idx})=>`<div style="margin-bottom:13px">${itemBlock(item,idx,1.12)}</div>`).join(''):`<p contenteditable="true" data-preview-text="emptyLiveMessage">${escText(d.emptyLiveMessage ?? 'Add menu items for Live Station')}</p>`;
-          p.innerHTML=`${frame()}${bodyHeader()}${formatHeading(d.liveTitle,true)}${stationTitle}
+          p.innerHTML=`${frame()}${bodyHeader()}${stationTitle}
             <div data-auto-fit-area class="menu-body-font text-center" style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:center">
               <div data-auto-fit-flow style="flex:0 0 auto;margin:auto 0">${collection}</div>
             </div><div>${brand()}</div>`;
@@ -4252,10 +4297,10 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           const stations=ragaEnsureLiveStations(session);
           for(const station of stations){
             const rows=entries.filter(row=>(row.item.ragaLiveStationId||stations[0]?.id)===station.id);
-            if(rows.length)groups.push({session,stationName:station.name,rows});
+            if(rows.length)groups.push({session,stationName:station.name,stationId:station.id,rows});
           }
         }
-        if(groups.length)groups.forEach(group=>fitPaginated(group.rows,subset=>makeLiveStation(subset,group.session,group.stationName)));
+        if(groups.length)groups.forEach(group=>fitPaginated(group.rows,subset=>makeLiveStation(subset,group.session,group.stationName,group.stationId)));
         else fitPaginated([],subset=>makeLiveStation(subset,null,''));
       } else if(fmt==='half-a4') {
         const makeTableFront=(records)=>{
@@ -4771,11 +4816,54 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       window.requestAnimationFrame(() => window.requestAnimationFrame(() => window.print()));
     }
 
-    function downloadPDF() {
-      if(document.getElementById('tab-summary')&&!document.getElementById('tab-summary').classList.contains('hidden')){printEventSummary();return;}
-      // Native print pipeline preserves actual A4 layout and avoids html2canvas freezing.
-      // Select "Save as PDF" as the destination in your browser print dialog.
-      window.print();
+    async function downloadPDF() {
+      // Save a genuine PDF. Never invoke the system Print dialog from a Save button.
+      const status=document.getElementById('raga-pdf-status');
+      if(status)status.textContent='Preparing PDF download…';
+      if(typeof window.html2pdf!=='function'){
+        const msg='PDF converter is unavailable. Check your connection and reload the page; Print remains a separate action.';
+        if(status)status.textContent=msg;else alert(msg);return false;
+      }
+      const summaryVisible=document.getElementById('tab-summary')&&!document.getElementById('tab-summary').classList.contains('hidden');
+      if(summaryVisible)renderSummaryPaper();else renderPreview();
+      const exportRoot=document.createElement('div');
+      exportRoot.className='ragasaan-pdf-only';
+      exportRoot.style.cssText='position:relative;z-index:0;pointer-events:none;width:210mm;max-width:210mm;background:#fff;margin:0;padding:0;display:block';
+      document.body.appendChild(exportRoot);
+      // Render outside the hidden preview tab: its source sheets can measure 0x0.
+      if(summaryVisible){
+        const source=document.getElementById('summary-print-root');
+        for(const page of source?.querySelectorAll('.print-sheet')||[])exportRoot.appendChild(page.cloneNode(true));
+      }else{
+        renderPreview(exportRoot);
+      }
+      const sheets=[...exportRoot.querySelectorAll('.print-sheet')];
+      sheets.forEach((page,i)=>{
+        page.querySelectorAll('.no-print,[contenteditable]').forEach(n=>{
+          if(n.classList.contains('no-print'))n.remove();
+          else n.removeAttribute('contenteditable');
+        });
+        page.classList.remove('raga-preview-only-hidden');
+        page.style.cssText+=';width:210mm!important;min-height:297mm;height:297mm;box-sizing:border-box;transform:none!important;display:block!important;margin:0!important;break-inside:avoid';
+        if(i<sheets.length-1){const br=document.createElement('div');br.className='html2pdf__page-break';page.after(br);}
+      });
+      if(!sheets.length){exportRoot.remove();if(status)status.textContent='Nothing to save: choose a menu with pages first.';return false;}
+      window.__lastPdfExportMetrics={sheets:sheets.length,width:exportRoot.getBoundingClientRect().width,height:exportRoot.getBoundingClientRect().height,sheetWidth:sheets[0].getBoundingClientRect().width,sheetHeight:sheets[0].getBoundingClientRect().height};
+      try{
+        await window.html2pdf().set({
+          margin:0,filename:(String(state.event.title||'Ragasaan_Menu').replace(/[^a-z0-9_-]+/gi,'_')||'Ragasaan_Menu')+'_'+(summaryVisible?'Event_Summary':state.layout)+'.pdf',
+          image:{type:'jpeg',quality:.98},
+          html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',scrollX:0,scrollY:0},
+          jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+          pagebreak:{mode:['css','legacy']}
+        }).from(exportRoot).save();
+        if(status)status.textContent='PDF saved. Printing was not started.';
+        return true;
+      }catch(error){
+        const message='PDF save failed: '+(error?.message||String(error));
+        if(status)status.textContent=message;else alert(message);
+        return false;
+      }finally{exportRoot.remove();}
     }
 
   </script>
@@ -4822,12 +4910,24 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <div id="rs-links-list" class="raga-list"></div>
         </section>
         <section class="raga-panel" data-rs-staff>
-          <h3>Client Design Submissions</h3>
-          <p>The client submits a theme, per-format fonts/colors/decorative borders and Table Menu Card couple details only. Review here; no JSON exchange is required.</p>
+          <h3>Pending Client Designs</h3>
+          <p id="rs-pending-designs-description" class="raga-help">In-app tasks assigned to Event Planners. Review each client design, then open the Print Studio.</p>
+          <div id="rs-pending-designs" class="raga-list" aria-live="polite"></div>
+          <p>Client design submissions update the shared event immediately. Review the pending design before approving printing.</p>
           <div class="raga-actions"><button id="rs-load-submissions" class="raga-btn">Refresh Submissions</button><button id="rs-approve-print" class="raga-btn primary">Approve Printing</button></div>
           <p class="raga-help">Only the assigned Event Planner approves submitted designs and printing. Admin has oversight and may print without approval. Approval applies to the last saved cloud event.</p>
           <div id="rs-submissions-list" class="raga-list"></div><div id="rs-design-inspector" class="raga-help"></div>
         </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin-only configuration uses a separate panel, not the Cloud Events dialog. -->
+  <div id="ragasaan-admin" class="raga-cloud-backdrop no-print" role="dialog" aria-modal="true" aria-label="Admin Settings">
+    <div class="raga-cloud-sheet">
+      <header class="raga-cloud-header"><div><h2>Admin Settings</h2><p class="raga-help">Print Rule · User Profile · QR code · Logo</p></div><button type="button" id="rs-close-admin" class="raga-btn">Close ×</button></header>
+      <p id="rs-admin-message" class="raga-alert" role="status" aria-live="polite"></p>
+      <div class="raga-cloud-grid">
         <section class="raga-panel" data-rs-admin>
           <details>
             <summary class="raga-section-title" style="cursor:pointer">Local Browser Backup &amp; Restore · Advanced</summary>
@@ -4841,9 +4941,21 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           </details>
         </section>
         <section class="raga-panel" data-rs-admin id="rs-admin-feedback-panel">
-          <h3>Admin Settings · Guest Feedback QR</h3>
+          <h3>QR code</h3>
           <p class="raga-help">Upload the official guest-feedback QR image (PNG, JPG or WebP, maximum 150 KB). One approved image is shared across all events. Only the Admin can change or remove it.</p>
           <p class="raga-help"><strong>We Value Your Feedback</strong><br>Thank you for celebrating with us. Please scan the QR code below to share your experience.</p>
+        <details id="raga-feedback-copy-editor" class="no-print bg-slate-950 px-3 py-2 rounded-lg border border-slate-800 space-y-2">
+          <summary class="text-xs font-semibold text-gold-400 cursor-pointer">Guest Feedback Text · Admin</summary>
+          <p class="text-[11px] text-slate-400">Shared wording for the Table Menu Card back page, managed only by Admin.</p>
+          <label class="block text-xs text-slate-300">Heading
+            <input id="raga-feedback-title-input" type="text" oninput="ragaUpdateFeedbackCopy('feedbackTitle',this.value)" class="block w-full mt-1 p-2 bg-slate-900 border border-slate-700 rounded text-white">
+          </label>
+          <label class="block text-xs text-slate-300">Message
+            <textarea id="raga-feedback-message-input" rows="3" oninput="ragaUpdateFeedbackCopy('feedbackMessage',this.value)" class="block w-full mt-1 p-2 bg-slate-900 border border-slate-700 rounded text-white"></textarea>
+          </label>
+          <button type="button" onclick="setLayout('half-a4')" class="raga-page-button">Preview Table Menu Card</button>
+          <button type="button" id="rs-feedback-copy-save" class="raga-btn primary">Save Guest Feedback Wording</button><p id="rs-feedback-copy-status" class="raga-help" role="status"></p>
+        </details>
           <label for="rs-feedback-upload">Official QR code image</label>
           <input id="rs-feedback-upload" type="file" accept="image/png,image/jpeg,image/webp" class="raga-input">
           <div class="raga-actions"><button type="button" id="rs-feedback-save" class="raga-btn primary">Publish QR to All Events</button><button type="button" id="rs-feedback-remove" class="raga-btn danger">Remove QR</button></div>
@@ -4852,7 +4964,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <p class="raga-help">Printed position: Table Menu Card → back page → right side. If a right-side image is present, feedback appears below it; otherwise feedback is centered. If no QR is uploaded, this section is hidden.</p>
         </section>
         <section class="raga-panel" data-rs-admin id="rs-admin-company">
-          <h3>Official Company Logo · Admin</h3>
+          <h3>Logo</h3>
           <p class="raga-help">Publish one company logo to all users through D1. Select PNG, JPG or WebP; larger images up to 12 MB will be automatically resized to meet the server's 150 KB limit. The existing GitHub logo remains the fallback.</p>
           <input id="rs-company-upload" type="file" class="raga-input" accept="image/png,image/jpeg,image/webp">
           <div class="raga-actions"><button id="rs-company-publish" type="button" class="raga-btn primary">Publish Company Logo</button><button id="rs-company-remove" type="button" class="raga-btn danger">Use GitHub Logo Instead</button></div>
@@ -4860,7 +4972,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <p id="rs-company-status" class="raga-help" role="status" aria-live="polite"></p>
         </section>
         <section class="raga-panel" data-rs-admin id="rs-admin-options">
-          <h3>Meal Defaults &amp; Printing Rules · Admin</h3>
+          <h3>Print Rule</h3>
           <p class="raga-help">Choose the options shown to planners and the default used for new selections. Previously saved event values are retained.</p>
           <div id="rs-choices-editor"></div>
           <button id="rs-save-choices" type="button" class="raga-btn primary">Save Shared Defaults</button>
@@ -4885,12 +4997,13 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <div id="rs-client-format-choices"></div><button type="button" class="raga-btn primary" id="rs-save-client-formats">Save Client Formats</button>
         </section>
         <section class="raga-panel" data-rs-admin>
-          <h3>User Management · Admin</h3>
+          <h3>User Profile</h3>
           <p>Create and manage accounts. Edit profiles, reset passwords (8+ characters), and deactivate or reactivate users. Passwords cannot be viewed. Existing sessions are revoked after password changes.</p>
           <label>Name</label><input id="rs-new-planner-name" class="raga-input" maxlength="100">
           <label>Email</label><input id="rs-new-planner-email" class="raga-input" type="email" maxlength="254">
           <label>Initial password (8+ characters)</label><input id="rs-new-planner-password" class="raga-input" type="password" minlength="8" autocomplete="new-password">
-          <div class="raga-actions"><button id="rs-create-planner" class="raga-btn primary">Create Event Planner</button></div>
+          <div class="raga-actions"><button id="rs-create-planner" type="button" class="raga-btn primary">Create Event Planner</button></div>
+          <p id="rs-new-planner-status" class="raga-help" role="status" aria-live="polite"></p>
           <div id="rs-planner-list" class="raga-list"></div>
         </section>
       </div>
@@ -4931,7 +5044,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     const id=eventUid();
     const name=(live?'Live Station ':'Station ')+(list.length+1);
     list.push({id,name});
-    if(live)session.liveStations=list;
+    if(live){session.liveStations=list;session.selectedLiveStationId=id;}
     else {session.stations=list;openCategories.add(idKey(session.id,ragaStationKey(id)));}
     onEventRecordsChanged();
   }
@@ -4947,7 +5060,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       if(live)item.ragaLiveStationId=other.id;
       else {item.menuCourse=ragaStationKey(other.id);item.ragaStationCourse=item.menuCourse;}
     }
-    if(live)session.liveStations=list.filter(st=>st.id!==id);
+    if(live){session.liveStations=list.filter(st=>st.id!==id);if(session.selectedLiveStationId===id)session.selectedLiveStationId=other.id;}
     else {
       session.stations=list.filter(st=>st.id!==id);
       if(session.categoryFormats)delete session.categoryFormats[ragaStationKey(id)];
@@ -4975,7 +5088,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   }
   function insertDish(session,category,dish){
     if(!session||!dish?.name)return;
-    const assignedLive=category==='Live Station'?ragaEnsureLiveStations(session)[0]?.id:undefined;
+    const assignedLive=category==='Live Station'?(session.selectedLiveStationId||ragaEnsureLiveStations(session)[0]?.id):undefined;
     const record={...JSON.parse(JSON.stringify(dish)),eventUid:eventUid(),sessionId:session.id,menuCourse:category,serviceType:'',ragaLiveStationId:assignedLive,printFormats:[...formats(session,category)],tagCopies:{}};
     eventRecords.push(record);openSessions.add(session.id);openCategories.add(idKey(session.id,category));onEventRecordsChanged();
   }
@@ -5005,7 +5118,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     const rows=catItems(session,cat),opened=openCategories.has(idKey(session.id,cat)),allowed=allowedFormats(session,cat),selected=formats(session,cat);
     const station=isMultiStationMode(session)?ragaEnsureStations(session).find(st=>ragaStationKey(st.id)===cat):null;
     const stationEditor=station?`<div class="raga-card-note"><label>Station name<input type="text" data-raga-action="station-name" data-session="${safe(session.id)}" data-station-id="${safe(station.id)}" value="${safe(station.name)}"></label><button type="button" class="raga-card-remove" data-raga-action="remove-station" data-session="${safe(session.id)}" data-station-id="${safe(station.id)}">Remove station</button></div>`:'';
-    const liveEditor=cat==='Live Station'?`<div class="raga-card-note"><strong>Dedicated A4 per Live Station</strong>${ragaEnsureLiveStations(session).map(st=>`<div style="display:flex;gap:6px;margin:5px 0;align-items:center"><input type="text" aria-label="Live station name" data-raga-action="live-station-name" data-session="${safe(session.id)}" data-station-id="${safe(st.id)}" value="${safe(st.name)}"><button type="button" data-raga-action="remove-live-station" data-session="${safe(session.id)}" data-station-id="${safe(st.id)}">Remove</button></div>`).join('')}<button type="button" data-raga-action="add-live-station" data-session="${safe(session.id)}">+ Add Live Station</button></div>`:'';
+    const liveEditor=cat==='Live Station'?`<div class="raga-card-note"><strong>Dedicated A4 per Live Station</strong><label>Assign new dishes to station<select data-raga-action="add-live-station-choice" data-session="${safe(session.id)}">${ragaEnsureLiveStations(session).map(st=>`<option value="${safe(st.id)}" ${(session.selectedLiveStationId||ragaEnsureLiveStations(session)[0]?.id)===st.id?'selected':''}>${safe(st.name)}</option>`).join('')}</select></label>${ragaEnsureLiveStations(session).map(st=>`<div style="display:flex;gap:6px;margin:5px 0;align-items:center"><input type="text" aria-label="Live station name" data-raga-action="live-station-name" data-session="${safe(session.id)}" data-station-id="${safe(st.id)}" value="${safe(st.name)}"><button type="button" data-raga-action="remove-live-station" data-session="${safe(session.id)}" data-station-id="${safe(st.id)}">Remove</button></div>`).join('')}<button type="button" data-raga-action="add-live-station" data-session="${safe(session.id)}">+ Add Live Station</button></div>`:'';
     const printLabels=selected.length?selected.map(f=>MENU_NAMES[f]||f).join(' · '):'No print formats';
     return `<details class="raga-course-card" data-session="${safe(session.id)}" data-category="${safe(cat)}" ${opened?'open':''}><summary data-raga-action="toggle-category" data-session="${safe(session.id)}" data-course="${safe(cat)}"><span class="raga-course-icon">${(categoryIcons[cat]||'🍽️')}</span><span><strong>${safe(courseDisplay(session,cat))}</strong><small>${rows.length} ${rows.length===1?'dish':'dishes'} · ${safe(printLabels)}</small></span></summary>
       <div class="raga-course-body"><section><h5 class="raga-course-section-title">1. Serving style &amp; add dishes</h5><div class="raga-course-setup">${serviceChoice(session,cat)}${stationEditor}${liveEditor}</div><div class="raga-card-picker"><input type="search" data-raga-search="true" data-session="${safe(session.id)}" data-course="${safe(cat)}" placeholder="Search the master dish database" autocomplete="off"><button type="button" class="raga-btn-add" data-raga-action="search" data-session="${safe(session.id)}" data-course="${safe(cat)}">Find dishes</button></div><div class="raga-card-results" data-raga-results="${safe(idKey(session.id,cat))}"></div><details class="raga-card-manual"><summary>+ Add manual dish to this category</summary><label>Dish name<input data-raga-manual="name" type="text" placeholder="New dish name" onblur="ragaFormatManualField(this,'dish')"></label><label>Description<textarea data-raga-manual="desc" rows="2" placeholder="Optional description" onblur="ragaFormatManualField(this,'description')"></textarea></label>${ragaCardTicks("allergens",[],null,true)}${ragaCardTicks("mayContain",[],null,true)}<label class="raga-verify"><input type="checkbox" data-raga-manual="verified"> Allergen information checked for this event</label><button type="button" class="raga-btn-add" data-raga-action="manual-add" data-session="${safe(session.id)}" data-course="${safe(cat)}">Add manual dish</button></details></section>
@@ -5025,6 +5138,13 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     }).join('');
   }
   window.ragaRenderMealCards=render;
+  window.ragaEditLiveStationTitle=function(element){
+    const session=byId(element?.dataset?.session);
+    const stationId=element?.dataset?.station;
+    if(!session||!stationId)return;
+    ragaRenameCardStation(session,stationId,element.innerText,true);
+  };
+
   function resultBox(session,course){return [...(holder()?.querySelectorAll('[data-raga-results]')||[])].find(n=>n.dataset.ragaResults===idKey(session,course));}
   function search(sid,course){
     const root=holder();const box=resultBox(sid,course);if(!box)return;
@@ -5067,6 +5187,9 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     const sid=el.dataset.session,course=el.dataset.course,session=byId(sid);
     if(el.dataset.ragaAction==='station-name'&&session){ragaRenameCardStation(session,el.dataset.stationId,el.value);return;}
     if(el.dataset.ragaAction==='live-station-name'&&session){ragaRenameCardStation(session,el.dataset.stationId,el.value,true);return;}
+    if(el.dataset.ragaAction==='add-live-station-choice'&&session){
+      if(ragaEnsureLiveStations(session).some(st=>st.id===el.value)){session.selectedLiveStationId=el.value;saveStyle();}return;
+    }
     if(el.dataset.ragaCheck){
       const group=el.closest('fieldset'),field=el.dataset.ragaCheck;
       if(group&&['allergens','mayContain'].includes(field))ragaEditSelectedDish(el.dataset.uid,field,[...group.querySelectorAll('input:checked')].map(x=>x.value));
@@ -5274,7 +5397,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         }
         if(!items.length)right.push(w.paragraph('No Table Menu Card dishes selected.',{size:10}));
         right.push(inlineImage(w,assets.company));
-        parts.push(w.table([left.join(''),right.join('')],{width:10200,border:true}));
+        parts.push(w.table([left.join(''),right.join('')],{width:10200,border:true,minHeightTwips:13100,alignVertical:['center','top']}));
         // Second/back page: separate half-page panels, optional Admin-managed feedback QR.
         parts.push(w.pageBreak());
         const leftBack=[inlineImage(w,assets.backLeft),w.paragraph('THANK YOU',{bold:true,size:18,serif:true,color:color(),align:'center',after:180}),
@@ -5291,7 +5414,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         }
         rightBack.push(inlineImage(w,assets.company));
         rightBack.push(w.paragraph('RAGASAAN',{bold:true,size:11,align:'center',color:color()}));
-        parts.push(w.table([leftBack.join(''),rightBack.join('')],{width:10200,border:true}));
+        parts.push(w.table([leftBack.join(''),rightBack.join('')],{width:10200,border:true,minHeightTwips:13100,alignVertical:['center','center']}));
       }
       const label=a4?'Buffet_Menu_A4':'Table_Menu_Card';
       save(w.create(parts),safeFilename(state.event.title||'Event')+'_'+label+'.docx');

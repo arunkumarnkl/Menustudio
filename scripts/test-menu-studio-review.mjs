@@ -86,17 +86,17 @@ pass('Word filename removes full venue address and format suffix',true);
 pass('Word regular menu item has no ordinal; summary still uses numbers',
   html.includes("const out=[w.paragraph(name,{bold:true,size:10") &&
   html.includes("cols[idx].push(w.paragraph(`${++num}. ${ragaDisplayText(item.name"));
-pass('Word two-column layout uses fixed geometry',html.includes('<w:tblLayout w:type="fixed"/>')&&html.includes('<w:vAlign w:val="top"/>'));
+pass('Word two-column layout is fixed, padded and balanced',html.includes('<w:tblLayout w:type="fixed"/>')&&html.includes("alignVertical:['center','top']")&&html.includes('minHeightTwips:13100'));
 
-pass('Cloud records sorted then limited to latest five in UI',client.includes('const visible=s.cloudShowArchive?sorted:sorted.slice(0,5)'));
+pass('Cloud records sorted then limited to latest twenty in UI',client.includes('const visible=s.cloudShowArchive?sorted:sorted.slice(0,20)'));
 pass('Cloud planner filter and older-record archive exist',client.includes('rs-cloud-planner-filter')&&client.includes('rs-cloud-archive-toggle'));
-pass('All records retained in client state, not deleted by five-row display',client.includes('s.events=r.events||[];'));
+pass('All records retained in client state, not deleted by twenty-row display',client.includes('s.events=Array.isArray(result.events)?result.events:[];'));
 pass('Feedback heading and message editable on print preview',html.includes('data-preview-text="feedbackTitle"')&&html.includes('data-preview-text="feedbackMessage"'));
-pass('Feedback editable in Print Studio without a QR image',html.includes('raga-feedback-title-input')&&html.includes('raga-feedback-message-input')&&html.includes('ragaUpdateFeedbackCopy'));
+pass('Feedback editable in Admin QR settings without requiring uploaded QR image',html.includes('raga-feedback-title-input')&&html.includes('raga-feedback-message-input')&&html.includes('ragaUpdateFeedbackCopy')&&html.includes('id="rs-feedback-copy-save"'));
 pass('Feedback text persisted and included in editable Word',html.includes("'feedbackTitle','feedbackMessage'")&&html.includes("w.paragraph(d.feedbackTitle ?? 'We Value Your Feedback'")&&html.includes("w.paragraph(d.feedbackMessage ?? 'Thank you for celebrating with us."));
 pass('Feedback fields and editor have no dedicated print spacing',html.includes('id="raga-feedback-copy-editor" class="no-print'));
 pass('Review-only Worker provides saved timestamps',worker.includes('createdAt:event.created_at,updatedAt:event.updated_at'));
-pass('Review-only Worker orders both cloud list routes by latest update',worker.split('ORDER BY COALESCE(updated_at,created_at) DESC,created_at DESC LIMIT 500').length-1===2);
+pass('Review-only Worker orders authenticated library by latest update',worker.includes("SELECT * FROM events WHERE status!='archived' ORDER BY COALESCE(updated_at,created_at) DESC,created_at DESC LIMIT 500"));
 pass('Company logo publishing automatically resizes high-resolution files',client.includes('async function ragaOptimiseCompanyLogo(file,progress)')&&client.includes("canvas.toBlob(resolve,'image/webp',quality)"));
 pass('Company logo publishing checks the stored D1 logo before claiming success',client.includes("const confirmed=await fetchCompanyLogo()")&&client.includes('Company logo published and verified. It will appear for all users on refresh.'));
 pass('Company logo publishing surfaces API failures beside uploader',client.includes("setStatus('Company logo not confirmed: '"));
@@ -233,4 +233,51 @@ pass('Editable Word menus and summary export emphasize allergens in dark red',
   html.includes("w.paragraph(a.join(', '),{bold:true,color:'8B1E20'") &&
   html.includes("w.paragraph(m.join(', '),{bold:true,color:'704600'") &&
   html.includes("color:allergens.length?'8B1E20':'555555'"));
+
+// xxxxxx.docx final-update regression gates. No deployment.
+const dinnerModes=['Buffet','Thali','Multi Stations','Plated Service','Bowl Food','Canapé','Live Station','Other'];
+for(const mode of dinnerModes){
+ const row={id:'dinner',kind:'dinner',serviceMode:mode,courseServices:{Starter:'Buffet',MainCourse:'Buffet',Dessert:'Buffet'}};
+ const course=Array.from(rules.availableCourses(row))[0];
+ assert.ok(Array.from(rules.ragaAllowedFormats(row,course)).includes('half-a4'));
+ if(mode!=='Plated Service')assert.ok(!Array.from(rules.ragaInitialFormats(row,course)).includes('half-a4'));
+}
+const other={id:'lunch',kind:'lunch',serviceMode:'Buffet'};
+assert.ok(!Array.from(rules.ragaAllowedFormats(other,'Other')).includes('half-a4'));
+pass('Optional Dinner-only Table Menu Card for all styles, without changing non-plated defaults',true);
+pass('Live Station prints independently with one editable title per station',
+ html.includes('data-live-title="true"')&&html.includes('ragaEditLiveStationTitle')&&
+ html.includes('group.stationName,group.stationId')&&!html.includes('formatHeading(d.liveTitle,true)')&&
+ html.includes('selectedLiveStationId')&&html.includes('add-live-station-choice'));
+pass('PDF save is separate from native Print dialog',(()=>{
+ const block=section('async function downloadPDF() {','</script>');
+ return block.includes('window.html2pdf().set')&&block.includes('.save()')&&!block.includes('window.print()')&&html.includes('function triggerPrint()');
+})());
+pass('20/80 Final Preview with compact Print/PDF icons',
+ html.includes('id="raga-final-export-layout"')&&html.includes('flex:0 0 20%')&&html.includes('flex:1 1 80%')&&html.includes('width:1cm!important;height:.5cm!important'));
+pass('Standalone Admin Settings contain the four renamed panels',
+ html.includes('id="ragasaan-admin"')&&['QR code','Logo','Print Rule','User Profile'].every(label=>html.includes('<h3>'+label+'</h3>')));
+pass('User creation validates details and reports server confirmation',
+ html.includes('id="rs-new-planner-status"')&&client.includes('async function createPlanner()')&&
+ client.includes('if(!created?.id)')&&client.includes('button.disabled=true'));
+pass('Archived D1 events remain recoverable with Admin/owner permission checks',
+ worker.includes("event.planner_user_id===who.id||event.created_by===who.id")&&
+ worker.includes("UPDATE events SET status='archived'")&&
+ worker.includes("UPDATE events SET status='draft'")&&
+ client.includes('data-delete-cloud=')&&client.includes('data-restore-cloud='));
+pass('Client link denies staff event endpoints and offers only design/approved print preview',
+ client.includes("document.body.classList.add('ragasaan-locked')")&&
+ worker.includes("if(path==='/public/events'||path.startsWith('/public/events/'))")&&
+ worker.includes('Event Planner or Admin sign-in')&&
+ client.includes('rs-client-print-controls')&&client.includes('s.clientCanPrint'));
+pass('Client submission applies allowlisted design immediately, with notification and review task',
+ worker.includes('client_design_immediately_applied')&&worker.includes('env.DB.batch([')&&
+ worker.includes('clientDesignPendingReview=true')&&html.includes('id="rs-pending-designs"')&&
+ client.includes('data-pending-review')&&client.includes('data-pending-print'));
+pass('Bride/Groom image vertical control supports 0–200px',
+ html.includes("compactNumber('coupleOffsetY','Vertical position (px)',0,200)"));
+pass('QR heading and message saved through an Admin-only D1 endpoint',
+ worker.includes("path==='/admin/feedback-copy'&&method==='PUT'")&&
+ client.includes("call('/admin/feedback-copy','PUT'")&&
+ html.indexOf('id="raga-feedback-copy-editor"')>html.indexOf('id="ragasaan-admin"'));
 console.log('REVIEW CHECKS COMPLETE. Real browser, D1 and Word/PDF layout checks are required before production deployment.');

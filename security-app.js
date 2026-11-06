@@ -10,12 +10,12 @@ const CLIENT_PRINT_FORMATS=['a4','a6-grid','a4-live','half-a4'];
 const FN={'a4':'Buffet A4','a4-live':'Live Station','half-a4':'Table Menu Card','a8-grid':'A8 Tags','foldtags-grid':'FoldTags','a6-grid':'A6 Tags','canape-grid':'Canapé Labels'};
 const PRESETS=[{"id":"executive-ivory","name":"Executive Ivory","kind":"professional","titleFont":"font-serif","bodyFont":"font-sans","textColor":"#24272d","accentColor":"#8b7551","borderColor":"#b5a78b","borderStyle":"solid","borderWidth":0.7,"frameMotif":"fine-line","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10,"weightGroup":"bold"},{"id":"midnight-premier","name":"Midnight Premier","kind":"professional","titleFont":"font-montserrat","bodyFont":"font-sans","textColor":"#18243a","accentColor":"#2d5172","borderColor":"#456982","borderStyle":"double","borderWidth":1.1,"frameMotif":"art-deco","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10,"weightGroup":"bold"},{"id":"modern-minimal","name":"Modern Minimal","kind":"professional","titleFont":"font-sans","bodyFont":"font-sans","textColor":"#111827","accentColor":"#475569","borderColor":"#64748b","borderStyle":"solid","borderWidth":0.3,"frameMotif":"none","titleFontSize":19,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10,"weightGroup":"bold"},{"id":"heritage-burgundy","name":"Heritage Burgundy","kind":"professional","titleFont":"font-serif","bodyFont":"font-cormorant","textColor":"#38252b","accentColor":"#70283c","borderColor":"#a47483","borderStyle":"double","borderWidth":1,"frameMotif":"corner-flourish","titleFontSize":22,"dishNameFontSize":14,"descFontSize":11,"allergenFontSize":10,"weightGroup":"bold"},{"id":"botanical-emerald","name":"Botanical Emerald","kind":"professional","titleFont":"font-cormorant","bodyFont":"font-sans","textColor":"#20392e","accentColor":"#33755e","borderColor":"#7d9e8d","borderStyle":"solid","borderWidth":0.8,"frameMotif":"botanical","titleFontSize":21,"dishNameFontSize":14,"descFontSize":11,"allergenFontSize":10,"weightGroup":"bold"},{"id":"slate-gold","name":"Slate & Gold","kind":"professional","titleFont":"font-montserrat","bodyFont":"font-sans","textColor":"#202835","accentColor":"#987637","borderColor":"#aa904f","borderStyle":"double","borderWidth":1.2,"frameMotif":"art-deco","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10,"weightGroup":"bold"},{"id":"romantic-blush","name":"Romantic Blush","kind":"wedding","titleFont":"font-script","bodyFont":"font-cormorant","textColor":"#573d47","accentColor":"#b67789","borderColor":"#cfa5b0","borderStyle":"double","borderWidth":0.9,"frameMotif":"corner-flourish","titleFontSize":25,"dishNameFontSize":14,"descFontSize":12,"allergenFontSize":10,"weightGroup":"mild"},{"id":"royal-wedding","name":"Royal Wedding","kind":"wedding","titleFont":"font-serif","bodyFont":"font-cormorant","textColor":"#2c2532","accentColor":"#a07b35","borderColor":"#beaa76","borderStyle":"double","borderWidth":1.3,"frameMotif":"art-deco","titleFontSize":23,"dishNameFontSize":14,"descFontSize":12,"allergenFontSize":10,"weightGroup":"mild"},{"id":"garden-ceremony","name":"Garden Ceremony","kind":"wedding","titleFont":"font-script","bodyFont":"font-cormorant","textColor":"#2e4736","accentColor":"#698868","borderColor":"#92aa8e","borderStyle":"solid","borderWidth":0.9,"frameMotif":"botanical","titleFontSize":25,"dishNameFontSize":14,"descFontSize":12,"allergenFontSize":10,"weightGroup":"mild"},{"id":"monarch-navy","name":"Monarch Navy","kind":"professional","weightGroup":"bold","titleFont":"font-montserrat","bodyFont":"font-serif","textColor":"#f1f5f9","accentColor":"#0f3563","borderColor":"#284b73","borderStyle":"double","borderWidth":1,"frameMotif":"art-deco","titleFontSize":24,"dishNameFontSize":14,"descFontSize":11,"allergenFontSize":10},{"id":"crimson-gala","name":"Crimson Gala","kind":"wedding","weightGroup":"bold","titleFont":"font-serif","bodyFont":"font-cormorant","textColor":"#562a32","accentColor":"#9d283b","borderColor":"#b95b69","borderStyle":"double","borderWidth":1,"frameMotif":"corner-flourish","titleFontSize":24,"dishNameFontSize":14,"descFontSize":11,"allergenFontSize":10},{"id":"copper-regency","name":"Copper Regency","kind":"wedding","weightGroup":"bold","titleFont":"font-serif","bodyFont":"font-cormorant","textColor":"#4b3027","accentColor":"#a24d30","borderColor":"#b88f78","borderStyle":"double","borderWidth":1,"frameMotif":"corner-flourish","titleFontSize":24,"dishNameFontSize":14,"descFontSize":11,"allergenFontSize":10},{"id":"golden-celebration","name":"Golden Celebration","kind":"wedding","weightGroup":"bold","titleFont":"font-script","bodyFont":"font-cormorant","textColor":"#533c1d","accentColor":"#a57a19","borderColor":"#c9af63","borderStyle":"double","borderWidth":1,"frameMotif":"art-deco","titleFontSize":24,"dishNameFontSize":14,"descFontSize":11,"allergenFontSize":10},{"id":"linen-serif","name":"Linen Serif","kind":"professional","weightGroup":"mild","titleFont":"font-serif","bodyFont":"font-sans","textColor":"#333335","accentColor":"#8a847f","borderColor":"#cabfb1","borderStyle":"solid","borderWidth":0.6,"frameMotif":"fine-line","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10},{"id":"sage-elegance","name":"Sage Elegance","kind":"wedding","weightGroup":"mild","titleFont":"font-cormorant","bodyFont":"font-cormorant","textColor":"#364c40","accentColor":"#78927e","borderColor":"#a9bbaa","borderStyle":"solid","borderWidth":0.6,"frameMotif":"botanical","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10},{"id":"powder-blue","name":"Powder Blue","kind":"professional","weightGroup":"mild","titleFont":"font-sans","bodyFont":"font-sans","textColor":"#304156","accentColor":"#718ea4","borderColor":"#afc1d0","borderStyle":"solid","borderWidth":0.6,"frameMotif":"fine-line","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10},{"id":"blush-linen","name":"Blush Linen","kind":"wedding","weightGroup":"mild","titleFont":"font-script","bodyFont":"font-cormorant","textColor":"#62464d","accentColor":"#bf9ca5","borderColor":"#d2b9be","borderStyle":"solid","borderWidth":0.6,"frameMotif":"corner-flourish","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10},{"id":"soft-pearl","name":"Soft Pearl","kind":"professional","weightGroup":"mild","titleFont":"font-cormorant","bodyFont":"font-sans","textColor":"#4c5158","accentColor":"#87929b","borderColor":"#c8ced3","borderStyle":"solid","borderWidth":0.6,"frameMotif":"fine-line","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10},{"id":"almond-garden","name":"Almond Garden","kind":"wedding","weightGroup":"mild","titleFont":"font-cormorant","bodyFont":"font-sans","textColor":"#514e3e","accentColor":"#a59d75","borderColor":"#cbc5a5","borderStyle":"double","borderWidth":0.6,"frameMotif":"botanical","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10},{"id":"lavender-mist","name":"Lavender Mist","kind":"wedding","weightGroup":"mild","titleFont":"font-serif","bodyFont":"font-cormorant","textColor":"#534f65","accentColor":"#8b86a8","borderColor":"#bdb8d0","borderStyle":"solid","borderWidth":0.6,"frameMotif":"corner-flourish","titleFontSize":20,"dishNameFontSize":13,"descFontSize":11,"allergenFontSize":10}];
 const SAFE=['titleFont','bodyFont','textColor','accentColor','bgColor','borderColor','borderStyle','borderWidth','borderOutsetCm','titleFontSize','dishNameFontSize','descFontSize','allergenFontSize','frameMotif'];
-const s={token:null, user:null,cloudEvent:null, events:[], planners:[], activeTheme:'', clientToken:null, clientEvent:null, clientDesign:{designs:{}},clientFmt:'half-a4',clientAllowed:[...CLIENT_PRINT_FORMATS],themes:[...PRESETS], pendingChanges:false};
+const s={token:null, user:null,cloudEvent:null, events:[], planners:[], activeTheme:'', clientToken:null, clientEvent:null, clientDesign:{designs:{}},clientFmt:'half-a4',clientAllowed:[...CLIENT_PRINT_FORMATS],themes:[...PRESETS], pendingChanges:false,clientCanPrint:false};
 const $=id=>document.getElementById(id);
 const e=x=>String(x??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const escAttr=e;
 const data=x=>JSON.parse(JSON.stringify(x));
-function msg(t,kind=''){const el=$('rs-cloud-message');if(el){el.textContent=t;el.className='raga-alert '+(kind==='error'?'raga-error':'');}}
+function msg(t,kind=''){for(const id of ['rs-cloud-message','rs-admin-message']){const el=$(id);if(el){el.textContent=t;el.className='raga-alert '+(kind==='error'?'raga-error':'');el.setAttribute('aria-live','polite');}}}
 function onLoginError(t){const el=$('rs-login-error');if(el)el.textContent=t;}
 async function call(path,method='GET',body,auth=true){
   const headers={'Content-Type':'application/json'};
@@ -55,6 +55,32 @@ async function publishFeedbackQR(remove=false){
     await fetchFeedbackQR();
     if(status)status.textContent=remove?'Official QR removed from all menu cards.':'Official QR published for all menu cards.';
   }catch(err){if(status)status.textContent='QR update failed: '+err.message;}
+}
+
+async function loadFeedbackCopy(){
+ if(s.user?.role!=='admin')return;
+ const content=await call('/admin/feedback-copy');
+ const cfg=state?.designs?.['half-a4'];if(cfg){
+   cfg.feedbackTitle=content.title||'We Value Your Feedback';
+   cfg.feedbackMessage=content.message||'Thank you for celebrating with us. Please scan the QR code below to share your experience.';
+   window.ragaSyncFeedbackCopyEditor?.();
+   if(state.layout==='half-a4')window.renderPreview?.();
+ }
+ const status=$('rs-feedback-copy-status');if(status)status.textContent='Shared guest feedback wording loaded.';
+}
+async function saveFeedbackCopy(){
+ const status=$('rs-feedback-copy-status');
+ if(s.user?.role!=='admin'){if(status)status.textContent='Administrator sign-in required.';return;}
+ const title=String($('raga-feedback-title-input')?.value||'').trim();
+ const message=String($('raga-feedback-message-input')?.value||'').trim();
+ if(!title||!message){if(status)status.textContent='Heading and message cannot be empty.';return;}
+ try{
+   const result=await call('/admin/feedback-copy','PUT',{title,message});
+   if(result?.updated!==true)throw Error('Security API did not confirm the saved wording');
+   if(status)status.textContent='Guest feedback wording saved to D1 and all menus.';
+   const cfg=state?.designs?.['half-a4'];if(cfg){cfg.feedbackTitle=title;cfg.feedbackMessage=message;}
+   window.renderPreview?.();
+ }catch(err){if(status)status.textContent='Feedback wording save failed: '+err.message;}
 }
 const CHOICE_NAMES={serviceModes:'Service types',mealSessions:'Meal sessions',menuCategories:'Menu categories',printFormats:'Menu / tag formats'};
 const CHOICE_LABELS={'a4':'Buffet Menu A4','a4-live':'Live Station A4','half-a4':'Table Menu Card','a8-grid':'A8 Tags','foldtags-grid':'FoldTags','a6-grid':'A6 Tags','canape-grid':'Canapé Labels'};
@@ -326,6 +352,10 @@ async function savePrintingRules(){
  }catch(err){const status=$('rs-print-rules-status');if(status)status.textContent='Save failed: '+err.message;}
 }
 function showPublic(){
+ closeAdminSettings();
+ // Shared event storage is staff-only. Client token holders must not be able
+ // to switch to the unrestricted Event Planner by removing URL fragments.
+ if(s.clientToken){document.body.classList.add('ragasaan-locked');return;}
  document.body.classList.remove('ragasaan-locked');
  $('ragasaan-auth-root')?.classList.remove('raga-client-on');
  const form=$('rs-login-form');if(form)form.hidden=false;
@@ -334,7 +364,7 @@ function showPublic(){
  document.querySelectorAll('[data-rs-admin],[data-rs-staff]').forEach(n=>n.hidden=true);
  const info=$('rs-user-info');if(info)info.textContent='Public event planning';
  loadChoiceOptions();loadMealDefaults();loadPrintingRules();
- refreshCloudList().catch(err=>msg('Unable to load shared events: '+err.message,'error'));
+ const list=$('rs-cloud-events');if(list)list.innerHTML='<p class="raga-help">Sign in as Event Planner or Admin to access shared cloud events. Local menu design remains available.</p>';
 }
 window.ragaOpenAdminLogin=function(){document.body.classList.add('ragasaan-locked');};
 function gateStatus(){const label=$('rs-user-info');if(label)label.textContent=s.user?`${s.user.name} · ${s.user.role==='admin'?'Administrator':'Event Planner'}`:'Not signed in';}
@@ -357,33 +387,97 @@ document.querySelectorAll('[data-rs-admin]').forEach(n=>n.hidden=s.user?.role!==
   // Existing local master UI is not an authorization boundary; publication is still checked by the separate GitHub Worker.
   {const master=$('tab-master');if(master)master.querySelectorAll('button[onclick*="requestMasterAuthorization"], #github-save-button').forEach(b=>b.hidden=s.user?.role!=='admin');}
 }
-function openCloud(){ $('ragasaan-cloud').classList.add('open');refreshCloudList().catch(err=>msg(err.message,'error'));}
+function openCloud(){if(s.clientToken)return; $('ragasaan-cloud').classList.add('open');refreshCloudList().catch(err=>msg(err.message,'error'));}
 function closeCloud(){$('ragasaan-cloud').classList.remove('open');}
+function openAdminSettings(){
+  if(s.clientToken)return;
+  if(s.user?.role!=='admin'){msg('Administrator sign-in required for Admin Settings.','error');window.ragaOpenAdminLogin();return;}
+  $('ragasaan-admin')?.classList.add('open');
+  window.ragaSyncFeedbackCopyEditor?.();
+  refreshPlanners().catch(err=>msg('User Profile loading failed: '+err.message,'error'));
+  loadFeedbackCopy().catch(err=>msg('Feedback wording loading failed: '+err.message,'error'));
+}
+function closeAdminSettings(){$('ragasaan-admin')?.classList.remove('open');}
 function opt(rows,idKey='id',labelKey='name'){return rows.map(r=>`<option value="${escAttr(r[idKey])}">${e(r[labelKey])}</option>`).join('');}
-async function refreshCloudList(){
- const r=await call(s.user?'/events':'/public/events','GET',undefined,!!s.user);s.events=r.events||[];
- const list=$('rs-cloud-events');if(!list)return;
- // Display the latest five by default while retaining all server-returned records.
- const plannerOf=x=>String(x.eventData?.plannerName||x.plannerName||'Unassigned planner').trim()||'Unassigned planner';
- const planners=[...new Set(s.events.map(plannerOf))].sort((a,b)=>a.localeCompare(b));
- const selected=String(s.cloudPlannerFilter||'');
- const relevant=s.events.filter(x=>!selected||plannerOf(x)===selected);
- const sorted=[...relevant].sort((a,b)=>{
-   const timestamp=x=>Date.parse(x.updatedAt||x.updated_at||x.createdAt||x.created_at||x.eventDate||'')||0;
-   return timestamp(b)-timestamp(a);
+
+function ragaPlannerName(x){
+ const assigned=s.planners.find(p=>p.id===x.plannerUserId);
+ return String(assigned?.display_name||x.eventData?.plannerName||x.plannerName||'Unassigned planner').trim()||'Unassigned planner';
+}
+function ragaCanDeleteCloud(x){
+ if(!s.user)return false;
+ if(s.user.role==='admin')return true;
+ return s.user.role==='planner'&&(x.plannerUserId===s.user.id||x.createdBy===s.user.id);
+}
+function ragaPendingClientDesigns(){
+ const pending=s.events.filter(row=>(row.status==='review'||(row.status==='approved'&&row.clientDesignUpdatedAt))&&!row.deletedAt);
+ const badge=$('rs-client-pending-badge');
+ if(badge){badge.hidden=!s.user||!pending.length;badge.textContent='Client designs: '+pending.length;}
+ const pane=$('rs-pending-designs');if(!pane)return;
+ pane.innerHTML=pending.length?pending.map(x=>
+  '<div class="raga-list-item raga-pending-task"><div class="raga-cloud-one-line"><strong>'+e(x.name)+'</strong><small>'+e(ragaPlannerName(x))+' · '+(x.status==='approved'?'Ready to print':'Pending client review')+'</small></div><div class="raga-actions"><button type="button" class="raga-btn" data-pending-review="'+e(x.id)+'">Review Design</button><button type="button" class="raga-btn primary" data-pending-print="'+e(x.id)+'">Review &amp; Print</button></div></div>'
+ ).join(''):'<p class="raga-help">No pending client designs.</p>';
+ pane.querySelectorAll('[data-pending-review]').forEach(button=>button.onclick=async()=>{
+   selectCloud(button.dataset.pendingReview);await loadSubmissions();
+   $('rs-design-inspector')?.scrollIntoView({block:'center',behavior:'smooth'});
  });
- const visible=s.cloudShowArchive?sorted:sorted.slice(0,5);
- const folder={};for(const x of visible){const day=String(x.eventDate||'No date').slice(0,10),planner=String(x.eventData?.plannerName||'General planner').slice(0,100);(folder[day]??={})[planner]??=[];folder[day][planner].push(x);}
- list.innerHTML='<div class="raga-list-item"><label class="raga-small">Filter by planner <select id="rs-cloud-planner-filter" class="raga-input"><option value="">All planners</option>'+planners.map(p=>'<option value="'+e(p)+'" '+(selected===p?'selected':'')+'>'+e(p)+'</option>').join('')+'</select></label><div class="raga-actions"><span class="raga-small">Showing '+visible.length+' of '+relevant.length+' matching events</span><button type="button" class="raga-btn" id="rs-cloud-archive-toggle">'+(s.cloudShowArchive?'Show latest five':'View older events')+'</button></div></div>'+(visible.length?Object.entries(folder).map(([day,planners])=>`<details class="raga-list-item" open><summary><b>📅 ${e(day)}</b></summary>${Object.entries(planners).map(([planner,events])=>`<details class="raga-list-item" open><summary>👤 ${e(planner)} · ${events.length} events</summary>${events.map(x=>`<div class="raga-list-item"><strong>${e(x.name)}</strong> <span class="raga-pill">${e(x.status)}</span><div class="raga-small">${e(x.eventDate||'Date not set')} · ${e(x.venue||'No venue')}</div><div class="raga-actions"><button class="raga-btn" data-load-cloud="${e(x.id)}">Load</button><button class="raga-btn" data-manage-cloud="${e(x.id)}">Manage</button></div></div>`).join('')}</details>`).join('')}</details>`).join(''):'<p class="raga-help">No matching cloud events. Choose All planners, or save a new event.</p>');
- const f=list.querySelector('#rs-cloud-planner-filter');
- if(f)f.onchange=()=>{s.cloudPlannerFilter=f.value;refreshCloudList().catch(err=>msg(err.message,'error'));};
- const archive=list.querySelector('#rs-cloud-archive-toggle');
- if(archive)archive.onclick=()=>{s.cloudShowArchive=!s.cloudShowArchive;refreshCloudList().catch(err=>msg(err.message,'error'));};
- list.querySelectorAll('[data-load-cloud]').forEach(b=>b.onclick=()=>loadCloud(b.dataset.loadCloud));
+ pane.querySelectorAll('[data-pending-print]').forEach(button=>button.onclick=async()=>{
+   const event=s.events.find(row=>row.id===button.dataset.pendingPrint);if(!event)return;
+   if(event.status!=='approved'){msg('Please review and approve the latest client design before printing.','error');selectCloud(event.id);await loadSubmissions();return;}
+   await loadCloud(event.id);window.switchTab?.('export');
+ });
+}
+async function ragaDeleteCloud(id){
+ const event=s.events.find(row=>row.id===id);if(!event)return;
+ if(!ragaCanDeleteCloud(event)){msg('Only Admin may delete any event; a planner may delete their own assigned/created event.','error');return;}
+ if(!confirm('Move "'+event.name+'" to recoverable deleted events? Its menu and design remain in D1.'))return;
+ try{
+   await call('/events/'+id,'DELETE',undefined,true);
+   if(s.cloudEvent?.id===id)s.cloudEvent=null;
+   msg('Event moved to recoverable deleted records.');await refreshCloudList();
+ }catch(err){msg('Delete failed: '+err.message,'error');}
+}
+async function ragaRestoreCloud(id){
+ if(!s.user){msg('Sign in to restore cloud events.','error');return;}
+ try{await call('/events/'+id+'/restore','POST',{},true);msg('Deleted event restored to Draft.');await refreshCloudList();}
+ catch(err){msg('Restore failed: '+err.message,'error');}
+}
+function renderCloudList(){
+ const list=$('rs-cloud-events');if(!list)return;
+ const planners=[...new Set(s.events.map(ragaPlannerName))].sort((a,b)=>a.localeCompare(b));
+ const selected=String(s.cloudPlannerFilter||'');
+ const relevant=s.events.filter(x=>!selected||ragaPlannerName(x)===selected);
+ const sorted=[...relevant].sort((a,b)=>{
+  const time=x=>Date.parse(x.updatedAt||x.updated_at||x.createdAt||x.created_at||x.eventDate||'')||0;
+  return time(b)-time(a);
+ });
+ const visible=s.cloudShowArchive?sorted:sorted.slice(0,20);
+ const plannerOptions=planners.map(p=>'<option value="'+e(p)+'" '+(selected===p?'selected':'')+'>'+e(p)+'</option>').join('');
+ const controls='<div class="raga-list-item raga-cloud-filters"><label>Filter by planner<select id="rs-cloud-planner-filter" class="raga-input"><option value="">All planners</option>'+plannerOptions+'</select></label><div class="raga-actions"><span class="raga-small">Latest '+visible.length+' of '+sorted.length+' events</span><button type="button" class="raga-btn" id="rs-cloud-archive-toggle">'+(s.cloudShowArchive?'Show latest 20':'Older events')+'</button>'+(s.user?'<button type="button" id="rs-cloud-restore-toggle" class="raga-btn">'+(s.cloudIncludeDeleted?'Hide deleted':'Recover deleted')+'</button>':'')+'</div></div>';
+ list.innerHTML=controls+(visible.length?visible.map(x=>{
+  const archived=x.status==='archived'||!!x.deletedAt;
+  const actions=archived?(ragaCanDeleteCloud(x)?'<button type="button" class="raga-btn" data-restore-cloud="'+e(x.id)+'">Restore</button>':''):'<button type="button" class="raga-btn primary" data-load-cloud="'+e(x.id)+'">Load</button><button type="button" class="raga-btn" data-manage-cloud="'+e(x.id)+'">Manage</button>'+(ragaCanDeleteCloud(x)?'<button type="button" class="raga-btn danger" data-delete-cloud="'+e(x.id)+'">Delete</button>':'');
+  return '<details class="raga-list-item raga-cloud-record"><summary class="raga-cloud-one-line"><strong>'+e(x.name)+'</strong><span>'+e(x.eventDate||'No date')+'</span><span>'+e(ragaPlannerName(x))+'</span><span class="raga-pill">'+e(x.status||'draft')+'</span></summary><div class="raga-cloud-details"><p>'+e(x.venue||'Venue not supplied')+'</p><div class="raga-actions">'+actions+'</div></div></details>';
+ }).join(''):'<p class="raga-help">No matching events. Select All planners or create an event.</p>');
+ const filter=list.querySelector('#rs-cloud-planner-filter');
+ if(filter)filter.onchange=()=>{s.cloudPlannerFilter=filter.value;renderCloudList();};
+ const older=list.querySelector('#rs-cloud-archive-toggle');
+ if(older)older.onclick=()=>{s.cloudShowArchive=!s.cloudShowArchive;renderCloudList();};
+ const deleted=list.querySelector('#rs-cloud-restore-toggle');
+ if(deleted)deleted.onclick=()=>{s.cloudIncludeDeleted=!s.cloudIncludeDeleted;refreshCloudList().catch(err=>msg(err.message,'error'));};
+ list.querySelectorAll('[data-load-cloud]').forEach(b=>b.onclick=()=>loadCloud(b.dataset.loadCloud).catch(err=>msg(err.message,'error')));
  list.querySelectorAll('[data-manage-cloud]').forEach(b=>b.onclick=()=>selectCloud(b.dataset.manageCloud));
- const current=s.cloudEvent&&s.events.find(x=>x.id===s.cloudEvent.id);
- if(current)s.cloudEvent=current;
- drawSelected();
+ list.querySelectorAll('[data-delete-cloud]').forEach(b=>b.onclick=()=>ragaDeleteCloud(b.dataset.deleteCloud));
+ list.querySelectorAll('[data-restore-cloud]').forEach(b=>b.onclick=()=>ragaRestoreCloud(b.dataset.restoreCloud));
+ const current=s.cloudEvent&&s.events.find(x=>x.id===s.cloudEvent.id);if(current)s.cloudEvent=current;
+ drawSelected();ragaPendingClientDesigns();
+}
+async function refreshCloudList(){
+ if(!s.user){const list=$('rs-cloud-events');if(list)list.innerHTML='<p class="raga-help">Event Planner or Admin sign-in required to view shared records.</p>';s.events=[];ragaPendingClientDesigns();return;}
+ const path='/events'+(s.cloudIncludeDeleted?'?includeArchived=1':'');
+ const result=await call(path,'GET',undefined,!!s.user);
+ s.events=Array.isArray(result.events)?result.events:[];
+ renderCloudList();
  if(s.user?.role==='admin')await refreshPlanners();
 }
 async function refreshPlanners(){
@@ -435,16 +529,18 @@ function compactCloudSnapshot(raw){
  return cleaned;
 }
 async function saveCloud(){
+ if(!s.user||!['admin','planner'].includes(s.user.role)){msg('Sign in as Event Planner or Admin before saving to the shared D1 library.','error');return;}
  const snapshot=compactCloudSnapshot(eventSnapshot()),current=s.cloudEvent;
  const chosenName=String(snapshot.name||snapshot.title||'Event').trim();
  const payload={name:chosenName,eventDate:snapshot.date||'',venue:snapshot.venue||'',partyNo:snapshot.partyNo||'',eventData:snapshot};
  if(s.user?.role==='admin'){const planner=$('rs-event-planner');payload.plannerUserId=planner?.value||null;}
- if(!current){const r=await call(s.user?'/events':'/public/events','POST',payload,!!s.user);s.cloudEvent={id:r.id,...payload,status:'draft'};msg('Shared event created.');}
+ if(!current){const r=await call('/events','POST',payload,true);s.cloudEvent={id:r.id,...payload,status:'draft'};msg('Shared event created.');}
  else {const confirmed=confirm('Overwrite the selected cloud event with the current builder snapshot? This resets print approval.');if(!confirmed)return;
- await call((s.user?'/events/':'/public/events/')+current.id,'PUT',payload,!!s.user);msg('Shared event updated.');}
+ await call('/events/'+current.id,'PUT',payload,true);msg('Shared event updated.');}
  await refreshCloudList();
 }
-async function loadCloud(id){const x=await call((s.user?'/events/':'/public/events/')+id,'GET',undefined,!!s.user);if(!x.event)throw Error('Cloud event not found');
+async function loadCloud(id){if(!s.user)throw Error('Event Planner or Admin sign-in required.');
+ const x=await call('/events/'+id,'GET',undefined,true);if(!x.event)throw Error('Cloud event not found');
  // Loading a cloud snapshot also loads its approved client design. Keep local browser copy intact until confirmed.
  const remote=data(x.event.eventData);for(const fmt of FMT){if(remote.designs?.[fmt]){for(const k of ['logoUrl','coupleLogoUrl']){const v=remote.sharedImages?.[k==='logoUrl'?'companyLogo':'coupleLogo'];if(v&&!remote.designs[fmt][k])remote.designs[fmt][k]=v;}if(state.designs?.[fmt])for(const k of ['logoUrl','coupleLogoUrl','halfBackLeftImageUrl','halfBackRightImageUrl'])if(!remote.designs[fmt][k]&&state.designs[fmt][k])remote.designs[fmt][k]=state.designs[fmt][k];}}
  if(restoreEventSnapshot(remote)!==true)return;s.cloudEvent=x.event;s.activeTheme=x.event.eventData?.themeId||'';renderThemeGallery();s.loadedSnapshot=JSON.stringify(compactCloudSnapshot(eventSnapshot()));s.loadedRemote=JSON.stringify(x.event.eventData);
@@ -472,9 +568,25 @@ async function loadSubmissions(){if(!s.cloudEvent)return;try{const r=await call(
 function showSubmissionDesign(item){const d=item.design||{};const root=$('rs-design-inspector');
  root.innerHTML=`<b>Revision ${item.revision} · ${e(item.status)}</b><p>Theme: ${e(d.themeId||'Custom')}<br>Table name: ${e(d.coupleTitle||[d.brideName,d.groomName].filter(Boolean).join(' & '))}<br>Welcome message: ${e(d.welcomeMessage||'')}</p><div class="raga-small">${Object.entries(d.designs||{}).map(([fmt,x])=>e(FN[fmt]||fmt)+': '+e(x.titleFont||'')+', '+e(x.accentColor||'')).join(' · ')}</div>`;}
 async function approvePrint(){if(!s.cloudEvent)return;try{await call('/events/'+s.cloudEvent.id+'/approve-print','POST',{});msg('Printing approved for this cloud event.');await refreshCloudList();}catch(err){msg(err.message,'error');}}
-async function createPlanner(){if(s.user?.role!=='admin')return;
- const email=$('rs-new-planner-email').value.trim(),name=$('rs-new-planner-name').value.trim(),password=$('rs-new-planner-password').value;
- try{await call('/users/planners','POST',{email,name,password});$('rs-new-planner-password').value='';msg('Event Planner created. Share their initial password through a secure channel.');await refreshPlanners();}catch(err){msg(err.message,'error');}}
+async function createPlanner(){
+ const status=$('rs-new-planner-status'),button=$('rs-create-planner');
+ const set=(message,isError=false)=>{if(status){status.textContent=message;status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.style.color=isError?'#a42342':'#256746';}msg(message,isError?'error':'');};
+ if(s.user?.role!=='admin'){set('Only an Administrator can create an Event Planner.',true);return;}
+ const email=String($('rs-new-planner-email')?.value||'').trim().toLowerCase();
+ const name=String($('rs-new-planner-name')?.value||'').trim();
+ const password=String($('rs-new-planner-password')?.value||'');
+ if(!name||!/^\S+@\S+\.\S+$/.test(email)||password.length<8){set('Enter a name, valid email and an initial password of at least 8 characters.',true);return;}
+ if(button){button.disabled=true;button.textContent='Creating Event Planner…';}
+ set('Checking account details and submitting user creation…');
+ try{
+  const created=await call('/users/planners','POST',{email,name,password});
+  if(!created?.id)throw Error('The server did not return a new user ID; account creation is not confirmed.');
+  $('rs-new-planner-password').value='';
+  set('Event Planner '+name+' created successfully. Share the initial password securely.');
+  await refreshPlanners();
+ }catch(err){set('Could not create Event Planner: '+(err?.message||String(err)),true);}
+ finally{if(button){button.disabled=false;button.textContent='Create Event Planner';}}
+}
 // The public HTML can be bypassed; this guard provides operational UI workflow protection only.
 // The backend independently authorizes cloud event, client link, submission, approval and print-status calls.
 async function canPrint(){return true;}
@@ -535,14 +647,19 @@ function exportThemes(){const blob=new Blob([JSON.stringify(savedThemes(),null,2
 async function importThemes(ev){const f=ev.target.files?.[0];if(!f)return;try{const raw=JSON.parse(await f.text());if(!Array.isArray(raw))throw Error('Expected a JSON array');const got=raw.map(validTheme).filter(Boolean),map=new Map(savedThemes().map(x=>[x.id,x]));for(const t of got)map.set(t.id,t);localStorage.setItem('ragasaan_custom_themes_v1',JSON.stringify([...map.values()]));renderThemeGallery();alert(`Imported ${got.length} valid themes`);}catch(err){alert('Theme import failed: '+err.message);}finally{ev.target.value='';}}
 function initClient(){const fragment=location.hash.match(/(?:^#|&)client=([a-f0-9]{64})/i);
  if(!fragment){$('rs-login-form').hidden=false;return false;}
- s.clientToken=fragment[1];$('ragasaan-auth-root').classList.add('raga-client-on');$('rs-login-form').hidden=true;$('rs-client-panel').hidden=false;openClient().catch(err=>{$('rs-client-panel').innerHTML=`<div class="raga-login-card"><h2>Client link unavailable</h2><p>${e(err.message)}</p></div>`;});return true;
+ s.clientToken=fragment[1];
+ // Fail closed before asynchronous /client/view: no staff navbar, cloud button,
+ // Admin interface or event builder may be visible on the client invitation URL.
+ document.body.classList.add('ragasaan-locked');
+ $('ragasaan-cloud')?.classList.remove('open');
+ $('ragasaan-admin')?.classList.remove('open');$('ragasaan-auth-root').classList.add('raga-client-on');$('rs-login-form').hidden=true;$('rs-client-panel').hidden=false;openClient().catch(err=>{$('rs-client-panel').innerHTML=`<div class="raga-login-card"><h2>Client link unavailable</h2><p>${e(err.message)}</p></div>`;});return true;
 }
-async function openClient(){const result=await call('/client/view','POST',{token:s.clientToken},false);s.clientEvent=result.event;
+async function openClient(){const result=await call('/client/view','POST',{token:s.clientToken},false);s.clientEvent=result.event;s.clientCanPrint=result.canPrint===true;
  s.clientAllowed=CLIENT_PRINT_FORMATS.filter(f=>Array.isArray(result.clientFormats)?result.clientFormats.includes(f):true);
  if(!s.clientAllowed.length)throw Error('Client design access is disabled for this event.');
  s.clientFmt=s.clientAllowed.includes('half-a4')?'half-a4':s.clientAllowed[0];
  s.clientDesign={themeId:'executive-ivory',designs:{},coupleTitle:'',brideName:'',groomName:'',welcomeMessage:'',coupleLogo:'',coupleLogoWidth:110};
- const root=$('rs-client-panel');root.innerHTML=`<div class="raga-client-shell"><section class="raga-client-side"><h2>Ragasaan Client Design</h2><p class="raga-muted">${e(result.event.name)} · ${e(result.event.eventDate||'')}<br>${e(result.event.venue||'')} · Link expires ${new Date(result.expiresAt).toLocaleString()}</p><div class="raga-rule"></div><h3 class="raga-section-title">1. Select a theme</h3><div class="raga-client-themes" id="rs-client-themes"></div><div class="raga-rule"></div><h3 class="raga-section-title">2. Design format &amp; type</h3><select id="rs-client-fmt" class="raga-input" onchange="ragaClientChangeFormat(this.value)">${s.clientAllowed.map(f=>`<option value="${f}" ${f===s.clientFmt?'selected':''}>${e(FN[f])}</option>`).join('')}</select><div id="rs-client-controls"></div><div class="raga-rule"></div><h3 class="raga-section-title">3. Table Menu Card personalization</h3><p class="raga-help">These fields apply to the Table Menu Card only; event dishes, allergens and other formats remain unchanged.</p><div class="raga-client-form-grid"><label>Bride name<input class="raga-input" maxlength="100" id="rs-bride" oninput="ragaClientDetail('brideName',this.value)"></label><label>Groom name<input class="raga-input" maxlength="100" id="rs-groom" oninput="ragaClientDetail('groomName',this.value)"></label></div><label>Couple display title<input class="raga-input" id="rs-couple-title" maxlength="220" placeholder="${escAttr(result.event.name)}" oninput="ragaClientDetail('coupleTitle',this.value)"></label><label>Welcome message (Table Menu Card only)<textarea class="raga-input" rows="3" maxlength="450" id="rs-welcome" oninput="ragaClientDetail('welcomeMessage',this.value)"></textarea></label><label>Couple monogram / image (PNG, JPG, WebP; max 240 KB)<input type="file" class="raga-input" accept="image/png,image/jpeg,image/webp" onchange="ragaClientLogo(event)"></label><label>Couple logo width (px)<input type="number" class="raga-input" min="30" max="220" value="110" onchange="ragaClientDetail('coupleLogoWidth',Number(this.value))"></label><div class="raga-rule"></div><button id="rs-submit-design" class="raga-btn primary" onclick="ragaSubmitClientDesign()">Submit Design to Event Planner</button><p id="rs-client-notice" class="raga-alert" role="status"></p><p class="raga-help">Submitting saves design choices in Cloudflare D1. The Event Planner must review them. You cannot edit dishes or allergens here.</p></section><section class="raga-client-preview"><div class="raga-client-preview-head"><div><b id="rs-client-preview-title">Table Menu Card</b><p>Read-only design preview · supplied event menu</p></div><span class="raga-pill">Live preview</span></div><div id="rs-client-paper" class="raga-client-paper"></div><p class="raga-help">This is the actual Print Studio template at scaled A4 dimensions, using the event menu supplied by your Event Planner. The Event Planner checks final output before printing.</p></section></div>`;
+ const root=$('rs-client-panel');root.innerHTML=`<div class="raga-client-shell"><section class="raga-client-side"><h2>Ragasaan Client Design</h2><p class="raga-muted">${e(result.event.name)} · ${e(result.event.eventDate||'')}<br>${e(result.event.venue||'')} · Link expires ${new Date(result.expiresAt).toLocaleString()}</p><div class="raga-rule"></div><h3 class="raga-section-title">1. Select a theme</h3><div class="raga-client-themes" id="rs-client-themes"></div><div class="raga-rule"></div><h3 class="raga-section-title">2. Design format &amp; type</h3><select id="rs-client-fmt" class="raga-input" onchange="ragaClientChangeFormat(this.value)">${s.clientAllowed.map(f=>`<option value="${f}" ${f===s.clientFmt?'selected':''}>${e(FN[f])}</option>`).join('')}</select><div id="rs-client-controls"></div><div class="raga-rule"></div><h3 class="raga-section-title">3. Table Menu Card personalization</h3><p class="raga-help">These fields apply to the Table Menu Card only; event dishes, allergens and other formats remain unchanged.</p><div class="raga-client-form-grid"><label>Bride name<input class="raga-input" maxlength="100" id="rs-bride" oninput="ragaClientDetail('brideName',this.value)"></label><label>Groom name<input class="raga-input" maxlength="100" id="rs-groom" oninput="ragaClientDetail('groomName',this.value)"></label></div><label>Couple display title<input class="raga-input" id="rs-couple-title" maxlength="220" placeholder="${escAttr(result.event.name)}" oninput="ragaClientDetail('coupleTitle',this.value)"></label><label>Welcome message (Table Menu Card only)<textarea class="raga-input" rows="3" maxlength="450" id="rs-welcome" oninput="ragaClientDetail('welcomeMessage',this.value)"></textarea></label><label>Couple monogram / image (PNG, JPG, WebP; max 240 KB)<input type="file" class="raga-input" accept="image/png,image/jpeg,image/webp" onchange="ragaClientLogo(event)"></label><label>Couple logo width (px)<input type="number" class="raga-input" min="30" max="220" value="110" onchange="ragaClientDetail('coupleLogoWidth',Number(this.value))"></label><div class="raga-rule"></div><button id="rs-submit-design" class="raga-btn primary" onclick="ragaSubmitClientDesign()">Submit Design to Event Planner</button><p id="rs-client-notice" class="raga-alert" role="status"></p><p class="raga-help">Submitting saves design choices in Cloudflare D1. The Event Planner must review them. You cannot edit dishes or allergens here.</p></section><section class="raga-client-preview"><div class="raga-client-preview-head"><div><b id="rs-client-preview-title">Table Menu Card</b><p>Read-only design preview · supplied event menu</p></div><span class="raga-pill">Live preview</span></div><div id="rs-client-print-controls" class="raga-actions" aria-label="Client Print Studio"><strong>Print Studio</strong><button type="button" id="rs-client-save-pdf" class="raga-btn" onclick="ragaClientSavePDF()" ${s.clientCanPrint?'':'disabled'}>Save PDF</button><button type="button" id="rs-client-print" class="raga-btn primary" onclick="ragaClientPrintPreview()" ${s.clientCanPrint?'':'disabled'}>Print</button><small id="rs-client-print-status" class="raga-help">${s.clientCanPrint?'Approved for client printing':'Preview available; planner approval required for printing'}</small></div><div id="rs-client-paper" class="raga-client-paper"></div><p class="raga-help">This is the actual Print Studio template at scaled A4 dimensions, using the event menu supplied by your Event Planner. The Event Planner checks final output before printing.</p></section></div>`;
  ragaSelectClientTheme('executive-ivory');
 }
 function selectClientTheme(id){const t=allThemes().find(x=>x.id===id);if(!t)return;
@@ -587,10 +704,32 @@ async function clientLogo(evt){const file=evt.target.files?.[0];if(!file)return;
  if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>240_000){alert('Use PNG, JPG or WebP smaller than 240 KB.');return;}
  const reader=new FileReader();reader.onload=()=>{s.clientDesign.coupleLogo=String(reader.result);renderClientPreview();};reader.readAsDataURL(file);
 }
+
+function printClientPreview(){
+ if(!s.clientCanPrint){const notice=$('rs-client-print-status');if(notice)notice.textContent='Planner approval required before client printing.';return;}
+ if(!$('rs-client-paper')?.querySelector('.print-sheet')){alert('No printable client page.');return;}
+ document.body.classList.add('raga-client-print');
+ window.print();
+}
+window.addEventListener('afterprint',()=>document.body.classList.remove('raga-client-print'));
+async function saveClientPdf(){
+ const status=$('rs-client-print-status');
+ if(!s.clientCanPrint){if(status)status.textContent='Planner approval required before client PDF download.';return;}
+ if(typeof window.html2pdf!=='function'){if(status)status.textContent='PDF converter unavailable. Reload with internet access.';return;}
+ const sheets=[...($('rs-client-paper')?.querySelectorAll('.print-sheet')||[])];
+ if(!sheets.length){if(status)status.textContent='No client pages available';return;}
+ const root=document.createElement('div');
+ root.style.cssText='position:fixed;left:-20000px;top:0;width:210mm;background:#fff';
+ sheets.forEach((page,i)=>{const el=page.cloneNode(true);el.style.cssText+=';width:210mm!important;height:297mm!important;zoom:1!important;transform:none!important;margin:0!important';el.removeAttribute('contenteditable');root.appendChild(el);if(i<sheets.length-1){const br=document.createElement('div');br.className='html2pdf__page-break';root.appendChild(br);}});
+ $('rs-client-panel').appendChild(root);
+ try{await window.html2pdf().set({margin:0,filename:'Ragasaan_Client_Design.pdf',image:{type:'jpeg',quality:.97},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(root).save();if(status)status.textContent='PDF saved.';}
+ catch(err){if(status)status.textContent='Unable to save PDF: '+err.message;}
+ finally{root.remove();}
+}
 async function submitClient(){if(!s.clientToken)return;
  const btn=$('rs-submit-design');btn.disabled=true;$('rs-client-notice').textContent='Submitting design…';
  try{const payload=data(s.clientDesign);if(!payload.coupleTitle){const couple=[payload.brideName,payload.groomName].filter(Boolean).join(' & ');payload.coupleTitle=couple||s.clientEvent.name||'';}const result=await call('/client/submit','POST',{token:s.clientToken,design:payload},false);
- $('rs-client-notice').textContent='Submitted successfully (revision stored). Your Event Planner can now review the design.';
+ $('rs-client-notice').textContent=result.applied===true?'Design saved immediately to the shared event. Your planner has an in-app review task; printing requires approval.':'Submission recorded. Your planner can review it; shared updates require the latest Security API.';
  }catch(err){$('rs-client-notice').textContent='Submission failed: '+err.message;}
  finally{btn.disabled=false;}
 }
@@ -598,7 +737,13 @@ function copyLink(){const x=$('rs-link-output').value;if(!x)return;try{navigator
 function attach(){
  // The form uses an inline fail-closed submit handler so missing JS cannot silently reload the page.
  $('rs-open-cloud')?.addEventListener('click',openCloud);
- $('rs-open-admin-qr')?.addEventListener('click',()=>{openCloud();setTimeout(()=>document.getElementById('rs-admin-feedback-panel')?.scrollIntoView({block:'center',behavior:'smooth'}),30);});
+ $('rs-client-pending-badge')?.addEventListener('click',()=>{
+   openCloud();$('rs-pending-designs')?.scrollIntoView({block:'center',behavior:'smooth'});
+ });
+ $('rs-open-admin-qr')?.addEventListener('click',openAdminSettings);
+ $('rs-close-admin')?.addEventListener('click',closeAdminSettings);
+ $('ragasaan-admin')?.addEventListener('click',evt=>{if(evt.target===evt.currentTarget)closeAdminSettings();});
+ $('rs-feedback-copy-save')?.addEventListener('click',()=>saveFeedbackCopy().catch(err=>msg(err.message,'error')));
  // Delegated handler survives Cloud Settings panel rerenders and always acknowledges clicks.
  document.addEventListener('click',event=>{
    const button=event.target.closest?.('#rs-company-publish, #rs-company-remove');
@@ -616,6 +761,10 @@ function attach(){
      if(status)status.textContent=detail;
      msg(detail,'error');
    });
+ });
+ document.addEventListener('click',event=>{
+   const button=event.target.closest?.('#rs-create-planner');
+   if(button&&!event.defaultPrevented){event.preventDefault();createPlanner().catch(err=>msg(err.message,'error'));}
  });
  $('rs-company-upload')?.addEventListener('change',event=>{
    const file=event.target.files?.[0],status=$('rs-company-status');
@@ -640,13 +789,16 @@ function attach(){
  $('rs-list-links')?.addEventListener('click',()=>listLinks().catch(x=>msg(x.message,'error')));
  $('rs-load-submissions')?.addEventListener('click',loadSubmissions);
  $('rs-approve-print')?.addEventListener('click',approvePrint);
- $('rs-create-planner')?.addEventListener('click',createPlanner);
+ $('rs-create-planner')?.addEventListener('click',event=>{event.preventDefault();createPlanner().catch(err=>msg(err.message,'error'));});
  $('rs-load-selected')?.addEventListener('click',()=>loadCloud(s.cloudEvent?.id).catch(x=>msg(x.message,'error')));
  $('rs-cloud')?.addEventListener('click',evt=>{if(evt.target===evt.currentTarget)closeCloud();});
  loadThemeGallery();
  // QR fetch is independent of staff login so client links show the exact printed QR.
  fetchFeedbackQR();fetchCompanyLogo().catch(()=>{});
  if(initClient())return;
+ // Refresh pending design notifications when the planner returns to the app.
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&s.user)refreshCloudList().catch(()=>{});});
+ setInterval(()=>{if(s.user&&!document.hidden)refreshCloudList().catch(()=>{});},120000);
  const stored=JSON.parse(sessionStorage.getItem('raga_session')||'null');
  if(stored?.token && new Date(stored.expiresAt)>new Date()){
  s.token=stored.token;call('/me').then(u=>{s.user=u;document.body.classList.remove('ragasaan-locked');showAuthenticated();}).catch(err=>{onLoginError('Admin session expired: '+err.message);showPublic();});
@@ -656,7 +808,7 @@ function attach(){
 Object.assign(window,{
  ragaLoginSubmit:login, ragaApplyTheme:applyTheme,ragaSaveCurrentTheme:saveCurrentTheme,ragaExportThemes:exportThemes,ragaImportThemes:importThemes,
  ragaSelectClientTheme:selectClientTheme,ragaClientChangeFormat:clientFormat,ragaClientDetail:detailClient,
- ragaClientStyle:updateClientStyle,ragaClientLogo:clientLogo,ragaSubmitClientDesign:submitClient
+ ragaClientStyle:updateClientStyle,ragaClientLogo:clientLogo,ragaSubmitClientDesign:submitClient,ragaClientPrintPreview:printClientPreview,ragaClientSavePDF:saveClientPdf
 });
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',attach);else attach();
 })();
