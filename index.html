@@ -1601,6 +1601,11 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 .raga-drag-handle:hover{opacity:1}
 .print-sheet .leading-tight:empty,.print-sheet [contenteditable="true"]:empty{display:none!important;margin:0!important;padding:0!important}
 @media print{.raga-drag-handle{display:none!important}}
+</style><style id="raga-print-studio-controls-css">
+.raga-page-button{background:#273449;color:#fff;border:1px solid #64748b;border-radius:5px;padding:5px 8px;font-size:11px}
+@media screen{#paper-render-target .raga-preview-only-hidden{display:none!important}}
+@media print{#raga-print-studio-preview-controls{display:none!important}}
+.print-sheet .leading-tight:has(span[aria-label="Declared allergens"]:empty):not(:has(span[aria-label="May contain"])){display:none!important}
 </style></head>
 <body class="h-full flex flex-col font-sans antialiased text-slate-100 bg-slate-950 overflow-hidden">
 
@@ -1867,6 +1872,16 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <p class="text-xs text-slate-400">Print, save as PDF, or download editable Word for A4 Buffet and Table Menu Card</p>
         </div>
 
+        <section id="raga-print-studio-preview-controls" class="no-print" aria-label="Final print preview page selector" style="background:#172033;border:1px solid #546276;border-radius:8px;padding:10px;display:grid;gap:8px">
+          <strong style="color:#fbbf24;font-size:12px">Final Preview</strong>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <button type="button" onclick="ragaStudioStep(-1)" aria-label="Previous page" class="raga-page-button">‹ Previous</button>
+            <select id="raga-studio-page-choice" aria-label="Select preview page" onchange="ragaStudioChoose(Number(this.value))" class="raga-page-button"></select>
+            <button type="button" onclick="ragaStudioStep(1)" aria-label="Next page" class="raga-page-button">Next ›</button>
+            <button type="button" onclick="ragaStudioShowAll()" class="raga-page-button">All pages</button>
+          </div>
+          <small style="color:#cbd5e1">Choose a page to inspect. Print/PDF includes all pages regardless of selection.</small>
+        </section>
         <!-- Buffet Menu (A4) -->
         <div class="bg-slate-950 px-2 py-2 rounded-lg border border-slate-800 space-y-1">
           <div class="flex items-center justify-between">
@@ -4453,13 +4468,16 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     }
     // Files use Windows-safe day-month-year + venue + format, as requested.
     function ragaDownloadFilename(original){
-      const date=String(document.getElementById('cfg-date')?.value||'');
-      const parts=date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-      const day=parts?`${parts[3]}-${parts[2]}-${parts[1]}`:'No_Date';
-      const venue=String(state.event.venue||'Venue').replace(/[\\/:*?"<>|]+/g,' ').replace(/\s+/g,' ').trim().slice(0,70)||'Venue';
-      const detail=String(original||'Menu').replace(/[\\/:*?"<>|]+/g,'_');
-      return `${day}_${venue}_${detail}`;
-    }
+          const raw=String(original||'Menu');
+          const date=String(document.getElementById('cfg-date')?.value||'');
+          const match=date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+          const ddmm=match?match[3]+'-'+match[2]:'No-Date';
+          const rawVenue=String(state.event.venue||'Venue');
+          const name=rawVenue.split(/[,\n]|\s[-–—]\s/)[0].trim().replace(/[\\/:*?"<>|]+/g,' ').replace(/\s+/g,' ').slice(0,65)||'Venue';
+          const venue=name.split(' ').filter(Boolean).map(w=>w[0].toUpperCase()+w.slice(1).toLowerCase()).join(' ');
+          if(/\.docx$/i.test(raw))return ddmm+'-'+venue+'.docx';
+          return ddmm+'-'+venue+'-'+raw.replace(/[\\/:*?"<>|]+/g,'_');
+        }
     function saveBlob(blob, filename) {
       filename=ragaDownloadFilename(filename);
       const link=document.createElement('a');
@@ -4892,7 +4910,32 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   document.addEventListener('DOMContentLoaded',()=>{render();});
 })();
 </script>
-  <script src="./security-app.js"></script>
+  <script id="raga-print-studio-navigation">
+(function(){
+  'use strict';
+  let index=0,all=false;
+  const sheets=()=>[...document.querySelectorAll('#paper-render-target > .print-sheet')];
+  const studio=()=>!document.getElementById('tab-export')?.classList.contains('hidden');
+  function draw(){
+    const pages=sheets(),sel=document.getElementById('raga-studio-page-choice');if(!sel)return;
+    index=Math.max(0,Math.min(index,pages.length-1));
+    const opts=pages.map((p,i)=>'<option value="'+i+'">Page '+(i+1)+' of '+pages.length+'</option>').join('');
+    if(sel.innerHTML!==opts)sel.innerHTML=opts;
+    sel.value=String(index);
+    pages.forEach((p,i)=>p.classList.toggle('raga-preview-only-hidden',studio()&&!all&&i!==index));
+  }
+  window.ragaStudioChoose=function(n){index=Math.max(0,Math.min(sheets().length-1,Number(n)||0));all=false;draw();};
+  window.ragaStudioStep=function(delta){window.ragaStudioChoose(index+delta);};
+  window.ragaStudioShowAll=function(){all=true;draw();};
+  document.addEventListener('DOMContentLoaded',()=>{
+    const mount=document.getElementById('paper-render-target');
+    if(mount)new MutationObserver(draw).observe(mount,{childList:true});
+    document.querySelectorAll('.tab-btn').forEach(button=>button.addEventListener('click',()=>requestAnimationFrame(draw)));
+    draw();
+  });
+})();
+</script>
+<script src="./security-app.js"></script>
 <script id="ragasaan-word-export-actions">
 /* Self-contained Word actions. These replace the old CDN-only DOCX actions.
    Documents are genuine, editable OOXML .docx files; exact visual fidelity
