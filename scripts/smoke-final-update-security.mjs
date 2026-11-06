@@ -83,6 +83,19 @@ try{
   previewText:document.querySelector('#paper-render-target')?.innerHTML.slice(0,15000)
  }));
  console.log('STAFF THEME DIAGNOSTICS',JSON.stringify({before:themeBefore,after:{...themeAfter,previewText:themeAfter.previewText?.includes(themeAfter.color)}}));
+ console.log('THEME SAVE FUNCTION DIAGNOSTIC',JSON.stringify(await tp.evaluate(()=>{
+  const before=JSON.parse(localStorage.getItem('ragasaan_style_v3')||'{}').designs?.a4?.accentColor;
+  const fn=String(window.saveStyle).slice(0,400);
+  let success='not-tested';
+  try{window.saveStyle();success='called';}catch(e){success='throws:'+e.message;}
+  let direct='not-tested';
+  try{localStorage.setItem('ragasaan_style_probe_v1',JSON.stringify({designs:state.designs}));direct='ok';}catch(e){direct='throws:'+e.message;}
+  return {before,after:JSON.parse(localStorage.getItem('ragasaan_style_v3')||'{}').designs?.a4?.accentColor,
+   current:state.designs.a4.accentColor,styleFn:fn,saveCall:success,direct,
+   storageLength:(localStorage.getItem('ragasaan_style_v3')||'').length,
+   stylesLength:JSON.stringify({designs:state.designs}).length};
+ })));
+
  assert.notEqual(themeAfter.color,themeBefore.color,'Theme selection changes the print accent colour');
  assert.equal(themeAfter.saved,themeAfter.color,'Theme selection persists the print accent colour');
  assert.ok(themeAfter.previewText.includes(themeAfter.color),'Preview uses the newly selected accent colour');
