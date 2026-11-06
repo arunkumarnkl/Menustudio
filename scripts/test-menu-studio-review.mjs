@@ -86,17 +86,17 @@ pass('Word filename removes full venue address and format suffix',true);
 pass('Word regular menu item has no ordinal; summary still uses numbers',
   html.includes("const out=[w.paragraph(name,{bold:true,size:10") &&
   html.includes("cols[idx].push(w.paragraph(`${++num}. ${ragaDisplayText(item.name"));
-pass('Word two-column layout uses fixed geometry',html.includes('<w:tblLayout w:type="fixed"/>')&&html.includes('<w:vAlign w:val="top"/>'));
+pass('Word two-column layout is fixed, padded and balanced',html.includes('<w:tblLayout w:type="fixed"/>')&&html.includes("alignVertical:['center','top']")&&html.includes('minHeightTwips:13100'));
 
-pass('Cloud records sorted then limited to latest five in UI',client.includes('const visible=s.cloudShowArchive?sorted:sorted.slice(0,5)'));
+pass('Cloud records sorted then limited to latest twenty in UI',client.includes('const visible=s.cloudShowArchive?sorted:sorted.slice(0,20)'));
 pass('Cloud planner filter and older-record archive exist',client.includes('rs-cloud-planner-filter')&&client.includes('rs-cloud-archive-toggle'));
-pass('All records retained in client state, not deleted by five-row display',client.includes('s.events=r.events||[];'));
+pass('All records retained in client state, not deleted by twenty-row display',client.includes('s.events=Array.isArray(result.events)?result.events:[];'));
 pass('Feedback heading and message editable on print preview',html.includes('data-preview-text="feedbackTitle"')&&html.includes('data-preview-text="feedbackMessage"'));
-pass('Feedback editable in Print Studio without a QR image',html.includes('raga-feedback-title-input')&&html.includes('raga-feedback-message-input')&&html.includes('ragaUpdateFeedbackCopy'));
+pass('Feedback editable in Admin QR settings without requiring uploaded QR image',html.includes('raga-feedback-title-input')&&html.includes('raga-feedback-message-input')&&html.includes('ragaUpdateFeedbackCopy')&&html.includes('id="rs-feedback-copy-save"'));
 pass('Feedback text persisted and included in editable Word',html.includes("'feedbackTitle','feedbackMessage'")&&html.includes("w.paragraph(d.feedbackTitle ?? 'We Value Your Feedback'")&&html.includes("w.paragraph(d.feedbackMessage ?? 'Thank you for celebrating with us."));
 pass('Feedback fields and editor have no dedicated print spacing',html.includes('id="raga-feedback-copy-editor" class="no-print'));
 pass('Review-only Worker provides saved timestamps',worker.includes('createdAt:event.created_at,updatedAt:event.updated_at'));
-pass('Review-only Worker orders both cloud list routes by latest update',worker.split('ORDER BY COALESCE(updated_at,created_at) DESC,created_at DESC LIMIT 500').length-1===2);
+pass('Review-only Worker orders authenticated library by latest update',worker.includes("SELECT * FROM events WHERE status!='archived' ORDER BY COALESCE(updated_at,created_at) DESC,created_at DESC LIMIT 500"));
 pass('Company logo publishing automatically resizes high-resolution files',client.includes('async function ragaOptimiseCompanyLogo(file,progress)')&&client.includes("canvas.toBlob(resolve,'image/webp',quality)"));
 pass('Company logo publishing checks the stored D1 logo before claiming success',client.includes("const confirmed=await fetchCompanyLogo()")&&client.includes('Company logo published and verified. It will appear for all users on refresh.'));
 pass('Company logo publishing surfaces API failures beside uploader',client.includes("setStatus('Company logo not confirmed: '"));
