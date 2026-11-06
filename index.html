@@ -4955,6 +4955,10 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   document.addEventListener('click',ev=>{
     const b=ev.target.closest('[data-raga-action]');if(!b||!holder()?.contains(b))return;
     const act=b.dataset.ragaAction,sid=b.dataset.session,course=b.dataset.course,session=byId(sid);
+    if(act==='add-station'&&session){ragaAddCardStation(session);return;}
+    if(act==='remove-station'&&session){ragaRemoveCardStation(session,b.dataset.stationId);return;}
+    if(act==='add-live-station'&&session){ragaAddCardStation(session,true);return;}
+    if(act==='remove-live-station'&&session){ragaRemoveCardStation(session,b.dataset.stationId,true);return;}
     if(act==='toggle-meal'){if(openSessions.has(sid))openSessions.delete(sid);else openSessions.add(sid);currentBuilderSession=sid;render();}
     if(act==='toggle-category'){ev.preventDefault();const k=idKey(sid,course);if(openCategories.has(k))openCategories.delete(k);else openCategories.add(k);render();}
     if(act==='search')search(sid,course);
@@ -4979,6 +4983,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   document.addEventListener('change',ev=>{
     const el=ev.target;if(!holder()?.contains(el))return;
     const sid=el.dataset.session,course=el.dataset.course,session=byId(sid);
+    if(el.dataset.ragaAction==='station-name'&&session){ragaRenameCardStation(session,el.dataset.stationId,el.value);return;}
+    if(el.dataset.ragaAction==='live-station-name'&&session){ragaRenameCardStation(session,el.dataset.stationId,el.value,true);return;}
     if(el.dataset.ragaCheck){
       const group=el.closest('fieldset'),field=el.dataset.ragaCheck;
       if(group&&['allergens','mayContain'].includes(field))ragaEditSelectedDish(el.dataset.uid,field,[...group.querySelectorAll('input:checked')].map(x=>x.value));
@@ -4987,11 +4993,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     if(el.dataset.ragaAction==='meal-service'&&session){sessionServiceChange(session,el.value);return;}
     if(el.dataset.ragaAction==='meal-time'&&session){session.time=el.value;onEventRecordsChanged();return;}
     if(el.dataset.ragaAction==='course-service'&&session){
-      ensureSessionServices(session)[course]=el.value;
-      // Re-choose defaults when course transitions from Buffet to Plated (or vice versa).
-      if(session.categoryFormats)delete session.categoryFormats[course];
-      catItems(session,course).forEach(item=>item.printFormats=initialFormats(session,course));
-      onEventRecordsChanged();return;
+      updateCourseService(session.id,course,el.value);return;
     }
     if(el.dataset.ragaFormat&&session){
       const current=new Set(formats(session,course));if(el.checked)current.add(el.dataset.ragaFormat);else current.delete(el.dataset.ragaFormat);
