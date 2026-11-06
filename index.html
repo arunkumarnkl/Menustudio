@@ -4179,15 +4179,30 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           groups.forEach(({session,rows,stationName})=>fitPaginated(rows,subset=>makeBuffet(subset,session,stationName)));
         }else fitPaginated([],subset=>makeBuffet(subset,null));
       } else if(fmt==='a4-live') {
-        (items.length?items:[null]).forEach((item,i) => {
-          const p=page(); p.style.padding=`${Math.max(2.5,Number(d.borderOutsetCm)+.5)}cm`; p.style.paddingTop=`${Math.max(0.8, Number(d.borderOutsetCm)+Number(d.borderWidth||1)/10+0.2)}cm`;
+        const makeLiveStation=(records,session,stationName)=>{
+          const p=page();p.style.padding=`${Math.max(2.5,Number(d.borderOutsetCm)+.5)}cm`;
+          p.style.paddingTop=`${Math.max(0.8,Number(d.borderOutsetCm)+Number(d.borderWidth||1)/10+0.2)}cm`;
           p.classList.add('flex','flex-col','justify-between');
-          p.innerHTML=`${frame()}${bodyHeader()}${formatHeading(d.liveTitle,true)}
-            <div class="menu-body-font text-center" style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;overflow:hidden">
-              ${item?itemBlock(item,i,1.5):`<p contenteditable="true" data-preview-text="emptyLiveMessage">${escText(d.emptyLiveMessage ?? 'Add menu items for Live Station')}</p>`}
+          const stationTitle=stationName?`<h3 class="menu-body-font text-center" style="color:${d.accentColor};font-weight:700;font-size:calc(17px * var(--ragasaan-fit,1));margin:10px 0">${escText(stationName)}</h3>`:'';
+          const collection=records.length?records.map(({item,idx})=>`<div style="margin-bottom:13px">${itemBlock(item,idx,1.12)}</div>`).join(''):`<p contenteditable="true" data-preview-text="emptyLiveMessage">${escText(d.emptyLiveMessage ?? 'Add menu items for Live Station')}</p>`;
+          p.innerHTML=`${frame()}${bodyHeader()}${formatHeading(d.liveTitle,true)}${stationTitle}
+            <div data-auto-fit-area class="menu-body-font text-center" style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:center">
+              <div data-auto-fit-flow style="flex:0 0 auto;margin:auto 0">${collection}</div>
             </div><div>${brand()}</div>`;
-          target.append(p);
-        });
+          return p;
+        };
+        const groups=[];
+        for(const session of eventSessions){
+          const entries=visibleItems.filter(row=>row.item.sessionId===session.id);
+          if(!entries.length)continue;
+          const stations=ragaEnsureLiveStations(session);
+          for(const station of stations){
+            const rows=entries.filter(row=>(row.item.ragaLiveStationId||stations[0]?.id)===station.id);
+            if(rows.length)groups.push({session,stationName:station.name,rows});
+          }
+        }
+        if(groups.length)groups.forEach(group=>fitPaginated(group.rows,subset=>makeLiveStation(subset,group.session,group.stationName)));
+        else fitPaginated([],subset=>makeLiveStation(subset,null,''));
       } else if(fmt==='half-a4') {
         const makeTableFront=(records)=>{
           const p=page('paper-half-a4','flex flex-col'); p.style.padding=`${Math.max(2.3,Number(d.borderOutsetCm)+.25)}cm`; p.style.paddingTop=`${Math.max(0.8, Number(d.borderOutsetCm)+Number(d.borderWidth||1)/10+0.2)}cm`;
