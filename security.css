@@ -194,3 +194,15 @@ body.ragasaan-locked #ragasaan-auth-root.raga-client-on{display:block!important}
  body.raga-client-print #rs-client-paper .print-sheet{display:block!important;width:210mm!important;height:297mm!important;min-height:297mm!important;margin:0!important;padding:0!important;page-break-after:always;break-after:page;box-shadow:none!important}
  body.raga-client-print #rs-client-paper .print-sheet:last-child{page-break-after:auto;break-after:auto}
 }
+
+/* Client PDF capture is the sole explicit exception to the fail-closed UI gate.
+   The element contains only the approved, read-only client preview and is
+   removed immediately after export. Other body siblings remain hidden. */
+body.ragasaan-locked > #raga-client-pdf-export.raga-client-pdf-export {
+  display:block!important;
+  position:relative!important;
+  width:210mm;
+  height:auto!important;
+  background:#fff;
+  color:#111;
+}
