@@ -210,6 +210,28 @@ try{
  assert.ok(pdfBytes.length>10000,'Populated PDF seems blank or incomplete: '+pdfBytes.length+' bytes');
  assert.equal(await page.evaluate(()=>window.__printCount),0,'PDF Save does not launch native Print');
  console.log('PASS Real html2pdf.js conversion produces a downloadable PDF without invoking Print, bytes:',pdfBytes.length);
+
+ // A8 PDF must preserve the native CSS Grid used by the printed labels.
+ await page.evaluate(()=>{
+   const session=eventSessions[0];
+   eventRecords.push({id:'a8-test',eventUid:'a8-test',sessionId:session.id,menuCourse:'Other',
+    name:'A8 Label Grid Alignment Test',desc:'Sample label',allergens:[],mayContain:[],
+    printFormats:['a8-grid'],tagCopies:{'a8-grid':1},manual:true});
+   state.layout='a8-grid';state.design=state.designs['a8-grid'];
+   normalizeEventFormatRecords();renderPreview();
+ });
+ assert.equal(await page.evaluate(()=>getComputedStyle(document.querySelector('#paper-render-target .print-sheet')).display),'grid',
+   'A8 preview should retain CSS Grid');
+ const [a8Download]=await Promise.all([
+   page.waitForEvent('download',{timeout:120000}),
+   page.evaluate(()=>downloadPDF())
+ ]);
+ const a8Bytes=readFileSync(await a8Download.path());
+ const a8Metrics=await page.evaluate(()=>window.__lastPdfExportMetrics);
+ assert.equal(a8Metrics.sheetDisplay,'grid','PDF capture must retain A8 CSS Grid geometry');
+ assert.ok(a8Bytes.length>10000,'A8 PDF is blank or incomplete: '+a8Bytes.length);
+ console.log('PASS A8 downloadable PDF preserves native CSS Grid for aligned tags:',a8Bytes.length,'bytes');
+
  await page.evaluate(()=>switchTab('export'));
  await page.screenshot({path:'browser-smoke/final-update-export.png'});
  const bounds=await page.evaluate(()=>{
