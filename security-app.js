@@ -733,7 +733,23 @@ async function saveClientPdf(){
   firstSheet:root.querySelector('.print-sheet')?.getBoundingClientRect().toJSON(),
   text:root.innerText.slice(0,240),locked:document.body.classList.contains('ragasaan-locked'),
   scrollHeight:document.body.scrollHeight};
- try{await window.html2pdf().set({margin:0,filename:'Ragasaan_Client_Design.pdf',image:{type:'jpeg',quality:.97},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',onclone:doc=>doc.body.classList.remove('ragasaan-locked')},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(root).save();if(status)status.textContent='PDF saved.';}
+ try{
+  const job=window.html2pdf().set({margin:0,filename:'Ragasaan_Client_Design.pdf',image:{type:'jpeg',quality:.97},
+   html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',onclone:doc=>{
+    window.__clientCloneMetrics={locked:doc.body.classList.contains('ragasaan-locked'),
+     htmlContainer:!!doc.querySelector('.html2pdf__container'),
+     visibleCapture:doc.querySelector('.html2pdf__container')?.getBoundingClientRect().toJSON()};
+    doc.body.classList.remove('ragasaan-locked');
+   }},
+   jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(root);
+  await job.toCanvas();
+  const canvas=await job.get('canvas');
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+  const values=[];
+  for(const [x,y] of [[4,4],[Math.floor(canvas.width/2),Math.floor(canvas.height/3)],[Math.floor(canvas.width/2),Math.floor(canvas.height/2)]])values.push([...ctx.getImageData(x,y,1,1).data]);
+  window.__clientPdfCanvasMetrics={width:canvas.width,height:canvas.height,pixels:values,clone:window.__clientCloneMetrics};
+  await job.save();if(status)status.textContent='PDF saved.';
+ }
  catch(err){if(status)status.textContent='Unable to save PDF: '+err.message;}
  finally{root.remove();document.body.classList.remove('raga-client-pdf-active');}
 }
