@@ -599,8 +599,28 @@ function attach(){
  // The form uses an inline fail-closed submit handler so missing JS cannot silently reload the page.
  $('rs-open-cloud')?.addEventListener('click',openCloud);
  $('rs-open-admin-qr')?.addEventListener('click',()=>{openCloud();setTimeout(()=>document.getElementById('rs-admin-feedback-panel')?.scrollIntoView({block:'center',behavior:'smooth'}),30);});
- $('rs-company-publish')?.addEventListener('click',()=>publishCompanyLogo(false));
- $('rs-company-remove')?.addEventListener('click',()=>publishCompanyLogo(true));
+ // Delegated handler survives Cloud Settings panel rerenders and always acknowledges clicks.
+ document.addEventListener('click',event=>{
+   const button=event.target.closest?.('#rs-company-publish, #rs-company-remove');
+   if(!button)return;
+   event.preventDefault();
+   const status=$('rs-company-status');
+   if(status){
+     status.hidden=false;
+     status.setAttribute('role','status');
+     status.setAttribute('aria-live','polite');
+     status.textContent='Checking administrator session...';
+   }
+   publishCompanyLogo(button.id==='rs-company-remove').catch(error=>{
+     const detail='Company logo publish action failed: '+(error?.message||String(error));
+     if(status)status.textContent=detail;
+     msg(detail,'error');
+   });
+ });
+ $('rs-company-upload')?.addEventListener('change',event=>{
+   const file=event.target.files?.[0],status=$('rs-company-status');
+   if(status&&file)status.textContent='Selected '+file.name+' ('+Math.ceil(file.size/1024)+' KB). Click Publish Company Logo to save for all users.';
+ });
  $('rs-save-choices')?.addEventListener('click',saveChoiceOptions);
  $('rs-save-meal-defaults')?.addEventListener('click',saveMealDefaults);
  $('rs-save-print-rules')?.addEventListener('click',savePrintingRules);
