@@ -103,6 +103,7 @@ try{
    page.evaluate(()=>downloadPDF())
  ]);
  const pdfPath=await pdfDownload.path(),pdfBytes=readFileSync(pdfPath);
+ console.log('PDF EXPORT METRICS',JSON.stringify(await page.evaluate(()=>window.__lastPdfExportMetrics)));
  assert.ok(pdfBytes.subarray(0,5).toString('ascii')==='%PDF-','Downloaded file is a real PDF');
  assert.ok(pdfBytes.length>10000,'Populated PDF seems blank or incomplete: '+pdfBytes.length+' bytes');
  assert.equal(await page.evaluate(()=>window.__printCount),0,'PDF Save does not launch native Print');
