@@ -81,6 +81,7 @@ try{
  ]);
  const clientBytes=readFileSync(await clientDownload.path());
  console.log('CLIENT PDF CAPTURE METRICS',JSON.stringify(await approved.page.evaluate(()=>window.__clientPdfCaptureMetrics)));
+ console.log('CLIENT PDF CANVAS METRICS',JSON.stringify(await approved.page.evaluate(()=>window.__clientPdfCanvasMetrics)));
  assert.ok(clientBytes.subarray(0,5).toString('ascii')==='%PDF-','Client PDF has correct file signature');
  assert.ok(clientBytes.length>10000,'Client PDF may be blank: '+clientBytes.length+' bytes');
  console.log('PASS Approved client changes theme and downloads actual PDF:',clientBytes.length,'bytes');
