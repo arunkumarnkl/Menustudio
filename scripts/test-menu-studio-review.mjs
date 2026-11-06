@@ -98,4 +98,14 @@ pass('Oversized PNG is converted and object URL released',true);
 assert.equal(await logoCtx.optimise({type:'image/png',size:100000,mockData:'data:image/png;base64,U01BTEw='}),'data:image/png;base64,U01BTEw=');
 pass('Already-small logo is preserved unchanged',true);
 
+pass('Company logo publish button click is delegated even if panel rerenders',
+  client.includes("document.addEventListener('click',event=>{") &&
+  client.includes("event.target.closest?.('#rs-company-publish, #rs-company-remove')") &&
+  client.includes("Checking administrator session..."));
+pass('Expired Admin sessions receive visible response on publish',
+  client.includes("Only a signed-in Administrator can publish the shared company logo.") &&
+  client.includes("status.textContent=detail"));
+pass('Logo selection reports filename and size next to the button',
+  client.includes("Selected '+file.name+' (") &&
+  client.includes("Click Publish Company Logo to save for all users."));
 console.log('REVIEW CHECKS COMPLETE. Real browser, D1 and Word/PDF layout checks are required before production deployment.');
