@@ -1785,7 +1785,7 @@ body.ragasaan-locked.raga-client-pdf-active > :not(#ragasaan-auth-root):not(scri
       <!-- TAB 1: EVENT MENU BUILDER -->
       <div id="tab-builder" class="tab-content flex-1 flex flex-col overflow-y-auto p-4 gap-4">
         <div>
-          <div class="flex justify-between items-center gap-2"><h2 class="text-sm font-semibold text-slate-200">Event Menu Builder</h2><button onclick="saveNamedEvent()" class="bg-amber-500 text-slate-950 font-bold rounded px-3 py-1.5 text-xs">Save Event</button></div>
+          <div class="flex justify-between items-center gap-2"><h2 class="text-sm font-semibold text-slate-200">Event Menu Builder</h2><button onclick="document.getElementById('rs-open-cloud')?.click()" class="bg-amber-500 text-slate-950 font-bold rounded px-3 py-1.5 text-xs">Cloud Library / Save</button></div>
           <div class="flex items-center justify-between gap-2 flex-wrap mt-2">
             <p class="text-xs text-slate-400">Select a meal, review its default service and print formats, then add and edit dishes.</p>
 
@@ -2160,7 +2160,7 @@ body.ragasaan-locked.raga-client-pdf-active > :not(#ragasaan-auth-root):not(scri
     <section id="tab-summary" class="tab-content hidden flex-1 min-w-0 overflow-y-auto bg-slate-950 p-4 lg:p-6 no-print" style="color:#e6ebf4">
       <div class="flex justify-between gap-2 items-center flex-wrap mb-3">
         <div><h2 class="text-lg font-semibold text-amber-400">Event Allergen Summary</h2><p class="text-xs text-slate-400">Two compact columns • meal, course &amp; service type • serial number and allergens alongside each dish</p></div>
-        <div class="flex gap-2 flex-wrap"><button onclick="saveNamedEvent()" class="bg-amber-500 text-slate-950 font-bold rounded px-3 py-2 text-xs">Save Event</button><button onclick="printEventSummary()" class="bg-amber-500 text-slate-950 font-bold rounded px-3 py-2 text-xs"><i class="fa-solid fa-print"></i> Print / PDF</button><button onclick="exportClientSummaryWord()" class="bg-slate-700 text-white font-bold rounded px-3 py-2 text-xs"><i class="fa-solid fa-file-word"></i> Download Word (.docx)</button></div>
+        <div class="flex gap-2 flex-wrap"><button onclick="document.getElementById('rs-open-cloud')?.click()" class="bg-amber-500 text-slate-950 font-bold rounded px-3 py-2 text-xs">Cloud Library / Save</button><button onclick="printEventSummary()" class="bg-amber-500 text-slate-950 font-bold rounded px-3 py-2 text-xs"><i class="fa-solid fa-print"></i> Print / PDF</button><button onclick="exportClientSummaryWord()" class="bg-slate-700 text-white font-bold rounded px-3 py-2 text-xs"><i class="fa-solid fa-file-word"></i> Download Word (.docx)</button></div>
       </div>
       <div class="summary-main-layout">
         <div class="summary-controls-left space-y-3">
@@ -2176,11 +2176,18 @@ body.ragasaan-locked.raga-client-pdf-active > :not(#ragasaan-auth-root):not(scri
             <div id="summary-session-manager" class="space-y-1"></div>
           </div>
           <div class="bg-slate-900 rounded-lg border border-slate-700 p-3 space-y-2 text-xs">
-            <h3 class="text-amber-400 font-semibold">Saved events</h3>
-            <div class="flex gap-2"><select id="saved-event-select" class="flex-1 min-w-0 bg-slate-950 text-white border border-slate-700 rounded p-2"></select><button onclick="loadNamedEvent()" class="bg-slate-700 px-2 rounded">Load</button></div>
-            <div class="flex gap-2"><button onclick="saveNamedEvent()" class="bg-amber-500 text-slate-950 font-bold rounded px-3 py-2 flex-1">Save Event</button><button onclick="downloadEventFile()" class="bg-slate-700 rounded px-3 py-2 flex-1">Export JSON</button></div>
-            <label class="block cursor-pointer bg-slate-700 rounded p-2 text-center">Import Event JSON<input type="file" accept="application/json,.json" class="hidden" onchange="importEventFile(event)"></label>
-            <p class="text-slate-400">Saved locally in this browser. Export JSON to transfer or back up an event. Does not alter the GitHub master database.</p>
+            <h3 class="text-amber-400 font-semibold">Cloud events &amp; backups</h3>
+            <button type="button" onclick="document.getElementById('rs-open-cloud')?.click()" class="bg-amber-500 text-slate-950 font-bold rounded px-3 py-2 w-full">Open Cloud Library / Save Event</button>
+            <p class="text-slate-400">Sign in and use Save Event in the cloud panel. Unsaved changes stay only in this open tab. Event menus are not automatically saved in this browser.</p>
+            <div class="flex gap-2"><button onclick="downloadEventFile()" class="bg-slate-700 rounded px-3 py-2 flex-1">Export Event JSON</button><label class="block cursor-pointer bg-slate-700 rounded p-2 flex-1 text-center">Import JSON<input type="file" accept="application/json,.json" class="hidden" onchange="importEventFile(event)"></label></div>
+            <details class="border border-slate-700 rounded p-2">
+              <summary class="cursor-pointer">Recover older browser events (read-only)</summary>
+              <p class="text-slate-400 mt-2">Old browser records remain available until you choose to clear them. New events are saved to Cloud D1, not local browser storage.</p>
+              <div class="flex gap-2 mt-2"><select id="saved-event-select" aria-label="Legacy browser event" class="flex-1 min-w-0 bg-slate-950 text-white border border-slate-700 rounded p-2"></select><button onclick="loadNamedEvent()" class="bg-slate-700 px-2 rounded">Load old</button></div>
+              <button type="button" onclick="recoverLegacyBrowserDraft()" class="bg-slate-700 rounded p-2 w-full mt-2">Recover previous browser draft</button>
+              <button type="button" onclick="downloadLegacyBrowserBackup()" class="bg-slate-700 rounded p-2 w-full mt-2">Download legacy event backup</button>
+              <button type="button" onclick="clearLegacyBrowserSnapshots()" class="bg-slate-700 rounded p-2 w-full mt-2">Clear previous browser event records</button>
+            </details>
           </div>
           <div class="bg-slate-900 rounded-lg border border-slate-700 p-3 space-y-2 text-xs">
             <h3 class="text-amber-400 font-semibold">Items for this event · editable</h3>
@@ -3037,11 +3044,43 @@ body.ragasaan-locked.raga-client-pdf-active > :not(#ragasaan-auth-root):not(scri
     function savedEventLibrary(){try{return JSON.parse(localStorage.getItem(EVENT_STORE_KEY)||'{}')}catch(_){return {}}}
     function refreshSavedEventSelect(){const sel=document.getElementById('saved-event-select');if(!sel)return;const names=Object.keys(savedEventLibrary()).sort();sel.innerHTML=names.map(name=>`<option value="${esc(name)}">${esc(name)}</option>`).join('');if(activeEventName&&names.includes(activeEventName))sel.value=activeEventName}
     function saveNamedEvent(){
-      const proposed=activeEventName||state.event.title||'Event';const name=prompt('Save event as:',proposed)?.trim();if(!name)return;
-      const library=savedEventLibrary();if(library[name]&&!confirm(`Overwrite saved event "${name}"?`))return;
-      activeEventName=name;library[name]=JSON.parse(JSON.stringify(eventSnapshot()));
-      try{localStorage.setItem(EVENT_STORE_KEY,JSON.stringify(library))}catch(err){alert('Browser storage is full. Use Export Event JSON instead.');return}
-      refreshSavedEventSelect();alert('Event saved locally: '+name);
+      // Backward-compatible entry point; never write new local event snapshots.
+      document.getElementById('rs-open-cloud')?.click();
+      alert('To retain this menu, sign in as an Event Planner or Admin and choose Save Event in the Cloud Library. Export JSON is available as a separate offline backup.');
+    }
+    function recoverLegacyBrowserDraft(){
+      let old={};
+      try{old=JSON.parse(localStorage.getItem('ragasaan_style_v3')||'{}');}
+      catch(err){alert('Previous browser draft cannot be read: '+err.message);return;}
+      if(!Array.isArray(old.eventRecords)||!old.eventRecords.length){alert('No old browser draft found. You can still check the legacy local events list.');return;}
+      const snapshot={
+        format:'ragasaan-event-v2',name:'Recovered browser draft',
+        title:old.event?.title||'',date:old.event?.date||'',venue:old.event?.venue||'',
+        sessions:Array.isArray(old.eventSessions)&&old.eventSessions.length?old.eventSessions:eventSessions,
+        items:old.eventRecords,designs:old.designs||{},
+        includeClientSummary:!!old.includeClientSummary
+      };
+      if(restoreEventSnapshot(snapshot))alert('Previous browser draft recovered into the editor. Save it to Cloud D1 or export JSON before leaving the page.');
+    }
+    function downloadLegacyBrowserBackup(){
+      const keys=['ragasaan_style_v3',EVENT_STORE_KEY];
+      const data={format:'ragasaan-legacy-event-browser-backup-v1',createdAt:new Date().toISOString(),storage:{}};
+      keys.forEach(key=>{data.storage[key]=localStorage.getItem(key);});
+      if(!keys.some(key=>data.storage[key])){alert('No previous browser event records to back up.');return;}
+      const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+      const link=document.createElement('a');const url=URL.createObjectURL(blob);
+      link.href=url;link.download='Menu_Studio_Legacy_Events_Backup.json';
+      document.body.appendChild(link);link.click();link.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),4000);
+    }
+    function clearLegacyBrowserSnapshots(){
+      if(!localStorage.getItem('ragasaan_style_v3')&&!localStorage.getItem(EVENT_STORE_KEY)){alert('No previous local event records found.');return;}
+      if(!confirm('Before clearing: have you downloaded and safely stored the legacy event backup, and saved needed events to Cloud D1? This deletes ONLY previous browser event snapshots, not Cloud D1 records or Word files.'))return;
+      if(!confirm('Clear previous browser event snapshots now? This cannot be undone without a backup.'))return;
+      localStorage.removeItem('ragasaan_style_v3');
+      localStorage.removeItem(EVENT_STORE_KEY);
+      refreshSavedEventSelect();
+      alert('Previous browser event snapshots cleared. Cloud events, menu Word export and current in-memory editor data are unchanged.');
     }
     function loadNamedEvent(){const name=document.getElementById('saved-event-select')?.value;const saved=savedEventLibrary()[name];if(saved)restoreEventSnapshot(saved)}
     function downloadEventFile(){const blob=new Blob([JSON.stringify(eventSnapshot(),null,2)],{type:'application/json'});const a=document.createElement('a');const url=URL.createObjectURL(blob);a.href=url;a.download=ragaDownloadFilename((activeEventName||state.event.title||'Ragasaan_Event').replace(/[^a-z0-9_-]+/gi,'_')+'.json');a.click();setTimeout(()=>URL.revokeObjectURL(url),2000)}
@@ -3255,19 +3294,10 @@ body.ragasaan-locked.raga-client-pdf-active > :not(#ragasaan-auth-root):not(scri
               .map(item => ({ ...item, menuCourse: String(item.menuCourse || '').trim() }));
           }
         });
-        if(saved.eventSessions?.length)eventSessions=saved.eventSessions.filter(x=>String(x.name||'').toLowerCase()!=='reception');
+        // Legacy local menu records and sessions are intentionally NOT auto-loaded.
+        // They remain readable using Recover Previous Browser Draft; no data is deleted.
         if(!eventSessions.some(x=>String(x.name||'').toLowerCase()==='hi tea'))eventSessions.push({id:'hi-tea',name:'HI Tea',time:'16:00',serviceMode:'Buffet',courseServices:{}});
         if(!eventSessions.some(x=>String(x.name||'').toLowerCase()==='late night snack'))eventSessions.push({id:'late-night',name:'Late Night Snack',time:'22:30',courseServices:{}});
-        if(Array.isArray(saved.eventRecords))eventRecords=saved.eventRecords.map(i=>({...i,sessionId:i.sessionId==='reception'?'dinner':i.sessionId,eventUid:i.eventUid||eventUid(),serviceType:i.serviceType||'',tagCopies:i.tagCopies||{}}));
-        else {
-          // Migrate the older per-format menus without dropping existing data.
-          const seen=new Map();
-          MENU_FORMATS.forEach(fmt=>state.formatMenus[fmt].forEach(item=>{
-            const signature=JSON.stringify([item.id,item.name,item.menuCourse,item.desc]);
-            if(!seen.has(signature)){const record={...item,eventUid:eventUid(),sessionId:'dinner',printFormats:[fmt]};seen.set(signature,record);eventRecords.push(record)}
-            else seen.get(signature).printFormats.push(fmt);
-          }));
-        }
         normalizeEventFormatRecords();
         state.event.partyNo=saved.event?.partyNo||'';
         state.sharedCompanyLogo=saved.companyLogo||'';
@@ -3349,9 +3379,10 @@ body.ragasaan-locked.raga-client-pdf-active > :not(#ragasaan-auth-root):not(scri
       } catch(e){console.warn('Unable to store selected menu theme',e);return false;}
     }
     function saveStyle() {
+      // Do not store event menus, records, images or sessions in the browser.
+      // They remain in memory until explicitly saved to Cloud D1 or exported as JSON.
+      // The lightweight theme preferences are the only settings persisted here.
       saveThemeStyles();
-      try {localStorage.setItem('ragasaan_style_v3',JSON.stringify({designs:state.designs,eventSessions,eventRecords,companyLogo:state.sharedCompanyLogo||'',coupleLogo:state.sharedCoupleLogo||'',appTheme:'light',includeClientSummary,event:{title:state.event.title,date:state.event.date,venue:state.event.venue,partyNo:state.event.partyNo||''}}));}
-      catch(e){console.warn('Full style storage unavailable; compact menu theme remains saved',e);}
     }
     function applyAppTheme() {
       // One official interface palette. Print-format themes remain independent.
