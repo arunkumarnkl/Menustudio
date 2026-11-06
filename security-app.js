@@ -720,7 +720,7 @@ async function saveClientPdf(){
  if(typeof window.html2pdf!=='function'){if(status)status.textContent='PDF converter unavailable. Reload with internet access.';return;}
  const sheets=[...($('rs-client-paper')?.querySelectorAll('.print-sheet')||[])];
  if(!sheets.length){if(status)status.textContent='No client pages available';return;}
- const root=document.createElement('div');root.id='raga-client-pdf-export';
+ const root=document.createElement('div');root.id='raga-client-pdf-export';root.className='raga-client-pdf-export';
  // html2pdf/html2canvas needs a measurable capture root in normal document flow.
  root.style.cssText='position:relative;display:block;width:210mm;max-width:210mm;background:#fff;pointer-events:none;margin:0;padding:0';
  sheets.forEach((page,i)=>{const el=page.cloneNode(true);el.style.cssText+=';width:210mm!important;height:297mm!important;zoom:1!important;transform:none!important;margin:0!important';el.removeAttribute('contenteditable');root.appendChild(el);if(i<sheets.length-1){const br=document.createElement('div');br.className='html2pdf__page-break';root.appendChild(br);}});
