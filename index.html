@@ -4844,33 +4844,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   const idKey=(sid,course)=>sid+'|'+course;
   const byId=id=>eventSessions.find(s=>s.id===id);
   const catItems=(session,category)=>eventRecords.filter(row=>row.sessionId===session.id&&(row.menuCourse||'Main Course')===category);
-  function allowedFormats(session,category){
-    let allowed;
-    const mode=sessionMode(session);
-    if(category==='Live Station')allowed=['a4-live'];
-    else if(category==='Canapé')allowed=['canape-grid','a8-grid','foldtags-grid'];
-    else if(mode==='Plated Service')allowed=['half-a4'];
-    else if(mode==='Bowl Food')allowed=['foldtags-grid','a8-grid','a6-grid','canape-grid'];
-    else if(mode==='Buffet-Selective'&&normalizeGroupService(session,category)==='Plated Service')allowed=['half-a4'];
-    else if(mode==='Buffet-Selective'&&normalizeGroupService(session,category)==='Bowl Food')allowed=['foldtags-grid','a8-grid','a6-grid','canape-grid'];
-    else allowed=['a4','a8-grid','a6-grid','canape-grid','foldtags-grid'];
-    const enabled=window.ragaAdminChoices?.printFormats?.enabled;
-    const saved=Array.isArray(session.categoryFormats?.[category])?session.categoryFormats[category]:[];
-    if(Array.isArray(enabled))allowed=allowed.filter(f=>enabled.includes(f)||saved.includes(f));
-    return allowed;
-  }
-  function initialFormats(session,category){
-    const allowed=allowedFormats(session,category),mode=sessionMode(session);
-    const fromAdmin=window.ragaMealDefaults?.[sessionKind(session)]?.categoryFormats?.[category];
-    if(Array.isArray(fromAdmin))return allowed.filter(f=>fromAdmin.includes(f));
-    if(category==='Live Station')return allowed.filter(f=>f==='a4-live');
-    if(category==='Canapé')return allowed.filter(f=>['a8-grid','canape-grid','foldtags-grid'].includes(f));
-    if(mode==='Bowl Food'||(mode==='Buffet-Selective'&&normalizeGroupService(session,category)==='Bowl Food'))return allowed.filter(f=>f==='foldtags-grid');
-    if(mode==='Plated Service'||(mode==='Buffet-Selective'&&normalizeGroupService(session,category)==='Plated Service'))return allowed.filter(f=>f==='half-a4');
-    const fromSession=session.formatSelection||RAGA_INITIAL_MEAL_DEFAULTS[sessionKind(session)]?.formats||['a4'];
-    const chosen=allowed.filter(f=>fromSession.includes(f));
-    return chosen.length?chosen:allowed.filter(f=>f==='a4').slice(0,1);
-  }
+  function allowedFormats(session,category){return ragaAllowedFormats(session,category);}
+  function initialFormats(session,category){return ragaInitialFormats(session,category);}
   function formats(session,category){
     const selection=session.categoryFormats?.[category];
     const allowed=allowedFormats(session,category);
@@ -4884,33 +4859,16 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   }
   function insertDish(session,category,dish){
     if(!session||!dish?.name)return;
-    const record={...JSON.parse(JSON.stringify(dish)),eventUid:eventUid(),sessionId:session.id,menuCourse:category,serviceType:'',printFormats:[...formats(session,category)],tagCopies:{}};
+    const assignedLive=category==='Live Station'?ragaEnsureLiveStations(session)[0]?.id:undefined;
+    const record={...JSON.parse(JSON.stringify(dish)),eventUid:eventUid(),sessionId:session.id,menuCourse:category,serviceType:'',ragaLiveStationId:assignedLive,printFormats:[...formats(session,category)],tagCopies:{}};
     eventRecords.push(record);openSessions.add(session.id);openCategories.add(idKey(session.id,category));onEventRecordsChanged();
   }
-  function sessionServiceChange(session,value){
-    if(!sessionChoices(session).some(c=>c[0]===value))return;
-    session.serviceMode=value;
-    if(value==='Buffet-Selective'){
-      const map=ensureSessionServices(session);
-      for(const course of ['Starter','Main Course','Dessert'])if(!['Plated Service','Buffet'].includes(map[course]))map[course]='Plated Service';
-    }
-    // Only course selections that cease to be valid are reset; old dish records are retained.
-    for(const cat of categoryNames){
-      const old=session.categoryFormats?.[cat];
-      if(Array.isArray(old)&&old.some(f=>!allowedFormats(session,cat).includes(f)))delete session.categoryFormats[cat];
-    }
-    onEventRecordsChanged();
-  }
+  function sessionServiceChange(session,value){if(ragaRouteSessionItems(session,value))onEventRecordsChanged();}
   function serviceChoice(session,category){
-    if(!['Starter','Main Course','Dessert'].includes(category))return '';
-    if(!isCourseWise(session))return `<div class="raga-card-note">${safe(sessionMode(session))} · Mains Menu and Desserts are separate</div>`;
-    const configured=window.ragaMealDefaults?.[sessionKind(session)]?.courses?.[category]?.enabled;
-    const base=['Plated Service','Buffet'];
-    if(sessionMode(session)!=='Buffet-Selective'&&category==='Main Course')base.push('Bowl Food');
-    const allowed=Array.isArray(configured)?base.filter(x=>configured.includes(x)):base;
+    if(!isCourseWise(session)||!['Starter','Main Course','Dessert'].includes(category))return '';
     const actual=normalizeGroupService(session,category);
-    if(!allowed.includes(actual))allowed.push(actual);
-    return `<label>Course serving style<select data-raga-action="course-service" data-session="${safe(session.id)}" data-course="${safe(category)}">${allowed.map(x=>`<option value="${safe(x)}" ${x===actual?'selected':''}>${safe(x)}</option>`).join('')}</select></label>`;
+    const all=['Plated Service','Buffet','Bowl Food','Thali'];
+    return `<label>Course serving style<select data-raga-action="course-service" data-session="${safe(session.id)}" data-course="${safe(category)}">${all.map(style=>`<option value="${safe(style)}" ${style===actual?'selected':''}>${safe(style)}</option>`).join('')}</select></label>`;
   }
   const RAGA_CARD_ALLERGENS=['Celery','Cereals containing gluten','Crustaceans','Eggs','Fish','Lupin','Milk','Molluscs','Mustard','Tree nuts','Peanuts','Sesame','Soya','Sulphites'];
   function ragaCardTicks(field,selected,uid,manual=false){
