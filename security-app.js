@@ -370,30 +370,84 @@ function openAdminSettings(){
 }
 function closeAdminSettings(){$('ragasaan-admin')?.classList.remove('open');}
 function opt(rows,idKey='id',labelKey='name'){return rows.map(r=>`<option value="${escAttr(r[idKey])}">${e(r[labelKey])}</option>`).join('');}
-async function refreshCloudList(){
- const r=await call(s.user?'/events':'/public/events','GET',undefined,!!s.user);s.events=r.events||[];
- const list=$('rs-cloud-events');if(!list)return;
- // Display the latest five by default while retaining all server-returned records.
- const plannerOf=x=>String(x.eventData?.plannerName||x.plannerName||'Unassigned planner').trim()||'Unassigned planner';
- const planners=[...new Set(s.events.map(plannerOf))].sort((a,b)=>a.localeCompare(b));
- const selected=String(s.cloudPlannerFilter||'');
- const relevant=s.events.filter(x=>!selected||plannerOf(x)===selected);
- const sorted=[...relevant].sort((a,b)=>{
-   const timestamp=x=>Date.parse(x.updatedAt||x.updated_at||x.createdAt||x.created_at||x.eventDate||'')||0;
-   return timestamp(b)-timestamp(a);
+
+function ragaPlannerName(x){
+ const assigned=s.planners.find(p=>p.id===x.plannerUserId);
+ return String(assigned?.display_name||x.eventData?.plannerName||x.plannerName||'Unassigned planner').trim()||'Unassigned planner';
+}
+function ragaCanDeleteCloud(x){
+ if(!s.user)return false;
+ if(s.user.role==='admin')return true;
+ return s.user.role==='planner'&&(x.plannerUserId===s.user.id||x.createdBy===s.user.id);
+}
+function ragaPendingClientDesigns(){
+ const pending=s.events.filter(row=>row.status==='review'&&!row.deletedAt);
+ const badge=$('rs-client-pending-badge');
+ if(badge){badge.hidden=!s.user||!pending.length;badge.textContent='Design tasks: '+pending.length;}
+ const pane=$('rs-pending-designs');if(!pane)return;
+ pane.innerHTML=pending.length?pending.map(x=>
+  '<div class="raga-list-item raga-pending-task"><div class="raga-cloud-one-line"><strong>'+e(x.name)+'</strong><small>'+e(ragaPlannerName(x))+' · Pending client review</small></div><div class="raga-actions"><button type="button" class="raga-btn" data-pending-review="'+e(x.id)+'">Review Design</button><button type="button" class="raga-btn primary" data-pending-print="'+e(x.id)+'">Review &amp; Print</button></div></div>'
+ ).join(''):'<p class="raga-help">No pending client designs.</p>';
+ pane.querySelectorAll('[data-pending-review]').forEach(button=>button.onclick=async()=>{
+   selectCloud(button.dataset.pendingReview);await loadSubmissions();
+   $('rs-design-inspector')?.scrollIntoView({block:'center',behavior:'smooth'});
  });
- const visible=s.cloudShowArchive?sorted:sorted.slice(0,5);
- const folder={};for(const x of visible){const day=String(x.eventDate||'No date').slice(0,10),planner=String(x.eventData?.plannerName||'General planner').slice(0,100);(folder[day]??={})[planner]??=[];folder[day][planner].push(x);}
- list.innerHTML='<div class="raga-list-item"><label class="raga-small">Filter by planner <select id="rs-cloud-planner-filter" class="raga-input"><option value="">All planners</option>'+planners.map(p=>'<option value="'+e(p)+'" '+(selected===p?'selected':'')+'>'+e(p)+'</option>').join('')+'</select></label><div class="raga-actions"><span class="raga-small">Showing '+visible.length+' of '+relevant.length+' matching events</span><button type="button" class="raga-btn" id="rs-cloud-archive-toggle">'+(s.cloudShowArchive?'Show latest five':'View older events')+'</button></div></div>'+(visible.length?Object.entries(folder).map(([day,planners])=>`<details class="raga-list-item" open><summary><b>📅 ${e(day)}</b></summary>${Object.entries(planners).map(([planner,events])=>`<details class="raga-list-item" open><summary>👤 ${e(planner)} · ${events.length} events</summary>${events.map(x=>`<div class="raga-list-item"><strong>${e(x.name)}</strong> <span class="raga-pill">${e(x.status)}</span><div class="raga-small">${e(x.eventDate||'Date not set')} · ${e(x.venue||'No venue')}</div><div class="raga-actions"><button class="raga-btn" data-load-cloud="${e(x.id)}">Load</button><button class="raga-btn" data-manage-cloud="${e(x.id)}">Manage</button></div></div>`).join('')}</details>`).join('')}</details>`).join(''):'<p class="raga-help">No matching cloud events. Choose All planners, or save a new event.</p>');
- const f=list.querySelector('#rs-cloud-planner-filter');
- if(f)f.onchange=()=>{s.cloudPlannerFilter=f.value;refreshCloudList().catch(err=>msg(err.message,'error'));};
- const archive=list.querySelector('#rs-cloud-archive-toggle');
- if(archive)archive.onclick=()=>{s.cloudShowArchive=!s.cloudShowArchive;refreshCloudList().catch(err=>msg(err.message,'error'));};
- list.querySelectorAll('[data-load-cloud]').forEach(b=>b.onclick=()=>loadCloud(b.dataset.loadCloud));
+ pane.querySelectorAll('[data-pending-print]').forEach(button=>button.onclick=async()=>{
+   const event=s.events.find(row=>row.id===button.dataset.pendingPrint);if(!event)return;
+   if(event.status!=='approved'){msg('Please review and approve the latest client design before printing.','error');selectCloud(event.id);await loadSubmissions();return;}
+   await loadCloud(event.id);window.switchTab?.('export');
+ });
+}
+async function ragaDeleteCloud(id){
+ const event=s.events.find(row=>row.id===id);if(!event)return;
+ if(!ragaCanDeleteCloud(event)){msg('Only Admin may delete any event; a planner may delete their own assigned/created event.','error');return;}
+ if(!confirm('Move "'+event.name+'" to recoverable deleted events? Its menu and design remain in D1.'))return;
+ try{
+   await call('/events/'+id,'DELETE',undefined,true);
+   if(s.cloudEvent?.id===id)s.cloudEvent=null;
+   msg('Event moved to recoverable deleted records.');await refreshCloudList();
+ }catch(err){msg('Delete failed: '+err.message,'error');}
+}
+async function ragaRestoreCloud(id){
+ if(!s.user){msg('Sign in to restore cloud events.','error');return;}
+ try{await call('/events/'+id+'/restore','POST',{},true);msg('Deleted event restored to Draft.');await refreshCloudList();}
+ catch(err){msg('Restore failed: '+err.message,'error');}
+}
+function renderCloudList(){
+ const list=$('rs-cloud-events');if(!list)return;
+ const planners=[...new Set(s.events.map(ragaPlannerName))].sort((a,b)=>a.localeCompare(b));
+ const selected=String(s.cloudPlannerFilter||'');
+ const relevant=s.events.filter(x=>!selected||ragaPlannerName(x)===selected);
+ const sorted=[...relevant].sort((a,b)=>{
+  const time=x=>Date.parse(x.updatedAt||x.updated_at||x.createdAt||x.created_at||x.eventDate||'')||0;
+  return time(b)-time(a);
+ });
+ const visible=s.cloudShowArchive?sorted:sorted.slice(0,20);
+ const plannerOptions=planners.map(p=>'<option value="'+e(p)+'" '+(selected===p?'selected':'')+'>'+e(p)+'</option>').join('');
+ const controls='<div class="raga-list-item raga-cloud-filters"><label>Filter by planner<select id="rs-cloud-planner-filter" class="raga-input"><option value="">All planners</option>'+plannerOptions+'</select></label><div class="raga-actions"><span class="raga-small">Latest '+visible.length+' of '+sorted.length+' events</span><button type="button" class="raga-btn" id="rs-cloud-archive-toggle">'+(s.cloudShowArchive?'Show latest 20':'Older events')+'</button>'+(s.user?'<button type="button" id="rs-cloud-restore-toggle" class="raga-btn">'+(s.cloudIncludeDeleted?'Hide deleted':'Recover deleted')+'</button>':'')+'</div></div>';
+ list.innerHTML=controls+(visible.length?visible.map(x=>{
+  const archived=x.status==='archived'||!!x.deletedAt;
+  const actions=archived?(ragaCanDeleteCloud(x)?'<button type="button" class="raga-btn" data-restore-cloud="'+e(x.id)+'">Restore</button>':''):'<button type="button" class="raga-btn primary" data-load-cloud="'+e(x.id)+'">Load</button><button type="button" class="raga-btn" data-manage-cloud="'+e(x.id)+'">Manage</button>'+(ragaCanDeleteCloud(x)?'<button type="button" class="raga-btn danger" data-delete-cloud="'+e(x.id)+'">Delete</button>':'');
+  return '<details class="raga-list-item raga-cloud-record"><summary class="raga-cloud-one-line"><strong>'+e(x.name)+'</strong><span>'+e(x.eventDate||'No date')+'</span><span>'+e(ragaPlannerName(x))+'</span><span class="raga-pill">'+e(x.status||'draft')+'</span></summary><div class="raga-cloud-details"><p>'+e(x.venue||'Venue not supplied')+'</p><div class="raga-actions">'+actions+'</div></div></details>';
+ }).join(''):'<p class="raga-help">No matching events. Select All planners or create an event.</p>');
+ const filter=list.querySelector('#rs-cloud-planner-filter');
+ if(filter)filter.onchange=()=>{s.cloudPlannerFilter=filter.value;renderCloudList();};
+ const older=list.querySelector('#rs-cloud-archive-toggle');
+ if(older)older.onclick=()=>{s.cloudShowArchive=!s.cloudShowArchive;renderCloudList();};
+ const deleted=list.querySelector('#rs-cloud-restore-toggle');
+ if(deleted)deleted.onclick=()=>{s.cloudIncludeDeleted=!s.cloudIncludeDeleted;refreshCloudList().catch(err=>msg(err.message,'error'));};
+ list.querySelectorAll('[data-load-cloud]').forEach(b=>b.onclick=()=>loadCloud(b.dataset.loadCloud).catch(err=>msg(err.message,'error')));
  list.querySelectorAll('[data-manage-cloud]').forEach(b=>b.onclick=()=>selectCloud(b.dataset.manageCloud));
- const current=s.cloudEvent&&s.events.find(x=>x.id===s.cloudEvent.id);
- if(current)s.cloudEvent=current;
- drawSelected();
+ list.querySelectorAll('[data-delete-cloud]').forEach(b=>b.onclick=()=>ragaDeleteCloud(b.dataset.deleteCloud));
+ list.querySelectorAll('[data-restore-cloud]').forEach(b=>b.onclick=()=>ragaRestoreCloud(b.dataset.restoreCloud));
+ const current=s.cloudEvent&&s.events.find(x=>x.id===s.cloudEvent.id);if(current)s.cloudEvent=current;
+ drawSelected();ragaPendingClientDesigns();
+}
+async function refreshCloudList(){
+ const path=(s.user?'/events':'/public/events')+(s.user&&s.cloudIncludeDeleted?'?includeArchived=1':'');
+ const result=await call(path,'GET',undefined,!!s.user);
+ s.events=Array.isArray(result.events)?result.events:[];
+ renderCloudList();
  if(s.user?.role==='admin')await refreshPlanners();
 }
 async function refreshPlanners(){
