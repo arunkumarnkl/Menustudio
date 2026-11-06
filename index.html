@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<html lang="en" class="h-full">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1241,8 +1241,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     function table(columns, opts={}){
       const width=Math.floor((opts.width||9800)/columns.length);
       const grid=columns.map(()=>`<w:gridCol w:w="${width}"/>`).join('');
-      const cells=columns.map(body=>`<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="dxa"/><w:tcMar><w:top w:w="80" w:type="dxa"/><w:left w:w="140" w:type="dxa"/><w:bottom w:w="80" w:type="dxa"/><w:right w:w="140" w:type="dxa"/></w:tcMar></w:tcPr>${body||paragraph(' ')} </w:tc>`).join('');
-      return `<w:tbl><w:tblPr><w:tblW w:w="${opts.width||9800}" w:type="dxa"/>${opts.border?'<w:tblBorders><w:insideV w:val="single" w:sz="4" w:color="D9C7AA"/></w:tblBorders>':''}</w:tblPr><w:tblGrid>${grid}</w:tblGrid><w:tr>${cells}</w:tr></w:tbl>`;
+      const cells=columns.map(body=>`<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="dxa"/><w:vAlign w:val="top"/><w:tcMar><w:top w:w="80" w:type="dxa"/><w:left w:w="140" w:type="dxa"/><w:bottom w:w="80" w:type="dxa"/><w:right w:w="140" w:type="dxa"/></w:tcMar></w:tcPr>${body||paragraph(' ')} </w:tc>`).join('');
+      return `<w:tbl><w:tblPr><w:tblW w:w="${opts.width||9800}" w:type="dxa"/><w:tblLayout w:type="fixed"/>${opts.border?'<w:tblBorders><w:insideV w:val="single" w:sz="4" w:color="D9C7AA"/></w:tblBorders>':''}</w:tblPr><w:tblGrid>${grid}</w:tblGrid><w:tr>${cells}</w:tr></w:tbl>`;
     }
     function image(dataUrl, widthPx=160, heightPx=160){
       const matched=String(dataUrl||'').match(/^data:image\/(png|jpe?g);base64,([A-Za-z0-9+/=]+)$/i);
@@ -1278,7 +1278,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 
   <script>
     if (window.tailwind) tailwind.config = {
-      darkMode: 'class',
+      darkMode: 'media',
       theme: {
         extend: {
           colors: {
@@ -1405,8 +1405,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     .summary-item-row:last-child{border-bottom:0}
     .summary-item-text{display:block;min-width:0}
     .summary-item-name{font-weight:700;color:#26221f}
-    .summary-item-allergens{color:#a3290a}
-    .summary-item-may{color:#93600f}
+    .summary-item-allergens{color:#8B1E20;font-weight:800}
+    .summary-item-may{color:#704600;font-weight:650}
     .summary-item-none{color:#777}
     .summary-footer{font-size:8px;line-height:1.3;color:#555;border-top:.2mm solid #d4c7b4;margin-top:3mm;padding-top:1.5mm}
     #summary-print-root{display:none}
@@ -1591,8 +1591,94 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 
 </style>
 <script src="./github-sync-config.js"></script>
+<style id="raga-uk14-style">
+.raga-allergen-ticks{grid-column:1/-1;border:1px solid #728093;border-radius:8px;padding:8px;margin:5px 0;min-width:0}
+.raga-allergen-ticks legend{font-size:11px;font-weight:600;padding:0 5px;color:inherit}
+.raga-tick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 10px}
+.raga-tick-grid label{font-weight:400!important;display:flex!important;align-items:center;gap:5px;font-size:11px!important;min-width:0}
+.raga-tick-grid input[type=checkbox]{width:14px!important;height:14px!important;flex:0 0 14px}
+.raga-drag-handle{position:absolute!important;top:-14px;left:0;z-index:12;opacity:.45;font-size:9px!important;line-height:1!important;padding:1px 3px!important}
+.raga-drag-handle:hover{opacity:1}
+.print-sheet .leading-tight:empty,.print-sheet [contenteditable="true"]:empty{display:none!important;margin:0!important;padding:0!important}
+@media print{.raga-drag-handle{display:none!important}}
+</style><style id="raga-print-studio-controls-css">
+.raga-page-button{background:#273449;color:#fff;border:1px solid #64748b;border-radius:5px;padding:5px 8px;font-size:11px}
+@media screen{#paper-render-target .raga-preview-only-hidden{display:none!important}}
+@media print{#raga-print-studio-preview-controls{display:none!important}}
+.print-sheet .leading-tight:has(span[aria-label="Declared allergens"]:empty):not(:has(span[aria-label="May contain"])){display:none!important}
+</style><style id="raga-ux-scale-2026">
+/* Editing UI only. Physical A4/label/Word print geometry is unchanged. */
+@media screen {
+  html, body, body * { scrollbar-width:auto; scrollbar-color:#8590a6 transparent; }
+  ::-webkit-scrollbar { width:4mm !important; height:4mm !important; }
+  ::-webkit-scrollbar-track { background:rgba(148,163,184,.10); border-radius:8px; }
+  ::-webkit-scrollbar-thumb { background:#8895af; border-radius:8px; border:3px solid transparent; background-clip:padding-box; }
+  ::-webkit-scrollbar-thumb:hover { background-color:#64748b; }
+  /* Native browser select popups may be rendered by the operating system. */
+  body :is(.tab-content,#ragasaan-cloud,#sidebar-controls,.raga-meal-cards)
+    :is(select,input[type="text"],input[type="search"],input[type="date"],input[type="time"],input[type="number"],input[type="email"],input[type="password"],textarea) {
+    font-size:20px !important;
+    line-height:1.5 !important;
+    min-height:52px !important;
+    padding:10px 14px !important;
+    border-radius:8px;
+    max-width:100%;
+    box-sizing:border-box;
+  }
+  body :is(.tab-content,#ragasaan-cloud,#sidebar-controls,.raga-meal-cards) select option {
+    font-size:20px !important;
+    padding:9px 12px;
+  }
+  body :is(.tab-content,#ragasaan-cloud,#sidebar-controls,.raga-meal-cards) textarea {
+    min-height:90px !important;
+  }
+  body :is(.tab-content,#ragasaan-cloud,#sidebar-controls,.raga-meal-cards) input[type="checkbox"],
+  body :is(.tab-content,#ragasaan-cloud,#sidebar-controls,.raga-meal-cards) input[type="radio"] {
+    width:19px !important; height:19px !important; min-width:19px;
+  }
+  body :is(.tab-content,#ragasaan-cloud,#sidebar-controls,.raga-meal-cards) input[type="range"] {
+    min-height:24px; accent-color:#c99b51; cursor:pointer;
+  }
+  body :is(.tab-content,#ragasaan-cloud,#sidebar-controls,.raga-meal-cards)
+    :is(select,input,textarea):focus-visible {
+    outline:2px solid #d6a85e; outline-offset:2px;
+  }
+  .raga-meal-card .raga-card-top label,
+  .raga-meal-card .raga-course-setup label,
+  .raga-course-print .raga-format-grid label {
+    line-height:1.45;
+  }
+}
+@media print {
+  /* All editing controls remain absent; never alter physical page measurements. */
+  #raga-print-studio-preview-controls, #raga-feedback-copy-editor { display:none !important; }
+}
+</style>
+<style id="ragasaan-allergen-print-emphasis">
+/* Distinguish declared allergens by weight as well as colour on all menu media. */
+.raga-declared-allergens,
+.summary-item-allergens {
+  color:#8B1E20 !important;
+  font-weight:800 !important;
+  -webkit-print-color-adjust:exact;
+  print-color-adjust:exact;
+}
+.raga-maycontain-allergens,
+.summary-item-may {
+  color:#704600 !important;
+  font-weight:650 !important;
+  -webkit-print-color-adjust:exact;
+  print-color-adjust:exact;
+}
+@media print {
+  .print-sheet .raga-declared-allergens,
+  #summary-print-root .summary-item-allergens {color:#8B1E20!important;font-weight:800!important;}
+  .print-sheet .raga-maycontain-allergens,
+  #summary-print-root .summary-item-may {color:#704600!important;font-weight:650!important;}
+}
+</style>
 </head>
-<body class="h-full flex flex-col font-sans antialiased text-slate-100 bg-slate-950 overflow-hidden">
+<body class="app-light h-full flex flex-col font-sans antialiased overflow-hidden">
 
   <!-- Top Navigation Bar -->
   <header class="no-print bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shrink-0 shadow-xl z-20">
@@ -1628,11 +1714,6 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 
     <!-- Quick Actions -->
     <div class="flex items-center gap-2">
-      <label class="text-xs text-slate-300 flex items-center gap-2 whitespace-nowrap">App Theme
-        <select id="header-app-theme" aria-label="Application Theme" onchange="applyAppTheme(this.value)" class="bg-slate-800 text-slate-100 border border-slate-600 rounded p-1.5">
-          <option value="dark">Dark</option><option value="light">Light</option>
-        </select>
-      </label>
       <button type="button" id="rs-open-cloud" class="px-3 py-1.5 bg-slate-800 border border-amber-800 text-amber-300 font-semibold rounded-lg text-xs">☁ Cloud Events</button>
       <button type="button" data-rs-admin hidden id="rs-open-admin-qr" class="px-3 py-1.5 bg-slate-800 border border-amber-800 text-amber-300 font-semibold rounded-lg text-xs">⚙ Admin Settings</button>
       <span id="rs-user-info" class="text-[10px] text-slate-300"></span>
@@ -1775,13 +1856,13 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <div id="raga-quick-dishes" class="space-y-1 max-h-48 overflow-y-auto" aria-live="polite"></div>
           </div>
           <div id="manual-add-controls" class="hidden space-y-2 text-xs">
-            <input id="manual-name" placeholder="Dish name *" aria-label="Dish name" class="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white">
+            <input id="manual-name" placeholder="Dish name *" aria-label="Dish name" onblur="ragaFormatManualField(this,'dish')" class="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white">
             <div class="grid grid-cols-2 gap-2">
               <input id="manual-category" list="manual-categories" placeholder="Source category (optional)" class="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white">
               <datalist id="manual-categories"><option value="Starter"><option value="Main Course"><option value="Dessert"><option value="Canapés"><option value="Other"></datalist>
               <input id="manual-subcategory" placeholder="Sub-category (optional)" class="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white">
             </div>
-            <textarea id="manual-description" rows="2" placeholder="Description (optional)" class="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white"></textarea>
+            <textarea id="manual-description" rows="2" placeholder="Description (optional)" onblur="ragaFormatManualField(this,'description')" class="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white"></textarea>
             <button type="button" onclick="addManualDishToMenu()" class="w-full py-2.5 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shadow"><i class="fa-solid fa-plus mr-1"></i> Add Item to This Meal</button>
             <p id="manual-add-feedback" role="status" aria-live="polite" class="text-[11px] text-emerald-400 hidden"></p>
             <details class="border border-slate-800 rounded-lg p-2" open><summary class="cursor-pointer text-amber-400 font-semibold">Allergens (UK 14)</summary><div id="manual-allergens" class="grid grid-cols-2 gap-1 pt-2"></div></details>
@@ -1857,6 +1938,27 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <p class="text-xs text-slate-400">Print, save as PDF, or download editable Word for A4 Buffet and Table Menu Card</p>
         </div>
 
+        <section id="raga-print-studio-preview-controls" class="no-print" aria-label="Final print preview page selector" style="background:#172033;border:1px solid #546276;border-radius:8px;padding:10px;display:grid;gap:8px">
+          <strong style="color:#fbbf24;font-size:12px">Final Preview</strong>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <button type="button" onclick="ragaStudioStep(-1)" aria-label="Previous page" class="raga-page-button">‹ Previous</button>
+            <select id="raga-studio-page-choice" aria-label="Select preview page" onchange="ragaStudioChoose(Number(this.value))" class="raga-page-button"></select>
+            <button type="button" onclick="ragaStudioStep(1)" aria-label="Next page" class="raga-page-button">Next ›</button>
+            <button type="button" onclick="ragaStudioShowAll()" class="raga-page-button">All pages</button>
+          </div>
+          <small style="color:#cbd5e1">Choose a page to inspect. Print/PDF includes all pages regardless of selection.</small>
+        </section>
+        <details id="raga-feedback-copy-editor" class="no-print bg-slate-950 px-3 py-2 rounded-lg border border-slate-800 space-y-2">
+          <summary class="text-xs font-semibold text-gold-400 cursor-pointer">Table Menu Card — Edit Guest Feedback Text</summary>
+          <p class="text-[11px] text-slate-400">These fields are editable even before an Admin QR is published. The back-page preview and Word export use this wording.</p>
+          <label class="block text-xs text-slate-300">Heading
+            <input id="raga-feedback-title-input" type="text" oninput="ragaUpdateFeedbackCopy('feedbackTitle',this.value)" class="block w-full mt-1 p-2 bg-slate-900 border border-slate-700 rounded text-white">
+          </label>
+          <label class="block text-xs text-slate-300">Message
+            <textarea id="raga-feedback-message-input" rows="3" oninput="ragaUpdateFeedbackCopy('feedbackMessage',this.value)" class="block w-full mt-1 p-2 bg-slate-900 border border-slate-700 rounded text-white"></textarea>
+          </label>
+          <button type="button" onclick="setLayout('half-a4')" class="raga-page-button">Preview Table Menu Card</button>
+        </details>
         <!-- Buffet Menu (A4) -->
         <div class="bg-slate-950 px-2 py-2 rounded-lg border border-slate-800 space-y-1">
           <div class="flex items-center justify-between">
@@ -2383,6 +2485,20 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       // Optional logo changes remain available in the application's controls.
     });
 
+    function ragaUpdateFeedbackCopy(key,value){
+      if(!['feedbackTitle','feedbackMessage'].includes(key))return;
+      const design=state.designs?.['half-a4'];if(!design)return;
+      design[key]=value;saveStyle();
+      if(state.layout==='half-a4')renderPreview();
+      // The separate text controls remain editable even when the official QR has not been published.
+    }
+    function ragaSyncFeedbackCopyEditor(){
+      const design=state.designs?.['half-a4'];if(!design)return;
+      const title=document.getElementById('raga-feedback-title-input');
+      const message=document.getElementById('raga-feedback-message-input');
+      if(title && title!==document.activeElement)title.value=design.feedbackTitle ?? 'We Value Your Feedback';
+      if(message && message!==document.activeElement)message.value=design.feedbackMessage ?? 'Thank you for celebrating with us. Please scan the QR code below to share your experience.';
+    }
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.tab-btn').forEach(el => {
@@ -2407,7 +2523,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       sidebar.classList.toggle('workspace-wide', tabId === 'builder' || tabId === 'export');
       sidebar.classList.toggle('hidden', tabId === 'master' || tabId === 'venues' || tabId === 'summary');
       master.classList.toggle('master-preview-split', tabId === 'master');
-      previewMain.classList.toggle('hidden', tabId !== 'design');
+      previewMain.classList.toggle('hidden', tabId !== 'design' && tabId !== 'export');
+      if(tabId==='export')ragaSyncFeedbackCopyEditor();
       if (tabId === 'master') renderMasterDB();
       else if (tabId === 'venues') renderVenueDB();
       else if (tabId === 'summary') {if(!includeClientSummary){setClientSummaryEnabled(true);}renderEventSummary();}
@@ -2541,7 +2658,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       {id:'hi-tea',name:'HI Tea',time:'16:00',serviceMode:'Buffet',formatSelection:[...RAGA_INITIAL_MEAL_DEFAULTS['hi-tea'].formats]},
       {id:'late-night',name:'Late Night Snack',time:'22:30',serviceMode:'Other',formatSelection:[...RAGA_INITIAL_MEAL_DEFAULTS['late-night'].formats]}
     ];
-    const SERVICE_TYPES=['Buffet','Plated Service','Bowl Food','Canapé','Live Station','Thali','Other'];
+    const SERVICE_TYPES=['Buffet','Thali','Multi Stations','Plated Service','Bowl Food','Canapé','Live Station','Other'];
     let currentBuilderSession='breakfast';
     const SUMMARY_PREF='ragasaan_include_client_summary_v1';
     let includeClientSummary = localStorage.getItem(SUMMARY_PREF)==='true';
@@ -2554,45 +2671,93 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       if(id==='late-night'||name==='late night snack')return 'late-night';
       return 'custom';
     }
-    function sessionChoices(session){
-      const kind=sessionKind(session);
-      const adminChoices=window.ragaAdminChoices?.serviceModes?.enabled;
-      const mealChoices=window.ragaMealDefaults?.[kind]?.enabledServices;
-      const filter=values=>{
-        if(!Array.isArray(adminChoices)&&!Array.isArray(mealChoices))return values;
-        // Existing Admin choice lists predate the new Dinner Buffet-Selective mode.
-        // Offer it until the administrator explicitly includes it in a newly saved list.
-        const allowed=values.filter(([id])=>((!Array.isArray(adminChoices)||adminChoices.includes(id)) || (id==='Buffet-Selective' && sessionKind(session)==='dinner'))&&(!Array.isArray(mealChoices)||mealChoices.includes(id)));
-        const old=String(session.serviceMode||'');
-        if(old&&values.some(([id])=>id===old)&&!allowed.some(([id])=>id===old))allowed.push([old,old+' (saved event)']);
-        return allowed.length?allowed:values.slice(0,1);
-      };
-
-      if(kind==='breakfast'||kind==='hi-tea')return filter([['Buffet','Buffet']]);
-      if(kind==='lunch')return filter([['Buffet','Buffet · one section'],['Regular Buffet','Regular Buffet (saved events)'],['Thali','Thali · one section'],['Plated Service','Plated Service · course-wise']]);
-      if(kind==='dinner')return filter([['Plated Service','Plated Service · course-wise'],['Buffet-Selective','Buffet-Selective · choose Plated / Buffet by course'],['Buffet','Buffet · one section'],['Thali','Thali · one section'],['Bowl Food','Bowl Food · one section']]);
-      if(kind==='late-night')return filter([['Other','Other']]);
-      return filter([['Buffet','Buffet'],['Plated Service','Plated Service · course-wise'],['Other','Other']]);
+    
+    // All meal sessions offer all styles; old "Regular Buffet" becomes Multi Stations.
+    const RAGA_SESSION_MODES=['Buffet','Thali','Multi Stations','Plated Service','Bowl Food','Canapé','Live Station','Other'];
+    const RAGA_PLATED_COURSES=['Canapé','Live Station','Starter','Main Course','Dessert'];
+    const RAGA_LABEL_FORMATS=['a4','foldtags-grid','a6-grid','a8-grid','canape-grid'];
+    const ragaCanonicalMode=value=>value==='Regular Buffet'||value==='Buffet – (saved Events)'||value==='Buffet - (saved Events)'?'Multi Stations':value==='Buffet-Selective'||value==='Table Service'||value==='Mixed Courses'?'Plated Service':value;
+    const ragaStationKey=id=>'station:'+id;
+    const ragaIsStationCourse=course=>String(course||'').startsWith('station:');
+    function ragaEnsureStations(session){
+      if(!Array.isArray(session.stations))
+        session.stations=Array.from({length:6},(_,i)=>({id:'station-'+(i+1),name:'Station '+(i+1)}));
+      session.stations=session.stations.filter(x=>x&&x.id).map((x,i)=>({id:String(x.id).slice(0,80),name:String(x.name||('Station '+(i+1))).slice(0,100)}));
+      return session.stations;
     }
+    function ragaEnsureLiveStations(session){
+      if(!Array.isArray(session.liveStations))session.liveStations=[{id:'live-1',name:'Live Station 1'}];
+      session.liveStations=session.liveStations.filter(x=>x&&x.id).map((x,i)=>({id:String(x.id).slice(0,80),name:String(x.name||('Live Station '+(i+1))).slice(0,100)}));
+      return session.liveStations;
+    }
+    function sessionChoices(session){return RAGA_SESSION_MODES.map(mode=>[mode,mode]);}
     function sessionMode(session){
-      if(session.serviceMode==='Table Service'||session.serviceMode==='Mixed Courses')session.serviceMode='Plated Service';
-      const modes=sessionChoices(session).map(([v])=>v);
-      if(modes.includes(session.serviceMode))return session.serviceMode;
-      const d={breakfast:'Buffet',lunch:'Regular Buffet',dinner:'Plated Service','hi-tea':'Buffet','late-night':'Other',custom:'Buffet'};
-      const preferred=window.ragaAdminChoices?.serviceModes?.default;const allowed=sessionChoices(session).map(x=>x[0]);
-      return allowed.includes(preferred)?preferred:(allowed.includes(d[sessionKind(session)])?d[sessionKind(session)]:allowed[0]);
+      const previous=String(session.serviceMode||'');
+      if(previous)session.serviceMode=ragaCanonicalMode(previous);
+      if(RAGA_SESSION_MODES.includes(session.serviceMode))return session.serviceMode;
+      const defaults={breakfast:'Buffet',lunch:'Buffet',dinner:'Plated Service','hi-tea':'Buffet','late-night':'Buffet',custom:'Buffet'};
+      return defaults[sessionKind(session)]||'Buffet';
     }
-    function isCourseWise(session){return ['Plated Service','Buffet-Selective'].includes(sessionMode(session));}
+    function isMultiStationMode(session){return sessionMode(session)==='Multi Stations';}
+    function isCourseWise(session){return sessionMode(session)==='Plated Service';}
     function availableCourses(session){
-      if(!isCourseWise(session))return ['Other'];const all=['Starter','Main Course','Dessert','Canapé','Live Station'];const allowed=window.ragaAdminChoices?.menuCategories?.enabled;return Array.isArray(allowed)?(all.filter(x=>allowed.includes(x)).length?all.filter(x=>allowed.includes(x)):['Starter']):all;
+      const mode=sessionMode(session);
+      if(mode==='Multi Stations')return ragaEnsureStations(session).map(station=>ragaStationKey(station.id));
+      if(mode==='Plated Service')return [...RAGA_PLATED_COURSES];
+      if(mode==='Live Station')return ['Live Station'];
+      if(mode==='Canapé')return ['Canapé'];
+      return ['Other'];
     }
-    function courseDisplay(session,course){return isCourseWise(session)?({ 'Main Course':'Main'}[course]||course||'Other'):'All Items';}
+    function courseDisplay(session,course){
+      if(isMultiStationMode(session))
+        return ragaEnsureStations(session).find(station=>ragaStationKey(station.id)===course)?.name||'Unassigned Station';
+      if(course==='Other'||!course)return 'General / Buffet Items';
+      return course==='Main Course'?'Main Course':String(course);
+    }
+    function ragaDefaultPlatedCourse(item){
+      if(RAGA_PLATED_COURSES.includes(item?.ragaPlatedCourse))return item.ragaPlatedCourse;
+      if(RAGA_PLATED_COURSES.includes(item?.menuCourse))return item.menuCourse;
+      const hint=String([item?.category,item?.subcategory].filter(Boolean).join(' ')).toLowerCase();
+      return /dessert|sweet|pudding|cake|pastry/.test(hint)?'Dessert':/canap/.test(hint)?'Canapé':/live station/.test(hint)?'Live Station':'Main Course';
+    }
+    function ragaRouteSessionItems(session,newValue){
+      const next=ragaCanonicalMode(newValue),old=sessionMode(session);
+      if(!RAGA_SESSION_MODES.includes(next)||old===next)return false;
+      const records=eventRecords.filter(item=>item.sessionId===session.id);
+      if(old==='Multi Stations')records.forEach(item=>{if(ragaIsStationCourse(item.menuCourse))item.ragaStationCourse=item.menuCourse;});
+      if(old==='Plated Service')records.forEach(item=>{if(RAGA_PLATED_COURSES.includes(item.menuCourse))item.ragaPlatedCourse=item.menuCourse;});
+      session.serviceMode=next;
+      if(next==='Multi Stations')ragaEnsureStations(session);
+      if(next==='Plated Service'||next==='Live Station')ragaEnsureLiveStations(session);
+      const courses=availableCourses(session);
+      for(const item of records){
+        if(next==='Multi Stations'){
+          item.menuCourse=courses.includes(item.ragaStationCourse)?item.ragaStationCourse:(courses[0]||'Other');
+        }else if(next==='Plated Service')item.menuCourse=ragaDefaultPlatedCourse(item);
+        else item.menuCourse=courses[0]||'Other';
+      }
+      // Keep all dish records, but replace the print defaults for the new style.
+      session.categoryFormats={};
+      session.formatSelection=[...new Set(courses.flatMap(course=>ragaInitialFormats(session,course)))];
+      for(const item of records)item.printFormats=[...ragaInitialFormats(session,item.menuCourse)];
+      return true;
+    }
+    function ragaEnsureValidCourses(session){
+      const courses=availableCourses(session);
+      for(const item of eventRecords.filter(row=>row.sessionId===session.id)){
+        if(courses.includes(item.menuCourse))continue;
+        if(isCourseWise(session))item.menuCourse=ragaDefaultPlatedCourse(item);
+        else if(isMultiStationMode(session))item.menuCourse=courses.includes(item.ragaStationCourse)?item.ragaStationCourse:(courses[0]||'Other');
+        else item.menuCourse=courses[0]||'Other';
+      }
+    }
     function normalizeGroupService(session,course){
-      if(!isCourseWise(session))return sessionMode(session)==='Regular Buffet'?'Buffet':sessionMode(session);
-      if(course==='Canapé')return 'Canapé';
-      if(course==='Live Station')return 'Live Station';
-      if(['Starter','Main Course','Dessert'].includes(course))return ensureSessionServices(session)[course]||'Plated Service';
-      return 'Plated Service';
+      const mode=sessionMode(session);
+      if(mode==='Multi Stations')return 'Buffet';
+      if(mode!=='Plated Service')return mode;
+      if(course==='Canapé'||course==='Live Station')return course;
+      return ['Starter','Main Course','Dessert'].includes(course)
+        ?ensureSessionServices(session)[course]||'Plated Service':'Plated Service';
     }
     function defaultServiceTypes(session){return {'Canapé':'Canapé','Live Station':'Live Station','Starter':'Plated Service','Main Course':'Plated Service','Dessert':'Plated Service','Other':'Buffet'};}
     function ensureSessionServices(session){session.courseServices={...defaultServiceTypes(session),...(session.courseServices||{})};for(const key of Object.keys(session.courseServices)){if(session.courseServices[key]==='Table Service')session.courseServices[key]='Plated Service';}return session.courseServices;}
@@ -2634,31 +2799,22 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       renderBuilderSessionTabs();renderFormatCheckboxes();renderActiveMenuItems();window.ragaRenderMealCards?.();
     }
     function setActiveSessionTime(time){const session=selectedBuilderSession();if(session)editEventSession(session.id,'time',time);}
-    function setSessionMode(value){
-      const session=selectedBuilderSession();if(!session||!sessionChoices(session).some(x=>x[0]===value))return;
-      session.serviceMode=value;
-      if(!isCourseWise(session))session.courseTimes={};
-      if(value==='Buffet-Selective'){
-        const services=ensureSessionServices(session);
-        for(const course of ['Starter','Main Course','Dessert']){
-          if(!['Plated Service','Buffet'].includes(services[course]))services[course]='Plated Service';
-        }
-      }
-      onEventRecordsChanged();
-    }
+    function setSessionMode(value){const session=selectedBuilderSession();if(session&&ragaRouteSessionItems(session,value))onEventRecordsChanged();}
     function setCourseTime(sessionId,course,time){
       const session=eventSessions.find(s=>s.id===sessionId);if(!session)return;
       session.courseTimes={...(session.courseTimes||{}),[course]:time};
       saveStyle();renderEventSummary();
     }
     function updateCourseService(sessionId,course,type){
-      const session=eventSessions.find(s=>s.id===sessionId);if(!session||!isCourseWise(session))return;
-      const standard={'Starter':['Plated Service','Buffet'],'Main Course':['Buffet','Plated Service','Bowl Food'],'Dessert':['Buffet','Plated Service']};
-      if(sessionMode(session)==='Buffet-Selective') standard['Main Course']=['Plated Service','Buffet'];
-      const configured=window.ragaMealDefaults?.[sessionKind(session)]?.courses?.[course]?.enabled;
-      const allowed=Array.isArray(configured)?standard[course]?.filter(v=>configured.includes(v)):standard[course];
-      if(!allowed?.includes(type))return;
-      ensureSessionServices(session)[course]=type;onEventRecordsChanged();
+      const session=eventSessions.find(row=>row.id===sessionId);
+      if(!session||!isCourseWise(session)||!['Starter','Main Course','Dessert'].includes(course))return;
+      if(!['Plated Service','Buffet','Bowl Food','Thali'].includes(type))return;
+      ensureSessionServices(session)[course]=type;
+      session.categoryFormats={...(session.categoryFormats||{})};
+      delete session.categoryFormats[course];
+      eventRecords.filter(item=>item.sessionId===session.id&&item.menuCourse===course)
+        .forEach(item=>{item.printFormats=[...ragaInitialFormats(session,course)];});
+      onEventRecordsChanged();
     }
     function setClientSummaryEnabled(checked){
       includeClientSummary=!!checked;
@@ -2683,9 +2839,9 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       if(area){
         const services=ensureSessionServices(session);
         area.innerHTML=['Canapé','Live Station','Starter','Main Course','Dessert'].map(course=>{
-          const standard=course==='Main Course'?(sessionMode(session)==='Buffet-Selective'?['Plated Service','Buffet']:['Plated Service','Buffet','Bowl Food']):(course==='Starter'||course==='Dessert')?['Plated Service','Buffet']:[];
+          const standard=['Starter','Main Course','Dessert'].includes(course)?['Plated Service','Buffet','Bowl Food','Thali']:[];
           const configured=window.ragaMealDefaults?.[sessionKind(session)]?.courses?.[course]?.enabled;
-          const allowed=Array.isArray(configured)?standard.filter(v=>configured.includes(v)):standard;
+          const allowed=standard;
           const service=allowed.length?`<select aria-label="${esc(course)} service" onchange="updateCourseService('${esc(session.id)}','${esc(course)}',this.value)" class="w-full rounded bg-slate-950 border border-slate-700 p-1 text-white">${(allowed.includes(services[course])?allowed:[...allowed,services[course]]).map(v=>`<option value="${esc(v)}" ${services[course]===v?'selected':''}>${esc(v)}${allowed.includes(v)?'':' (saved event)'}</option>`).join('')}</select>`:`<span class="text-slate-400">${esc(normalizeGroupService(session,course))}</span>`;
           const courseTime=includeClientSummary?`<label class="text-[10px]">Course time <input type="time" aria-label="${esc(course)} time" value="${esc(session.courseTimes?.[course]||'')}" onchange="setCourseTime('${esc(session.id)}','${esc(course)}',this.value)" class="w-full mt-1 p-1 rounded bg-slate-950 border border-slate-700 text-white"></label>`:'';
           return `<div class="rounded bg-slate-950 p-2 border border-slate-700"><b class="text-amber-300">${esc(courseDisplay(session,course))}</b><div class="mt-1">${service}</div>${courseTime}</div>`;
@@ -2697,8 +2853,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         courses.innerHTML=list.map(c=>`<option value="${esc(c)}" ${old===c?'selected':''}>${esc(courseDisplay(session,c))}</option>`).join('');
         if(!list.includes(old))courses.value=list[0];
       }
-      const selector=document.getElementById('builder-course-control');if(selector)selector.hidden=!isCourseWise(session);
-      if(document.getElementById('builder-service-hint'))document.getElementById('builder-service-hint').textContent=sessionMode(session)==='Buffet-Selective'?'Dinner: choose Plated Service or Buffet for each course. Plated courses print on Table Menu Card; Buffet courses print on A4 plus labels. Canapés print only on canapé/A8/A6 labels.':sessionKind(session)==='dinner'&&sessionMode(session)==='Plated Service'?'Dinner Plated Service: all dishes except canapés print on Table Menu Card; canapés print only as Canapé/A8/A6 labels.':isCourseWise(session)?'Choose course and, when requesting A4 Client Summary, enter a time for each course.':'One section for all dishes — course selection is not needed.';
+      const selector=document.getElementById('builder-course-control');if(selector)selector.hidden=!(isCourseWise(session)||isMultiStationMode(session));
+      if(document.getElementById('builder-service-hint'))document.getElementById('builder-service-hint').textContent=isMultiStationMode(session)?'Select the station to add dishes. Each station receives its own A4 page; defaults A4 and FoldTags.':isCourseWise(session)?'Canapé defaults to FoldTags; Live Station to dedicated A4; Plated courses to Table Menu Card, Buffet/Bowl/Thali courses to A4 and FoldTags.':'General / Buffet Items only. Default print formats: A4 and FoldTags.';
     }
 
     let activeEventName='';
@@ -2709,44 +2865,35 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       return [item.menuCourse,item.category,item.subcategory,item.serviceType]
         .some(value=>/\bcanapes?\b/i.test(String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')));
     }
+    
+    function ragaAllowedFormats(session,course){
+      const mode=sessionMode(session);
+      if(mode==='Plated Service'){
+        if(course==='Canapé')return ['canape-grid','a8-grid','a6-grid','foldtags-grid'];
+        if(course==='Live Station')return ['a4-live'];
+        return normalizeGroupService(session,course)==='Plated Service'?['half-a4']:['a4','foldtags-grid','a8-grid','a6-grid','canape-grid'];
+      }
+      if(mode==='Canapé')return ['canape-grid','a8-grid','a6-grid','foldtags-grid'];
+      if(mode==='Live Station')return ['a4-live'];
+      return [...RAGA_LABEL_FORMATS];
+    }
+    function ragaInitialFormats(session,course){
+      const allowed=ragaAllowedFormats(session,course);
+      if(allowed.includes('half-a4'))return ['half-a4'];
+      if(allowed.includes('a4-live'))return ['a4-live'];
+      if(sessionMode(session)==='Canapé'||course==='Canapé')return ['foldtags-grid'];
+      return ['a4','foldtags-grid'].filter(fmt=>allowed.includes(fmt));
+    }
     function effectiveItemFormats(item){
-      const selected=new Set((Array.isArray(item.printFormats)?item.printFormats:[]).filter(f=>MENU_FORMATS.includes(f)));
-      const rule=ragaCurrentPrintRules||RAGA_PRINT_RULE_FALLBACK;
-      const companions=Array.isArray(rule.a4Companions)?rule.a4Companions:[];
-      const expandA4=chosen=>{
-        const out=new Set(chosen);
-        if(out.has('a4'))companions.filter(f=>MENU_FORMATS.includes(f)).forEach(f=>out.add(f));
-        return [...out];
-      };
-      const session=eventSessions.find(s=>s.id===item.sessionId);
-      const course=String(item.menuCourse||'Other');
-      // Category rules take precedence over the meal-wide service selection.
-      if(course==='Live Station')return ['a4-live'];
-      if(isCanapeDish(item)){
-        const allowed=['canape-grid','a8-grid','foldtags-grid'];
-        const configured=(session?.id==='dinner'&&Array.isArray(rule.dinnerCanape))?rule.dinnerCanape:allowed;
-        const valid=allowed.filter(f=>configured.includes(f));
-        const chosen=valid.filter(f=>selected.has(f));
-        return chosen.length?chosen:(selected.size?[]:valid);
-      }
-      const mode=session?sessionMode(session):'Buffet';
-      if(mode==='Plated Service')return ['half-a4'];
-      if(mode==='Buffet-Selective'&&session){
-        const served=normalizeGroupService(session,course);
-        if(served==='Plated Service')return ['half-a4'];
-        if(served==='Bowl Food')return [...selected].filter(f=>['foldtags-grid','a8-grid','a6-grid','canape-grid'].includes(f));
-        return expandA4([...selected].filter(f=>['a4','a8-grid','a6-grid','canape-grid','foldtags-grid'].includes(f)));
-      }
-      if(mode==='Bowl Food')return [...selected].filter(f=>['foldtags-grid','a8-grid','a6-grid','canape-grid'].includes(f));
-      return expandA4([...selected].filter(f=>['a4','a8-grid','a6-grid','canape-grid','foldtags-grid'].includes(f)));
+      const session=eventSessions.find(row=>row.id===item.sessionId);
+      if(!session)return [];
+      const selected=Array.isArray(item.printFormats)?item.printFormats:ragaInitialFormats(session,item.menuCourse);
+      return ragaAllowedFormats(session,item.menuCourse).filter(fmt=>selected.includes(fmt));
     }
     function normalizeEventFormatRecords(){
+      eventSessions.forEach(session=>ragaEnsureValidCourses(session));
       state.formatMenus=Object.fromEntries(MENU_FORMATS.map(fmt=>[fmt,[]]));
-      eventRecords.forEach(item=>{
-        effectiveItemFormats(item).forEach(fmt=>{
-          if(state.formatMenus[fmt])state.formatMenus[fmt].push(item);
-        });
-      });
+      eventRecords.forEach(item=>effectiveItemFormats(item).forEach(fmt=>state.formatMenus[fmt]?.push(item)));
       state.event.items=state.formatMenus[state.layout]||[];
     }
     function selectedEventSession(){return currentBuilderSession || eventSessions[0]?.id || 'breakfast'}
@@ -2762,13 +2909,12 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       const session=selectedBuilderSession();if(!session)return;
       // Each meal has its own print-format selection for subsequently added dishes.
       const rule=window.ragaMealDefaults?.[sessionKind(session)];
-      const fallback=RAGA_INITIAL_MEAL_DEFAULTS[sessionKind(session)]?.formats||['a4'];
-      const source=Array.isArray(session.formatSelection)?session.formatSelection:(Array.isArray(rule?.formats)?rule.formats:fallback);
+      const fallback=ragaInitialFormats(session,selectedMenuCourse()||availableCourses(session)[0]||'Other');
+      const source=Array.isArray(session.categoryFormats?.[selectedMenuCourse()])?session.categoryFormats[selectedMenuCourse()]:fallback;
       const chosen=new Set(source);
-      const enabled=window.ragaAdminChoices?.printFormats?.enabled;
-      const available=Array.isArray(enabled)?MENU_FORMATS.filter(f=>enabled.includes(f)):MENU_FORMATS;
+      const available=ragaAllowedFormats(session,selectedMenuCourse()||availableCourses(session)[0]||'Other');
       // A format hidden by Admin remains visible on old events if already selected.
-      const formats=MENU_FORMATS.filter(f=>available.includes(f)||chosen.has(f));
+      const formats=MENU_FORMATS.filter(f=>available.includes(f));
       root.innerHTML=formats.map(fmt=>`<label class="flex items-center gap-1"><input type="checkbox" value="${esc(fmt)}" ${chosen.has(fmt)?'checked':''}> ${esc(MENU_NAMES[fmt])}${available.includes(fmt)?'':' (saved event)'}</label>`).join('');
       root.dataset.sessionId=session.id;
       syncRelevantTagCopies();
@@ -2788,7 +2934,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       if(event.target.matches('#builder-print-formats input[type="checkbox"]')){const session=selectedBuilderSession();if(session)session.formatSelection=selectedPrintFormats();syncRelevantTagCopies();}
     });
     function addEventDish(dish,menuCourse){
-      const formats=selectedPrintFormats();
+      const formats=ragaInitialFormats(selectedBuilderSession(),menuCourse);
       const copies={};
       const newItem={...JSON.parse(JSON.stringify(dish)),eventUid:eventUid(),sessionId:selectedEventSession(),menuCourse,serviceType:'',printFormats:formats,tagCopies:copies};
       eventRecords.push(newItem);
@@ -2834,8 +2980,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       ragaCurrentPrintRules=ragaNormalisePrintRules(snapshot.printRules);
       const publicPlanner=document.getElementById('rs-public-planner-name');if(publicPlanner)publicPlanner.value=String(snapshot.plannerName||'');
       state.event.title=String(snapshot.title||'');state.event.date=String(snapshot.date||'');state.event.venue=String(snapshot.venue||'');state.event.partyNo='';includeClientSummary=!!snapshot.includeClientSummary;localStorage.setItem(SUMMARY_PREF,String(includeClientSummary));
-      eventSessions=snapshot.sessions.filter(x=>x&&x.id&&x.name&&String(x.name).toLowerCase()!=='reception').map(x=>({id:String(x.id),name:String(x.name),time:String(x.time||''),serviceMode:x.serviceMode,courseTimes:{...(x.courseTimes||{})},courseServices:{...(x.courseServices||{})},formatSelection:Array.isArray(x.formatSelection)?x.formatSelection:undefined,categoryFormats:x.categoryFormats&&typeof x.categoryFormats==='object'?JSON.parse(JSON.stringify(x.categoryFormats)):{},printHeading:x.printHeading,showPrintHeading:x.showPrintHeading}));
-      if(!eventSessions.length)eventSessions=[{id:'lunch',name:'Lunch',time:'',serviceMode:'Regular Buffet',courseServices:{}}];
+      eventSessions=snapshot.sessions.filter(x=>x&&x.id&&x.name&&String(x.name).toLowerCase()!=='reception').map(x=>({id:String(x.id),name:String(x.name),time:String(x.time||''),serviceMode:x.serviceMode,courseTimes:{...(x.courseTimes||{})},courseServices:{...(x.courseServices||{})},formatSelection:Array.isArray(x.formatSelection)?x.formatSelection:undefined,categoryFormats:x.categoryFormats&&typeof x.categoryFormats==='object'?JSON.parse(JSON.stringify(x.categoryFormats)):{},stations:Array.isArray(x.stations)?x.stations.map(st=>({...st})):undefined,liveStations:Array.isArray(x.liveStations)?x.liveStations.map(st=>({...st})):undefined,printHeading:x.printHeading,showPrintHeading:x.showPrintHeading}));
+      if(!eventSessions.length)eventSessions=[{id:'lunch',name:'Lunch',time:'',serviceMode:'Buffet',courseServices:{}}];
       eventRecords=snapshot.items.filter(x=>x&&x.name).map(x=>({...x,eventUid:x.eventUid||eventUid(),sessionId:String(x.sessionId)==='reception'?'dinner':(x.sessionId||eventSessions[0].id),printFormats:Array.isArray(x.printFormats)?x.printFormats.filter(f=>MENU_FORMATS.includes(f)):[],tagCopies:x.tagCopies||{}}));
       if(snapshot.designs&&typeof snapshot.designs==='object')MENU_FORMATS.forEach(f=>{if(snapshot.designs[f])Object.assign(state.designs[f],snapshot.designs[f])});
       currentBuilderSession=eventSessions[0].id;setClientSummaryEnabled(includeClientSummary);state.design=state.designs[state.layout];activeEventName=snapshot.name||'';window.ragaActiveThemeId=snapshot.themeId||'';
@@ -2876,7 +3022,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           const uid=esc(x.eventUid);
           const courses=[...new Set([...availableCourses(session),String(x.menuCourse||'Other')])];
           const courseSelect=isCourseWise(session)?`<label>Menu course<select class="summary-input-field" data-summary-record-uid="${uid}" data-summary-record-field="menuCourse">${courses.map(c=>`<option value="${esc(c)}" ${x.menuCourse===c?'selected':''}>${esc(c)}</option>`).join('')}</select></label>`:'';
-          return `<div class="summary-compact-item"><div class="flex gap-1 items-center"><small>${i+1}.</small><input class="summary-name-input" aria-label="Edit dish name" data-summary-record-uid="${uid}" data-summary-record-field="name" value="${esc(x.name)}" /><button type="button" title="Remove from event" aria-label="Remove ${esc(x.name)}" data-summary-remove-uid="${uid}" style="color:#fca5a5;font-size:16px;padding:2px">×</button></div><details><summary>Edit category, course, description &amp; allergens</summary>${courseSelect}<label>Category<input class="summary-input-field" data-summary-record-uid="${uid}" data-summary-record-field="category" value="${esc(x.category||'')}"></label><label>Subcategory<input class="summary-input-field" data-summary-record-uid="${uid}" data-summary-record-field="subcategory" value="${esc(x.subcategory||'')}"></label><label>Description<textarea data-summary-record-uid="${uid}" data-summary-record-field="desc">${esc(x.desc||'')}</textarea></label><label>Declared allergens (comma separated)<textarea data-summary-record-uid="${uid}" data-summary-record-field="allergens">${esc((x.allergens||[]).join(', '))}</textarea></label><label>May contain (comma separated)<textarea data-summary-record-uid="${uid}" data-summary-record-field="mayContain">${esc((x.mayContain||[]).join(', '))}</textarea></label></details></div>`;
+          return `<div class="summary-compact-item"><div class="flex gap-1 items-center"><small>${i+1}.</small><input class="summary-name-input" aria-label="Edit dish name" data-summary-record-uid="${uid}" data-summary-record-field="name" value="${esc(x.name)}" /><button type="button" title="Remove from event" aria-label="Remove ${esc(x.name)}" data-summary-remove-uid="${uid}" style="color:#fca5a5;font-size:16px;padding:2px">×</button></div><details><summary>Edit category, course, description &amp; allergens</summary>${courseSelect}<label>Category<input class="summary-input-field" data-summary-record-uid="${uid}" data-summary-record-field="category" value="${esc(x.category||'')}"></label><label>Subcategory<input class="summary-input-field" data-summary-record-uid="${uid}" data-summary-record-field="subcategory" value="${esc(x.subcategory||'')}"></label><label>Description<textarea data-summary-record-uid="${uid}" data-summary-record-field="desc">${esc(x.desc||'')}</textarea></label>${ragaTickMarkup(uid,"allergens",x.allergens,"summary")}${ragaTickMarkup(uid,"mayContain",x.mayContain,"summary")}</details></div>`;
         }).join('')}</div>`;
       }).join('')||'<p class="text-slate-400">No dishes added yet.</p>';
       refreshSavedEventSelect();renderSummaryPaper();
@@ -2900,6 +3046,11 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     });
     document.addEventListener('change', event=>{
       const el=event.target;
+      if(el.dataset?.summaryAllergenField){
+        const item=eventRecords.find(x=>x.eventUid===el.dataset.summaryAllergenUid),group=el.closest('fieldset'),field=el.dataset.summaryAllergenField;
+        if(item&&group&&['allergens','mayContain'].includes(field)){item[field]=[...group.querySelectorAll('input:checked')].map(x=>x.value);saveStyle();renderSummaryPaper();renderPreview();window.ragaRenderMealCards?.();}
+        return;
+      }
       if(el.hasAttribute('data-summary-record-uid')){
         const uid=el.dataset.summaryRecordUid,key=el.dataset.summaryRecordField;
         const item=eventRecords.find(x=>x.eventUid===uid);if(!item)return;
@@ -3005,8 +3156,9 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       const template = {...state.design};
       // Each dimension receives its own settings, not merely a shared A4 width slider.
       state.designs = Object.fromEntries(MENU_FORMATS.map(fmt => [fmt, {
-        ...template, titleFontSize:10, dishNameFontSize:10, descFontSize:10, allergenFontSize:10, autoFitText:true,
-        logoWidth: 110, menuHeading:'Menu',
+        ...template, titleFontSize:10, dishNameFontSize:15, descFontSize:10, allergenFontSize:12, autoFitText:true,
+        dishTextCase:'title',descriptionTextCase:'sentence',allergenTextCase:'title',
+        logoWidth: 110, menuHeading:'Menu', feedbackTitle:'We Value Your Feedback', feedbackMessage:'Thank you for celebrating with us. Please scan the QR code below to share your experience.',
         coupleLogoWidth: 100, borderOutsetCm:0.2, coupleOffsetX:0, coupleOffsetY:0, showDescription:false,
         foldTagsBottomHeightCm:3, foldTagsDividerWidthMm:0.3, foldTagsDividerColor:'#8f8572', foldTagsPanelInsetMm:2.5, foldTagsLogoWidth:100,
         showHalfBackLeftImage:false, showHalfBackRightImage:false,
@@ -3073,11 +3225,11 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         state.event.partyNo=saved.event?.partyNo||'';
         state.sharedCompanyLogo=saved.companyLogo||'';
         state.sharedCoupleLogo=saved.coupleLogo||'';
-        state.appTheme=saved.appTheme||'dark';
+        state.appTheme='light';
         if(typeof saved.includeClientSummary==='boolean')includeClientSummary=saved.includeClientSummary;
         if(saved.event) Object.assign(state.event,{title:saved.event.title||state.event.title,date:saved.event.date||state.event.date,venue:saved.event.venue||state.event.venue});
       } catch(e){console.warn('Saved style unavailable',e);}
-      applySharedLogos(); applyAppTheme(state.appTheme||'dark');
+      applySharedLogos(); applyAppTheme('light');
       updateSessionPicker();renderFormatCheckboxes();renderBuilderSessionTabs();
       state.design=state.designs[state.layout];
       syncFormatLabels();
@@ -3126,17 +3278,42 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       MENU_FORMATS.forEach(fmt=>{state.designs[fmt].logoUrl=state.sharedCompanyLogo||'';state.designs[fmt].coupleLogoUrl=state.sharedCoupleLogo||'';});
     }
     function saveStyle() {
-      try {localStorage.setItem('ragasaan_style_v3',JSON.stringify({designs:state.designs,eventSessions,eventRecords,companyLogo:state.sharedCompanyLogo||'',coupleLogo:state.sharedCoupleLogo||'',appTheme:state.appTheme||'dark',includeClientSummary,event:{title:state.event.title,date:state.event.date,venue:state.event.venue,partyNo:state.event.partyNo||''}}));}
+      try {localStorage.setItem('ragasaan_style_v3',JSON.stringify({designs:state.designs,eventSessions,eventRecords,companyLogo:state.sharedCompanyLogo||'',coupleLogo:state.sharedCoupleLogo||'',appTheme:'light',includeClientSummary,event:{title:state.event.title,date:state.event.date,venue:state.event.venue,partyNo:state.event.partyNo||''}}));}
       catch(e){console.warn('Storage full; consider smaller logo images',e);}
     }
-    function applyAppTheme(theme) {
-      state.appTheme=theme;
-      document.body.classList.toggle('app-light',theme==='light');
-      const headerTheme=document.getElementById('header-app-theme');
-      if(headerTheme) headerTheme.value=theme;
+    function applyAppTheme() {
+      // One official interface palette. Print-format themes remain independent.
+      state.appTheme='light';
+      document.body.classList.add('app-light');
       saveStyle();
     }
-    function showStartupLogos() { document.getElementById('startup-logos')?.classList.remove('hidden'); }
+
+    // Presentation only: never alter canonical allergen identities or master-database values.
+    const RAGA_CASE_OPTIONS=['title','upper','sentence','lower','original'];
+    function ragaFormatTypography(value,mode='title'){
+      const str=String(value??'');
+      const lower=str.toLocaleLowerCase('en-GB');
+      switch(mode){
+        case 'upper':return str.toLocaleUpperCase('en-GB');
+        case 'lower':return lower;
+        case 'sentence':return lower.replace(/(^|[.!?]\s+|\n+)(\s*['"“‘(]*)(\p{L})/gu,(_,prefix,punct,letter)=>prefix+punct+letter.toLocaleUpperCase('en-GB'));
+        case 'title':return lower.replace(/(^|[\s/()\-–—:;,.!?])(\p{L})/gu,(_,prefix,letter)=>prefix+letter.toLocaleUpperCase('en-GB'));
+        default:return str;
+      }
+    }
+    function ragaTypographyMode(kind,format=state.layout){
+      const design=state.designs?.[format]||state.design||{};
+      const prop=kind==='dish'?'dishTextCase':kind==='allergen'?'allergenTextCase':'descriptionTextCase';
+      const fallback=kind==='description'?'sentence':'title';
+      return RAGA_CASE_OPTIONS.includes(design[prop])?design[prop]:fallback;
+    }
+    function ragaDisplayText(value,kind='dish',format=state.layout){
+      return ragaFormatTypography(value,ragaTypographyMode(kind,format));
+    }
+    function ragaFormatManualField(field,kind='dish'){
+      if(field&&typeof field.value==='string')field.value=ragaDisplayText(field.value,kind);
+    }
+        function showStartupLogos() { document.getElementById('startup-logos')?.classList.remove('hidden'); }
     function closeStartupLogos() { document.getElementById('startup-logos')?.classList.add('hidden'); localStorage.setItem('ragasaan_initial_setup_v1','1'); saveStyle(); }
     function syncFormatLabels() {
       const label = document.getElementById('preview-format-label');
@@ -3213,6 +3390,12 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
             ${fontSlider('descFontSize','Description Size')}
             ${fontSlider('allergenFontSize','Allergen Text Size')}
           </div>
+          <div class="grid grid-cols-2 gap-3">
+            ${[['dishTextCase','Dish Name Capitalization'],['descriptionTextCase','Description Capitalization'],['allergenTextCase','Allergen Text Capitalization']].map(([key,title])=>`<label class="text-slate-400">${title}<select class="w-full mt-1 bg-slate-900 border border-slate-700 rounded p-2 text-white" onchange="state.design['${key}']=this.value;renderPreview();window.ragaRenderMealCards?.()">
+              ${[['title','Title Case'],['upper','UPPERCASE'],['sentence','Sentence case'],['lower','lowercase'],['original','As entered']].map(([value,name])=>`<option value="${value}" ${(d[key]|| (key==='descriptionTextCase'?'sentence':'title'))===value?'selected':''}>${name}</option>`).join('')}
+            </select></label>`).join('')}
+          </div>
+          <p class="text-[10px] text-slate-500">This menu-format setting changes displayed letters only. Declared and may-contain allergen identities stay unchanged.</p>
           <label class="flex items-start gap-2 text-amber-300"><input type="checkbox" ${d.autoFitText!==false?'checked':''} onchange="state.design.autoFitText=this.checked;renderPreview()"> <span><b>Auto-fit text to the page</b><span class="block text-[10px] text-slate-400">Shrinks all text proportionally when needed. If the minimum readable size is reached, creates extra pages instead of hiding dishes.</span></span></label>
           <label class="block text-slate-400"><input type="checkbox" ${d.showDescription===true?'checked':''} onchange="state.design.showDescription=this.checked;renderPreview()"> Show menu descriptions on this format</label>
 
@@ -3245,7 +3428,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <summary class="font-semibold text-gold-400 cursor-pointer mb-2">FoldTags Layout</summary>
           <p class="text-[10px] text-slate-400">Physical tag size is fixed to approximately 9 × 6 cm, matching your sample. Adjust the lower text panel and dividing line here.</p>
           <div class="grid grid-cols-2 gap-2">
-            <label class="text-slate-400">Bottom panel height (cm)<input type="number" min="2.2" max="4.5" step="0.1" value="${Number(d.foldTagsBottomHeightCm)||3}" oninput="state.design.foldTagsBottomHeightCm=Math.max(2.2,Math.min(4.5,Number(this.value)||3));renderPreview()" class="w-full mt-1 p-1.5 rounded bg-slate-900 border border-slate-700 text-white"></label>
+            <div class="text-slate-400" style="font-size:11px">Fold balance: <strong>3 cm top / 3 cm text</strong><small style="display:block">Fixed equal halves</small></div>
             <label class="text-slate-400">Panel inset (mm)<input type="number" min="1" max="8" step="0.5" value="${Number(d.foldTagsPanelInsetMm)||2.5}" oninput="state.design.foldTagsPanelInsetMm=Math.max(1,Math.min(8,Number(this.value)||2.5));renderPreview()" class="w-full mt-1 p-1.5 rounded bg-slate-900 border border-slate-700 text-white"></label>
             <label class="text-slate-400">Divider line width (mm)<input type="number" min="0.2" max="2" step="0.1" value="${Number(d.foldTagsDividerWidthMm)||0.3}" oninput="state.design.foldTagsDividerWidthMm=Math.max(0.2,Math.min(2,Number(this.value)||0.3));renderPreview()" class="w-full mt-1 p-1.5 rounded bg-slate-900 border border-slate-700 text-white"></label>
             <label class="text-slate-400">Divider line color<input type="color" value="${d.foldTagsDividerColor||d.borderColor}" oninput="state.design.foldTagsDividerColor=this.value;renderPreview()" class="w-full mt-1 h-8 rounded"></label>
@@ -3701,6 +3884,20 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     }
 
     const MANUAL_ALLERGENS = ['Celery','Cereals containing gluten','Crustaceans','Eggs','Fish','Lupin','Milk','Molluscs','Mustard','Tree nuts','Peanuts','Sesame','Soya','Sulphites'];
+    function ragaAllergenOptions(selected){
+      const list=['Celery','Cereals containing gluten','Crustaceans','Eggs','Fish','Lupin','Milk','Molluscs','Mustard','Tree nuts','Peanuts','Sesame','Soya','Sulphites'];
+      return [...list,...(Array.isArray(selected)?selected:[]).filter(x=>!list.includes(x))];
+    }
+    function ragaTickMarkup(uid,field,selected,context){
+      return '<fieldset class="raga-allergen-ticks" data-raga-uk14-group="'+esc(field)+'"><legend>'+(field==='allergens'?'Declared allergens':'May contain')+' (tick to select)</legend><div class="raga-tick-grid">'+ragaAllergenOptions(selected).map(v=>'<label><input type="checkbox" value="'+esc(v)+'" '+(context==='summary'?'data-summary-allergen-field="'+field+'" data-summary-allergen-uid="'+esc(uid)+'"':context==='builder'?'data-raga-builder-allergen="'+field+'" data-raga-builder-uid="'+esc(uid)+'"':'')+' '+((selected||[]).includes(v)?'checked':'')+'>'+esc(v)+'</label>').join('')+'</div></fieldset>';
+    }
+    function ragaApplyBuilderTick(el){
+      const row=eventRecords.find(x=>x.eventUid===el.dataset.ragaBuilderUid),field=el.dataset.ragaBuilderAllergen;
+      if(!row||!['allergens','mayContain'].includes(field))return;
+      row[field]=[...el.closest('fieldset').querySelectorAll('input:checked')].map(x=>x.value);
+      saveStyle();renderPreview();renderSummaryPaper();window.ragaRenderMealCards?.();
+    }
+    document.addEventListener('change',event=>{if(event.target.matches?.('[data-raga-builder-allergen]'))ragaApplyBuilderTick(event.target)});
     function initManualAllergens() {
       for(const id of ['manual-allergens','manual-maycontain']) {
         const root=document.getElementById(id);
@@ -3719,7 +3916,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     }
     function selectedMenuCourse() {
       const select = document.getElementById('builder-course-select');
-      const session=selectedBuilderSession();if(!isCourseWise(session))return 'Other';
+      const session=selectedBuilderSession();if(!isCourseWise(session)&&!isMultiStationMode(session))return availableCourses(session)[0]||'Other';
       const course = String(select?.value || '').trim();
       if (!course) { alert('Please select a course (Starter, Main Course, Dessert, etc.) before adding the dish.'); select?.focus(); return ''; }
       return course;
@@ -3730,7 +3927,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       item.menuCourse = course; // Never overwrite the source/master category.
       onEventRecordsChanged();
     }
-    const MENU_COURSES = ['Canapé','Starter','Main Course','Dessert','Late Night Snack','Live Station','Other'];
+    const MENU_COURSES = ['Canapé','Live Station','Starter','Main Course','Dessert','Late Night Snack','Other'];
     function menuCourseOptions(selected) {
       const all = MENU_COURSES.includes(selected) || !selected ? MENU_COURSES : [...MENU_COURSES, selected];
       return `<option value="" ${!selected?'selected':''} disabled>Choose course</option>` +
@@ -3739,11 +3936,11 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     function addManualDishToMenu() {
       const get=id=>document.getElementById(id).value.trim();
       const menuCourse=selectedMenuCourse(); if(!menuCourse)return;
-      const name=get('manual-name');
+      const name=ragaDisplayText(get('manual-name'),'dish');
       if(!name){alert('Please enter a dish name.');document.getElementById('manual-name').focus();return;}
       const checks=id=>[...document.querySelectorAll('#'+id+' input:checked')].map(el=>el.value);
       const dish={id:'manual-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),name,menuCourse,
-        category:get('manual-category')||'Other',subcategory:get('manual-subcategory'),desc:get('manual-description'),
+        category:get('manual-category')||'Other',subcategory:get('manual-subcategory'),desc:ragaDisplayText(get('manual-description'),'description'),
         allergens:checks('manual-allergens'),mayContain:checks('manual-maycontain'),price:'',manual:true};
       addEventDish(dish,menuCourse);
       const feedback=document.getElementById('manual-add-feedback');
@@ -3799,7 +3996,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     function ragaEditSelectedDish(uid,key,value){
       const row=eventRecords.find(x=>x.eventUid===uid);if(!row)return;
       if(key==='name'&&!String(value).trim())return;
-      if(key==='allergens'||key==='mayContain')row[key]=String(value).split(',').map(v=>v.trim()).filter(Boolean);
+      if(key==='allergens'||key==='mayContain')row[key]=Array.isArray(value)?value:String(value).split(',').map(v=>v.trim()).filter(Boolean);
       else row[key]=value;
       onEventRecordsChanged();
     }
@@ -3816,8 +4013,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <label>Dish name<input value="${safe(item.name)}" onblur="ragaEditSelectedDish('${safe(item.eventUid)}','name',this.value)"></label>
           <label>Course / category<select onchange="ragaEditSelectedDish('${safe(item.eventUid)}','menuCourse',this.value)">${MENU_COURSES.map(c=>`<option value="${safe(c)}" ${item.menuCourse===c?'selected':''}>${safe(c)}</option>`).join('')}</select></label>
           <label>Description<textarea rows="2" onblur="ragaEditSelectedDish('${safe(item.eventUid)}','desc',this.value)">${safe(item.desc||'')}</textarea></label>
-          <label>Allergens (comma separated)<input value="${safe(Array.isArray(item.allergens)?item.allergens.join(', '):item.allergens||'')}" onblur="ragaEditSelectedDish('${safe(item.eventUid)}','allergens',this.value)"></label>
-          <label>May contain (comma separated)<input value="${safe(Array.isArray(item.mayContain)?item.mayContain.join(', '):item.mayContain||'')}" onblur="ragaEditSelectedDish('${safe(item.eventUid)}','mayContain',this.value)"></label>
+          ${ragaTickMarkup(item.eventUid,"allergens",item.allergens,"builder")}${ragaTickMarkup(item.eventUid,"mayContain",item.mayContain,"builder")}
         </div></div>`).join('')||'<p class="text-slate-400 text-xs py-3">No dishes selected for this meal.</p>';
     }
     function ragaToggleDishEditor(uid){const el=document.getElementById('raga-editor-'+uid);if(el)el.hidden=!el.hidden}
@@ -3880,9 +4076,14 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
             <p contenteditable="true" data-preview-text="noticeMessage">${escText(d.noticeMessage ?? 'Red text identifies declared allergens; amber text indicates possible cross-contact (may contain). Please speak to event staff about allergies before eating. Colours supplement, not replace, written allergen information.')}</p>
             <div style="margin-top:12px">${brand()}</div></div>`;
       const allergies = (item,idx) => {
-        const a=(item.allergens||[]).join(', ');
-        const m=(item.mayContain||[]).join(', ');
-        return `<span aria-label="Declared allergens" title="Declared allergens" contenteditable="true" oninput="editAllergenValues(${idx},'allergens',this.innerText)" style="color:#a3290a">${escText(a || '—')}</span>${m?`<span style="padding:0 5px;color:#555">•</span><span aria-label="May contain" title="May contain (cross-contact)" contenteditable="true" oninput="editAllergenValues(${idx},'mayContain',this.innerText)" style="color:#b7791f">${escText(m)}</span>`:''}`;
+        const a=(item.allergens||[]).map(value=>ragaDisplayText(value,'allergen',fmt)).join(', ');
+        const m=(item.mayContain||[]).map(value=>ragaDisplayText(value,'allergen',fmt)).join(', ');
+        if(!a&&!m)return '';
+        // UK allergen declaration: bold weight + dark red; colour never used alone.
+        // Keep may-contain visually distinct from declared allergens.
+        const declared=a?`<span class="raga-declared-allergens" aria-label="Declared allergens" title="Declared allergens" contenteditable="true" oninput="editAllergenValues(${idx},'allergens',this.innerText)" style="color:#8B1E20;font-weight:800">${escText(a)}</span>`:'';
+        const precaution=m?`<span class="raga-maycontain-allergens" aria-label="May contain (cross-contact)" title="May contain (cross-contact)" contenteditable="true" oninput="editAllergenValues(${idx},'mayContain',this.innerText)" style="color:#704600;font-weight:650">${escText(m)}</span>`:'';
+        return declared+(a&&m?'<span aria-hidden="true" style="padding:0 5px;color:#555">•</span>':'')+precaution;
       };
       // All text (including event header) uses the same page-local scaling variable.
       // Editing the font fields changes the baseline; auto-fit never overwrites those values.
@@ -3903,10 +4104,10 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         return p;
       };
       const itemBlock = (item, idx, factor=1) => `
-        <div class="menu-body-font text-center space-y-1" data-preview-drop-item-uid="${esc(item.eventUid||'')}" style="overflow-wrap:anywhere;">
+        <div class="menu-body-font text-center space-y-1" data-preview-drop-item-uid="${esc(item.eventUid||'')}" style="overflow-wrap:anywhere;position:relative;">
           ${(fmt==='a4'||fmt==='half-a4')&&item.eventUid?`<span role="button" class="raga-drag-handle no-print" title="Drag to reorder or move into another course" aria-label="Drag ${escText(item.name)}" draggable="true" data-preview-drag-uid="${esc(item.eventUid)}">↕ Move</span>`:''}
-          <h4 contenteditable="true" oninput="updateActiveItem(${idx},'name',this.innerText)" onblur="finishCanvasItemEdit(${idx})" class="font-bold leading-tight" style="color:${d.textColor};${font(d.dishNameFontSize*factor)}">${escText(item.name)}</h4>
-          ${d.showDescription && item.desc?`<p contenteditable="true" oninput="updateActiveItem(${idx},'desc',this.innerText)" class="leading-snug" style="${font(d.descFontSize*factor)}">${escText(item.desc)}</p>`:''}
+          <h4 contenteditable="true" oninput="updateActiveItem(${idx},'name',this.innerText)" onblur="finishCanvasItemEdit(${idx})" class="font-bold leading-tight" style="color:${d.textColor};${font(d.dishNameFontSize*factor)}">${escText(ragaDisplayText(item.name,'dish',fmt))}</h4>
+          ${d.showDescription && item.desc?`<p contenteditable="true" oninput="updateActiveItem(${idx},'desc',this.innerText)" class="leading-snug" style="${font(d.descFontSize*factor)}">${escText(ragaDisplayText(item.desc,'description',fmt))}</p>`:''}
           <div class="leading-tight" style="${font(d.allergenFontSize*factor)}">${allergies(item,idx)}</div>
         </div>`;
       const bodyHeader = () => `<div class="text-center" style="border-bottom:1px solid ${d.accentColor}44;padding-bottom:12px">
@@ -4008,28 +4209,54 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       if(fmt==='a4') {
         // An A4 buffet sheet belongs to ONE meal session only. Auto-pagination
         // may add pages for that meal, but never blends two sessions on a page.
-        const makeBuffet=(records,session)=>{
+        const makeBuffet=(records,session,stationName='')=>{
           const p=page(); p.style.padding=`${Math.max(2.5,Number(d.borderOutsetCm)+.5)}cm`; p.style.paddingTop=`${Math.max(0.8, Number(d.borderOutsetCm)+Number(d.borderWidth||1)/10+0.2)}cm`;
           p.classList.add('flex','flex-col','justify-between');
           const sessionTitle=session&&session.showPrintHeading!==false?`<h3 contenteditable="true" title="Edit the printed meal heading" onblur="ragaUpdatePrintedMealName('${esc(session.id)}',this.innerText)" class="menu-body-font text-center" style="font-size:calc(15px * var(--ragasaan-fit,1));font-weight:bold;color:${d.accentColor};margin:6px 0">${escText(session.printHeading??session.name)}</h3>`:'';
+          const stationTitle=stationName?`<h4 class="menu-body-font text-center" style="font-weight:700;color:${d.accentColor};font-size:calc(17px * var(--ragasaan-fit,1));margin:10px 0">${escText(stationName)}</h4>`:'';
           const collectionHtml=session&&!isCourseWise(session)?records.map(({item,idx})=>`<div style="margin:0 0 9px">${itemBlock(item,idx)}</div>`).join(''):tableCardCollection(records);
-          p.innerHTML=`${frame()}${bodyHeader()}${d.showMenuHeading!==false?formatHeading(d.menuHeading??'Menu','buffet'):''}${sessionTitle}<div data-auto-fit-area class="menu-body-font" style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;padding:8px 0"><div data-auto-fit-flow style="flex:0 0 auto;margin:auto 0">${collectionHtml}</div></div><div class="text-center" style="padding-top:12px">${brand()}</div>`;
+          p.innerHTML=`${frame()}${bodyHeader()}${d.showMenuHeading!==false?formatHeading(d.menuHeading??'Menu','buffet'):''}${sessionTitle}${stationTitle}<div data-auto-fit-area class="menu-body-font" style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;padding:8px 0"><div data-auto-fit-flow style="flex:0 0 auto;margin:auto 0">${collectionHtml}</div></div><div class="text-center" style="padding-top:12px">${brand()}</div>`;
           return p;
         };
-        const groups=eventSessions.map(session=>({session,rows:visibleItems.filter(row=>row.item.sessionId===session.id)})).filter(group=>group.rows.length);
+        const groups=[];
+        eventSessions.forEach(session=>{
+          const mealRows=visibleItems.filter(row=>row.item.sessionId===session.id);
+          if(!mealRows.length)return;
+          if(isMultiStationMode(session)){
+            for(const station of ragaEnsureStations(session)){
+              const rows=mealRows.filter(row=>row.item.menuCourse===ragaStationKey(station.id));
+              if(rows.length)groups.push({session,rows,stationName:station.name});
+            }
+          }else groups.push({session,rows:mealRows,stationName:''});
+        });
         if(groups.length){
-          groups.forEach(({session,rows})=>fitPaginated(rows, subset=>makeBuffet(subset,session)));
+          groups.forEach(({session,rows,stationName})=>fitPaginated(rows,subset=>makeBuffet(subset,session,stationName)));
         }else fitPaginated([],subset=>makeBuffet(subset,null));
       } else if(fmt==='a4-live') {
-        (items.length?items:[null]).forEach((item,i) => {
-          const p=page(); p.style.padding=`${Math.max(2.5,Number(d.borderOutsetCm)+.5)}cm`; p.style.paddingTop=`${Math.max(0.8, Number(d.borderOutsetCm)+Number(d.borderWidth||1)/10+0.2)}cm`;
+        const makeLiveStation=(records,session,stationName)=>{
+          const p=page();p.style.padding=`${Math.max(2.5,Number(d.borderOutsetCm)+.5)}cm`;
+          p.style.paddingTop=`${Math.max(0.8,Number(d.borderOutsetCm)+Number(d.borderWidth||1)/10+0.2)}cm`;
           p.classList.add('flex','flex-col','justify-between');
-          p.innerHTML=`${frame()}${bodyHeader()}${formatHeading(d.liveTitle,true)}
-            <div class="menu-body-font text-center" style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;overflow:hidden">
-              ${item?itemBlock(item,i,1.5):`<p contenteditable="true" data-preview-text="emptyLiveMessage">${escText(d.emptyLiveMessage ?? 'Add menu items for Live Station')}</p>`}
+          const stationTitle=stationName?`<h3 class="menu-body-font text-center" style="color:${d.accentColor};font-weight:700;font-size:calc(17px * var(--ragasaan-fit,1));margin:10px 0">${escText(stationName)}</h3>`:'';
+          const collection=records.length?records.map(({item,idx})=>`<div style="margin-bottom:13px">${itemBlock(item,idx,1.12)}</div>`).join(''):`<p contenteditable="true" data-preview-text="emptyLiveMessage">${escText(d.emptyLiveMessage ?? 'Add menu items for Live Station')}</p>`;
+          p.innerHTML=`${frame()}${bodyHeader()}${formatHeading(d.liveTitle,true)}${stationTitle}
+            <div data-auto-fit-area class="menu-body-font text-center" style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:center">
+              <div data-auto-fit-flow style="flex:0 0 auto;margin:auto 0">${collection}</div>
             </div><div>${brand()}</div>`;
-          target.append(p);
-        });
+          return p;
+        };
+        const groups=[];
+        for(const session of eventSessions){
+          const entries=visibleItems.filter(row=>row.item.sessionId===session.id);
+          if(!entries.length)continue;
+          const stations=ragaEnsureLiveStations(session);
+          for(const station of stations){
+            const rows=entries.filter(row=>(row.item.ragaLiveStationId||stations[0]?.id)===station.id);
+            if(rows.length)groups.push({session,stationName:station.name,rows});
+          }
+        }
+        if(groups.length)groups.forEach(group=>fitPaginated(group.rows,subset=>makeLiveStation(subset,group.session,group.stationName)));
+        else fitPaginated([],subset=>makeLiveStation(subset,null,''));
       } else if(fmt==='half-a4') {
         const makeTableFront=(records)=>{
           const p=page('paper-half-a4','flex flex-col'); p.style.padding=`${Math.max(2.3,Number(d.borderOutsetCm)+.25)}cm`; p.style.paddingTop=`${Math.max(0.8, Number(d.borderOutsetCm)+Number(d.borderWidth||1)/10+0.2)}cm`;
@@ -4049,7 +4276,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           // Never show a placeholder QR that guests might mistakenly scan.
           const qrSource = window.ragaFeedbackQrData || '';
           const hasQR = /^data:image\/(?:png|jpeg|webp);base64,[a-z0-9+/=]+$/i.test(qrSource);
-          const formalFeedback = hasQR ? `<section aria-label="Guest feedback" style="text-align:center;max-width:85mm;margin:0 auto;padding:4mm 2mm;break-inside:avoid;color:${d.textColor}"><h3 class="menu-body-font" style="font-size:15px;line-height:1.3;color:${d.accentColor};font-weight:700;margin:0 0 2mm">We Value Your Feedback</h3><p class="menu-body-font" style="font-size:12px;line-height:1.45;margin:0 0 4mm">Thank you for celebrating with us. Please scan the QR code below to share your experience.</p><img src="${qrSource}" alt="Scan to share your feedback" style="display:block;width:38mm;height:38mm;max-width:100%;object-fit:contain;margin:0 auto;padding:2mm;background:#fff;border:.25mm solid #bbb;border-radius:1.5mm;image-rendering:auto"></section>` : '';
+          const formalFeedback = hasQR ? `<section aria-label="Guest feedback" style="text-align:center;max-width:85mm;margin:0 auto;padding:4mm 2mm;break-inside:avoid;color:${d.textColor}"><h3 contenteditable="true" data-preview-text="feedbackTitle" aria-label="Edit feedback heading" class="menu-body-font" style="font-size:15px;line-height:1.3;color:${d.accentColor};font-weight:700;margin:0 0 2mm">${escText(d.feedbackTitle ?? 'We Value Your Feedback')}</h3><p contenteditable="true" data-preview-text="feedbackMessage" aria-label="Edit feedback message" class="menu-body-font" style="font-size:12px;line-height:1.45;margin:0 0 4mm">${escText(d.feedbackMessage ?? 'Thank you for celebrating with us. Please scan the QR code below to share your experience.')}</p><img src="${qrSource}" alt="Scan to share your feedback" style="display:block;width:38mm;height:38mm;max-width:100%;object-fit:contain;margin:0 auto;padding:2mm;background:#fff;border:.25mm solid #bbb;border-radius:1.5mm;image-rendering:auto"></section>` : '';
           const rightBackPanel = `<div style="display:flex;flex-direction:column;min-width:0;height:100%;overflow:hidden"><div style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:${rightHasImage?'space-evenly':'center'};overflow:hidden">${rightHasImage?halfBackCenterImage('right',hasQR):''}${formalFeedback}</div><div style="padding-top:5px;text-align:center;flex-shrink:0">${brand()}</div></div>`;
           back.innerHTML=`${frame()}<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;height:100%"><div style="padding-right:8px;border-right:1px solid ${d.accentColor}55">${leftBackPanel}</div><div style="padding-left:8px">${rightBackPanel}</div></div>`;
           return back;
@@ -4061,7 +4288,17 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         const perPage=fmt==='a8-grid'?10:fmt==='a6-grid'?4:8;
         const pageClass=fmt==='a8-grid'?'paper-a8-grid':fmt==='foldtags-grid'?'paper-foldtags-grid':fmt==='a6-grid'?'paper-a6-grid':'paper-canape-grid';
         const cardClass=fmt==='a8-grid'?'paper-a8-single':fmt==='foldtags-grid'?'paper-foldtags-single':fmt==='a6-grid'?'paper-a6-single':'paper-canape-single';
-        const tagGroups=eventSessions.map(session=>({session,rows:visibleItems.filter(row=>row.item.sessionId===session.id)})).filter(group=>group.rows.length);
+        const tagGroups=[];
+        eventSessions.forEach(session=>{
+          const mealRows=visibleItems.filter(row=>row.item.sessionId===session.id);
+          if(!mealRows.length)return;
+          if(isMultiStationMode(session)||isCourseWise(session)){
+            for(const course of availableCourses(session)){
+              const rows=mealRows.filter(row=>row.item.menuCourse===course);
+              if(rows.length)tagGroups.push({session,rows,course});
+            }
+          }else tagGroups.push({session,rows:mealRows,course:'Other'});
+        });
         for(const {session:tagSession,rows:tagRows} of (tagGroups.length?tagGroups:[{session:null,rows:[]}])) {
         const n=Math.max(1,Math.ceil(tagRows.length/perPage));
         for(let j=0;j<n;j++) {
@@ -4087,18 +4324,18 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
             label.style.cssText=`background:#ffffff;color:${d.textColor};--body-family:${bodyFamily};--label-border:${d.borderColor};${d.borderStyle==='none'?'border:none;':''}`;
             if(fmt==='foldtags-grid') {
               const outerStyle = d.borderStyle==='none' ? 'border:none;' : `border:${Math.max(.2,Math.min(2,Number(d.borderWidth)||.8))}mm ${d.borderStyle==='triple'?'double':d.borderStyle} ${d.borderColor};`;
-              const panelHeight = Math.max(2.2,Math.min(4.5,Number(d.foldTagsBottomHeightCm)||3));
+              const panelHeight = 3; // Fixed equal halves to protect the fold line.
               const inset = Math.max(1,Math.min(8,Number(d.foldTagsPanelInsetMm)||2.5));
               const dividerWidth = Math.max(.2,Math.min(2,Number(d.foldTagsDividerWidthMm)||.3));
               const dividerColor = d.foldTagsDividerColor || d.borderColor;
-              const topHeight = Math.max(0.8, 6 - panelHeight);
+              const topHeight=3;
               label.style.cssText += outerStyle;
               label.innerHTML=`
-                <div style="height:${topHeight}cm;flex:0 0 auto"></div>
-                <div style="height:${panelHeight}cm;flex:0 0 auto;margin:0 ${inset}mm ${inset}mm;border:${dividerWidth}mm solid ${dividerColor};display:flex;flex-direction:column;justify-content:flex-start;align-items:center;padding:1.1mm 2mm 1.6mm;box-sizing:border-box;overflow:hidden">
+                <div style="height:${topHeight}cm;flex:0 0 50%;border-bottom:0.25mm solid ${dividerColor};box-sizing:border-box"></div>
+                <div style="height:3cm;flex:0 0 50%;margin:0 ${inset}mm;border:${dividerWidth}mm solid ${dividerColor};display:flex;flex-direction:column;justify-content:flex-start;align-items:center;padding:0.7mm 1.5mm;box-sizing:border-box;overflow:hidden">
                   <div style="flex:0 0 auto;margin-bottom:1.2mm;line-height:1">${brandMark(Number(d.foldTagsLogoWidth)||100)}</div>
                   <div class="menu-body-font" style="min-width:0;max-width:100%;overflow-wrap:anywhere;word-break:break-word;white-space:normal;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:1.2mm;overflow:hidden">
-                    <h4 contenteditable="true" oninput="updateActiveItem(${i},'name',this.innerText)" onblur="finishCanvasItemEdit(${i})" class="font-bold leading-tight" style="margin:0;color:${d.textColor};${font(Math.max(10,(Number(d.dishNameFontSize)||10)*0.96))};text-transform:uppercase">${escText(item.name)}</h4>
+                    <h4 contenteditable="true" oninput="updateActiveItem(${i},'name',this.innerText)" onblur="finishCanvasItemEdit(${i})" class="font-bold leading-tight" style="margin:0;color:${d.textColor};${font(Math.max(10,(Number(d.dishNameFontSize)||10)*0.96))};text-transform:uppercase">${escText(ragaDisplayText(item.name,'dish',fmt))}</h4>
                     <div class="leading-tight" style="${font(Math.max(9,(Number(d.allergenFontSize)||10)*0.84))}">${allergies(item,i)}</div>
                   </div>
                 </div>`;
@@ -4208,12 +4445,12 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 
     // All static/format-specific preview strings are editable and saved per format.
     // Do not re-render during typing: it would move the cursor out of the field.
-    const previewTextKeys = new Set(['noticeTitle','noticeMessage','tableMenuHeading','emptyMenuMessage','emptyLiveMessage']);
+    const previewTextKeys = new Set(['noticeTitle','noticeMessage','tableMenuHeading','emptyMenuMessage','emptyLiveMessage','feedbackTitle','feedbackMessage']);
     document.addEventListener('input', function(event) {
       const node=event.target.closest?.('[data-preview-text]');
       if(!node || !document.getElementById('paper-render-target')?.contains(node)) return;
       const key=node.dataset.previewText;
-      if(previewTextKeys.has(key) && state.design) {state.design[key]=node.innerText;saveStyle();}
+      if(previewTextKeys.has(key) && state.design) {state.design[key]=node.innerText;saveStyle();if(key==='feedbackTitle'||key==='feedbackMessage')ragaSyncFeedbackCopyEditor();}
     });
     document.addEventListener('focusout', function(event) {
       const node=event.target.closest?.('[data-preview-text],[data-course-original]');
@@ -4408,15 +4645,18 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     function safeFilename(text) {
       return String(text||'Menu').replace(/[^a-z0-9_-]/gi,'_').replace(/_+/g,'_').slice(0,65);
     }
-    // Files use Windows-safe day-month-year + venue + format, as requested.
+    // Word exports: DD-MM-VenueName.docx. Other downloads retain a descriptive suffix.
     function ragaDownloadFilename(original){
-      const date=String(document.getElementById('cfg-date')?.value||'');
-      const parts=date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-      const day=parts?`${parts[3]}-${parts[2]}-${parts[1]}`:'No_Date';
-      const venue=String(state.event.venue||'Venue').replace(/[\\/:*?"<>|]+/g,' ').replace(/\s+/g,' ').trim().slice(0,70)||'Venue';
-      const detail=String(original||'Menu').replace(/[\\/:*?"<>|]+/g,'_');
-      return `${day}_${venue}_${detail}`;
-    }
+          const raw=String(original||'Menu');
+          const date=String(document.getElementById('cfg-date')?.value||'');
+          const match=date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+          const ddmm=match?match[3]+'-'+match[2]:'No-Date';
+          const rawVenue=String(state.event.venue||'Venue');
+          const name=rawVenue.split(/[,\n]|\s[-–—]\s/)[0].trim().replace(/[\\/:*?"<>|]+/g,' ').replace(/\s+/g,' ').slice(0,65)||'Venue';
+          const venue=name.split(' ').filter(Boolean).map(w=>w[0].toUpperCase()+w.slice(1).toLowerCase()).join(' ');
+          if(/\.docx$/i.test(raw))return ddmm+'-'+venue+'.docx';
+          return ddmm+'-'+venue+'-'+raw.replace(/[\\/:*?"<>|]+/g,'_');
+        }
     function saveBlob(blob, filename) {
       filename=ragaDownloadFilename(filename);
       const link=document.createElement('a');
@@ -4454,10 +4694,10 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       const logoImage=()=>image(d.logoUrl,d.logoWidth);
       const brideImage=()=>d.showCoupleLogo?image(d.coupleLogoUrl,d.coupleLogoWidth):[];
       const itemContents=(item)=>[
-        P(item.name,d.dishNameFontSize,{bold:true,after:65}),
-        ...(d.showDescription===true && item.desc?[P(item.desc,d.descFontSize,{after:65})]:[]),
-        P('Allergens: '+((item.allergens||[]).join(', ')||'None declared'),d.allergenFontSize,{color:rgb(d.accentColor),after:30}),
-        ...((item.mayContain||[]).length?[P('May Contain: '+item.mayContain.join(', '),d.allergenFontSize,{after:85})]:[])
+        P(ragaDisplayText(item.name,'dish',format),d.dishNameFontSize,{bold:true,after:65}),
+        ...(d.showDescription===true && item.desc?[P(ragaDisplayText(item.desc,'description',format),d.descFontSize,{after:65})]:[]),
+        P('Allergens: '+((item.allergens||[]).map(v=>ragaDisplayText(v,'allergen',format)).join(', ')||'None declared'),d.allergenFontSize,{bold:true,color:'8B1E20',after:30}),
+        ...((item.mayContain||[]).length?[P('May Contain: '+item.mayContain.map(v=>ragaDisplayText(v,'allergen',format)).join(', '),d.allergenFontSize,{bold:true,color:'704600',after:85})]:[])
       ];
       const headings=()=>[P(state.event.title,d.titleFontSize,{bold:true,color:rgb(d.accentColor),after:100}),
         ...brideImage(),P(state.event.venue,d.descFontSize),P(state.event.date,d.descFontSize,{after:250})];
@@ -4524,6 +4764,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     async function exportFormatWord(format){return window.RagasaanWordActions.exportFormatWord(format);}
 
     function triggerPrint() {
+      if(document.getElementById('tab-summary')&&!document.getElementById('tab-summary').classList.contains('hidden')){printEventSummary();return;}
       // The old application referenced this function without defining it.
       // Remove preview zoom for the print media and invoke the native print dialog.
       renderPreview();
@@ -4531,6 +4772,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     }
 
     function downloadPDF() {
+      if(document.getElementById('tab-summary')&&!document.getElementById('tab-summary').classList.contains('hidden')){printEventSummary();return;}
       // Native print pipeline preserves actual A4 layout and avoids html2canvas freezing.
       // Select "Save as PDF" as the destination in your browser print dialog.
       window.print();
@@ -4611,11 +4853,11 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         </section>
         <section class="raga-panel" data-rs-admin id="rs-admin-company">
           <h3>Official Company Logo · Admin</h3>
-          <p class="raga-help">Publish a logo to D1 for all users. The existing GitHub logo remains the fallback. PNG/JPG/WebP, up to 150 KB.</p>
+          <p class="raga-help">Publish one company logo to all users through D1. Select PNG, JPG or WebP; larger images up to 12 MB will be automatically resized to meet the server's 150 KB limit. The existing GitHub logo remains the fallback.</p>
           <input id="rs-company-upload" type="file" class="raga-input" accept="image/png,image/jpeg,image/webp">
           <div class="raga-actions"><button id="rs-company-publish" type="button" class="raga-btn primary">Publish Company Logo</button><button id="rs-company-remove" type="button" class="raga-btn danger">Use GitHub Logo Instead</button></div>
           <img id="rs-company-image" hidden alt="Current company logo" style="max-width:180px;max-height:100px;object-fit:contain;background:white;margin-top:8px;padding:5px">
-          <p id="rs-company-status" class="raga-help"></p>
+          <p id="rs-company-status" class="raga-help" role="status" aria-live="polite"></p>
         </section>
         <section class="raga-panel" data-rs-admin id="rs-admin-options">
           <h3>Meal Defaults &amp; Printing Rules · Admin</h3>
@@ -4683,34 +4925,43 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   const holder=()=>document.getElementById('raga-meal-cards');
   const idKey=(sid,course)=>sid+'|'+course;
   const byId=id=>eventSessions.find(s=>s.id===id);
-  const catItems=(session,category)=>eventRecords.filter(row=>row.sessionId===session.id&&(row.menuCourse||'Other')===category);
-  function allowedFormats(session,category){
-    let allowed;
-    const mode=sessionMode(session);
-    if(category==='Live Station')allowed=['a4-live'];
-    else if(category==='Canapé')allowed=['canape-grid','a8-grid','foldtags-grid'];
-    else if(mode==='Plated Service')allowed=['half-a4'];
-    else if(mode==='Bowl Food')allowed=['foldtags-grid','a8-grid','a6-grid','canape-grid'];
-    else if(mode==='Buffet-Selective'&&normalizeGroupService(session,category)==='Plated Service')allowed=['half-a4'];
-    else if(mode==='Buffet-Selective'&&normalizeGroupService(session,category)==='Bowl Food')allowed=['foldtags-grid','a8-grid','a6-grid','canape-grid'];
-    else allowed=['a4','a8-grid','a6-grid','canape-grid','foldtags-grid'];
-    const enabled=window.ragaAdminChoices?.printFormats?.enabled;
-    const saved=Array.isArray(session.categoryFormats?.[category])?session.categoryFormats[category]:[];
-    if(Array.isArray(enabled))allowed=allowed.filter(f=>enabled.includes(f)||saved.includes(f));
-    return allowed;
+  const catItems=(session,category)=>eventRecords.filter(row=>row.sessionId===session.id&&(row.menuCourse||'Main Course')===category);
+  function ragaAddCardStation(session,live=false){
+    const list=live?ragaEnsureLiveStations(session):ragaEnsureStations(session);
+    const id=eventUid();
+    const name=(live?'Live Station ':'Station ')+(list.length+1);
+    list.push({id,name});
+    if(live)session.liveStations=list;
+    else {session.stations=list;openCategories.add(idKey(session.id,ragaStationKey(id)));}
+    onEventRecordsChanged();
   }
-  function initialFormats(session,category){
-    const allowed=allowedFormats(session,category),mode=sessionMode(session);
-    const fromAdmin=window.ragaMealDefaults?.[sessionKind(session)]?.categoryFormats?.[category];
-    if(Array.isArray(fromAdmin))return allowed.filter(f=>fromAdmin.includes(f));
-    if(category==='Live Station')return allowed.filter(f=>f==='a4-live');
-    if(category==='Canapé')return allowed.filter(f=>['a8-grid','canape-grid','foldtags-grid'].includes(f));
-    if(mode==='Bowl Food'||(mode==='Buffet-Selective'&&normalizeGroupService(session,category)==='Bowl Food'))return allowed.filter(f=>f==='foldtags-grid');
-    if(mode==='Plated Service'||(mode==='Buffet-Selective'&&normalizeGroupService(session,category)==='Plated Service'))return allowed.filter(f=>f==='half-a4');
-    const fromSession=session.formatSelection||RAGA_INITIAL_MEAL_DEFAULTS[sessionKind(session)]?.formats||['a4'];
-    const chosen=allowed.filter(f=>fromSession.includes(f));
-    return chosen.length?chosen:allowed.filter(f=>f==='a4').slice(0,1);
+  function ragaRemoveCardStation(session,id,live=false){
+    const list=live?ragaEnsureLiveStations(session):ragaEnsureStations(session);
+    if(list.length<2){alert('Keep at least one station.');return;}
+    const target=list.find(st=>st.id===id);
+    if(!target)return;
+    const other=list.find(st=>st.id!==id);
+    const impacted=eventRecords.filter(item=>item.sessionId===session.id&&(live?item.menuCourse==='Live Station'&&(item.ragaLiveStationId||list[0].id)===id:item.menuCourse===ragaStationKey(id)));
+    if(impacted.length&&!confirm('Move '+impacted.length+' dishes from '+target.name+' to '+other.name+' and remove this station?'))return;
+    for(const item of impacted){
+      if(live)item.ragaLiveStationId=other.id;
+      else {item.menuCourse=ragaStationKey(other.id);item.ragaStationCourse=item.menuCourse;}
+    }
+    if(live)session.liveStations=list.filter(st=>st.id!==id);
+    else {
+      session.stations=list.filter(st=>st.id!==id);
+      if(session.categoryFormats)delete session.categoryFormats[ragaStationKey(id)];
+    }
+    onEventRecordsChanged();
   }
+  function ragaRenameCardStation(session,id,value,live=false){
+    const target=(live?ragaEnsureLiveStations(session):ragaEnsureStations(session)).find(st=>st.id===id);
+    if(!target)return;
+    target.name=String(value||'').trim().slice(0,100)||target.name;
+    onEventRecordsChanged();
+  }
+  function allowedFormats(session,category){return ragaAllowedFormats(session,category);}
+  function initialFormats(session,category){return ragaInitialFormats(session,category);}
   function formats(session,category){
     const selection=session.categoryFormats?.[category];
     const allowed=allowedFormats(session,category);
@@ -4724,45 +4975,40 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   }
   function insertDish(session,category,dish){
     if(!session||!dish?.name)return;
-    const record={...JSON.parse(JSON.stringify(dish)),eventUid:eventUid(),sessionId:session.id,menuCourse:category,serviceType:'',printFormats:[...formats(session,category)],tagCopies:{}};
+    const assignedLive=category==='Live Station'?ragaEnsureLiveStations(session)[0]?.id:undefined;
+    const record={...JSON.parse(JSON.stringify(dish)),eventUid:eventUid(),sessionId:session.id,menuCourse:category,serviceType:'',ragaLiveStationId:assignedLive,printFormats:[...formats(session,category)],tagCopies:{}};
     eventRecords.push(record);openSessions.add(session.id);openCategories.add(idKey(session.id,category));onEventRecordsChanged();
   }
-  function sessionServiceChange(session,value){
-    if(!sessionChoices(session).some(c=>c[0]===value))return;
-    session.serviceMode=value;
-    if(value==='Buffet-Selective'){
-      const map=ensureSessionServices(session);
-      for(const course of ['Starter','Main Course','Dessert'])if(!['Plated Service','Buffet'].includes(map[course]))map[course]='Plated Service';
-    }
-    // Only course selections that cease to be valid are reset; old dish records are retained.
-    for(const cat of categoryNames){
-      const old=session.categoryFormats?.[cat];
-      if(Array.isArray(old)&&old.some(f=>!allowedFormats(session,cat).includes(f)))delete session.categoryFormats[cat];
-    }
-    onEventRecordsChanged();
-  }
+  function sessionServiceChange(session,value){if(ragaRouteSessionItems(session,value))onEventRecordsChanged();}
   function serviceChoice(session,category){
-    if(!['Starter','Main Course','Dessert'].includes(category))return '';
-    if(!isCourseWise(session))return `<div class="raga-card-note">${safe(sessionMode(session))} · one combined section</div>`;
-    const configured=window.ragaMealDefaults?.[sessionKind(session)]?.courses?.[category]?.enabled;
-    const base=['Plated Service','Buffet'];
-    if(sessionMode(session)!=='Buffet-Selective'&&category==='Main Course')base.push('Bowl Food');
-    const allowed=Array.isArray(configured)?base.filter(x=>configured.includes(x)):base;
+    if(!isCourseWise(session)||!['Starter','Main Course','Dessert'].includes(category))return '';
     const actual=normalizeGroupService(session,category);
-    if(!allowed.includes(actual))allowed.push(actual);
-    return `<label>Course serving style<select data-raga-action="course-service" data-session="${safe(session.id)}" data-course="${safe(category)}">${allowed.map(x=>`<option value="${safe(x)}" ${x===actual?'selected':''}>${safe(x)}</option>`).join('')}</select></label>`;
+    const all=['Plated Service','Buffet','Bowl Food','Thali'];
+    return `<label>Course serving style<select data-raga-action="course-service" data-session="${safe(session.id)}" data-course="${safe(category)}">${all.map(style=>`<option value="${safe(style)}" ${style===actual?'selected':''}>${safe(style)}</option>`).join('')}</select></label>`;
+  }
+  const RAGA_CARD_ALLERGENS=['Celery','Cereals containing gluten','Crustaceans','Eggs','Fish','Lupin','Milk','Molluscs','Mustard','Tree nuts','Peanuts','Sesame','Soya','Sulphites'];
+  function ragaCardTicks(field,selected,uid,manual=false){
+    const current=Array.isArray(selected)?selected:[];
+    const options=[...RAGA_CARD_ALLERGENS,...current.filter(v=>!RAGA_CARD_ALLERGENS.includes(v))];
+    const text=field==='allergens'?'Declared allergens':'May contain';
+    return '<fieldset class="raga-allergen-ticks"><legend>'+text+' (tick to select)</legend><div class="raga-tick-grid">'+options.map(v=>'<label><input type="checkbox" value="'+safe(v)+'" '+(manual?'data-raga-manual-check="'+field+'"':'data-raga-check="'+field+'" data-uid="'+safe(uid)+'"')+' '+(current.includes(v)?'checked':'')+'>'+safe(ragaDisplayText(v,'allergen'))+'</label>').join('')+'</div></fieldset>';
   }
   function dishEditor(item){
     const uid=safe(item.eventUid);
     const editing=editItems.has(item.eventUid);
+    const session=byId(item.sessionId)||eventSessions[0];
+    const choices=availableCourses(session);
     return `<div class="raga-card-item"><div class="raga-item-head"><div><strong>${safe(item.name)}</strong><span> · ${safe((item.allergens||[]).join?.(', ')||'No declared allergens recorded')}</span></div><div style="display:flex;gap:5px;flex-shrink:0"><button type="button" data-raga-action="edit" data-uid="${uid}">${editing?'Close':'Edit'}</button><button type="button" class="raga-card-remove" data-raga-action="remove" data-uid="${uid}" aria-label="Remove ${safe(item.name)}">×</button></div></div>
-      ${editing?`<div class="raga-card-item-edit"><label>Dish name<input type="text" data-raga-edit="name" data-uid="${uid}" value="${safe(item.name)}"></label><label>Category<select data-raga-edit="menuCourse" data-uid="${uid}">${categoryNames.map(x=>`<option value="${safe(x)}" ${x===item.menuCourse?'selected':''}>${safe(x)}</option>`).join('')}</select></label><label class="wide">Description<textarea data-raga-edit="desc" data-uid="${uid}">${safe(item.desc||'')}</textarea></label><label>Declared allergens (comma separated)<input type="text" data-raga-edit="allergens" data-uid="${uid}" value="${safe((item.allergens||[]).join?.(', ')||'')}"></label><label>May contain (comma separated)<input type="text" data-raga-edit="mayContain" data-uid="${uid}" value="${safe((item.mayContain||[]).join?.(', ')||'')}"></label></div>`:''}</div>`;
+      ${editing?`<div class="raga-card-item-edit"><label>Dish name<input type="text" data-raga-edit="name" data-uid="${uid}" value="${safe(item.name)}"></label><label>Category<select data-raga-edit="menuCourse" data-uid="${uid}">${choices.map(x=>`<option value="${safe(x)}" ${x===item.menuCourse?'selected':''}>${safe(courseDisplay(session,x))}</option>`).join('')}</select></label>${item.menuCourse==='Live Station'?`<label>Live Station<select data-raga-edit="ragaLiveStationId" data-uid="${uid}">${ragaEnsureLiveStations(session).map(st=>`<option value="${safe(st.id)}" ${(item.ragaLiveStationId||ragaEnsureLiveStations(session)[0]?.id)===st.id?'selected':''}>${safe(st.name)}</option>`).join('')}</select></label>`:''}<label class="wide">Description<textarea data-raga-edit="desc" data-uid="${uid}">${safe(item.desc||'')}</textarea></label>${ragaCardTicks("allergens",item.allergens,uid)}${ragaCardTicks("mayContain",item.mayContain,uid)}</div>`:''}</div>`;
   }
   function category(session,cat){
     const rows=catItems(session,cat),opened=openCategories.has(idKey(session.id,cat)),allowed=allowedFormats(session,cat),selected=formats(session,cat);
+    const station=isMultiStationMode(session)?ragaEnsureStations(session).find(st=>ragaStationKey(st.id)===cat):null;
+    const stationEditor=station?`<div class="raga-card-note"><label>Station name<input type="text" data-raga-action="station-name" data-session="${safe(session.id)}" data-station-id="${safe(station.id)}" value="${safe(station.name)}"></label><button type="button" class="raga-card-remove" data-raga-action="remove-station" data-session="${safe(session.id)}" data-station-id="${safe(station.id)}">Remove station</button></div>`:'';
+    const liveEditor=cat==='Live Station'?`<div class="raga-card-note"><strong>Dedicated A4 per Live Station</strong>${ragaEnsureLiveStations(session).map(st=>`<div style="display:flex;gap:6px;margin:5px 0;align-items:center"><input type="text" aria-label="Live station name" data-raga-action="live-station-name" data-session="${safe(session.id)}" data-station-id="${safe(st.id)}" value="${safe(st.name)}"><button type="button" data-raga-action="remove-live-station" data-session="${safe(session.id)}" data-station-id="${safe(st.id)}">Remove</button></div>`).join('')}<button type="button" data-raga-action="add-live-station" data-session="${safe(session.id)}">+ Add Live Station</button></div>`:'';
     const printLabels=selected.length?selected.map(f=>MENU_NAMES[f]||f).join(' · '):'No print formats';
-    return `<details class="raga-course-card" data-session="${safe(session.id)}" data-category="${safe(cat)}" ${opened?'open':''}><summary data-raga-action="toggle-category" data-session="${safe(session.id)}" data-course="${safe(cat)}"><span class="raga-course-icon">${categoryIcons[cat]}</span><span><strong>${safe(cat==='Other'?'General / Buffet Items':cat)}</strong><small>${rows.length} ${rows.length===1?'dish':'dishes'} · ${safe(printLabels)}</small></span></summary>
-      <div class="raga-course-body"><section><h5 class="raga-course-section-title">1. Serving style &amp; add dishes</h5><div class="raga-course-setup">${serviceChoice(session,cat)}</div><div class="raga-card-picker"><input type="search" data-raga-search="true" data-session="${safe(session.id)}" data-course="${safe(cat)}" placeholder="Search the master dish database" autocomplete="off"><button type="button" class="raga-btn-add" data-raga-action="search" data-session="${safe(session.id)}" data-course="${safe(cat)}">Find dishes</button></div><div class="raga-card-results" data-raga-results="${safe(idKey(session.id,cat))}"></div><details class="raga-card-manual"><summary>+ Add manual dish to this category</summary><label>Dish name<input data-raga-manual="name" type="text" placeholder="New dish name"></label><label>Description<textarea data-raga-manual="desc" rows="2" placeholder="Optional description"></textarea></label><label>Declared allergens<input data-raga-manual="allergens" type="text" placeholder="Comma-separated allergens; write none if confirmed"></label><label>May contain<input data-raga-manual="mayContain" type="text" placeholder="Optional, comma-separated"></label><label class="raga-verify"><input type="checkbox" data-raga-manual="verified"> Allergen information checked for this event</label><button type="button" class="raga-btn-add" data-raga-action="manual-add" data-session="${safe(session.id)}" data-course="${safe(cat)}">Add manual dish</button></details></section>
+    return `<details class="raga-course-card" data-session="${safe(session.id)}" data-category="${safe(cat)}" ${opened?'open':''}><summary data-raga-action="toggle-category" data-session="${safe(session.id)}" data-course="${safe(cat)}"><span class="raga-course-icon">${(categoryIcons[cat]||'🍽️')}</span><span><strong>${safe(courseDisplay(session,cat))}</strong><small>${rows.length} ${rows.length===1?'dish':'dishes'} · ${safe(printLabels)}</small></span></summary>
+      <div class="raga-course-body"><section><h5 class="raga-course-section-title">1. Serving style &amp; add dishes</h5><div class="raga-course-setup">${serviceChoice(session,cat)}${stationEditor}${liveEditor}</div><div class="raga-card-picker"><input type="search" data-raga-search="true" data-session="${safe(session.id)}" data-course="${safe(cat)}" placeholder="Search the master dish database" autocomplete="off"><button type="button" class="raga-btn-add" data-raga-action="search" data-session="${safe(session.id)}" data-course="${safe(cat)}">Find dishes</button></div><div class="raga-card-results" data-raga-results="${safe(idKey(session.id,cat))}"></div><details class="raga-card-manual"><summary>+ Add manual dish to this category</summary><label>Dish name<input data-raga-manual="name" type="text" placeholder="New dish name" onblur="ragaFormatManualField(this,'dish')"></label><label>Description<textarea data-raga-manual="desc" rows="2" placeholder="Optional description" onblur="ragaFormatManualField(this,'description')"></textarea></label>${ragaCardTicks("allergens",[],null,true)}${ragaCardTicks("mayContain",[],null,true)}<label class="raga-verify"><input type="checkbox" data-raga-manual="verified"> Allergen information checked for this event</label><button type="button" class="raga-btn-add" data-raga-action="manual-add" data-session="${safe(session.id)}" data-course="${safe(cat)}">Add manual dish</button></details></section>
       <section><h5 class="raga-course-section-title">2. Selected dishes · ${rows.length}</h5><div class="raga-card-items">${rows.length?rows.map(dishEditor).join(''):'<div class="raga-empty">No dishes in this category yet. Search above to add.</div>'}</div></section>
       <section class="raga-course-print"><h5 class="raga-course-section-title">3. Print formats for this category</h5><div class="raga-format-grid">${allowed.map(fmt=>`<label><input type="checkbox" data-raga-format="${safe(fmt)}" data-session="${safe(session.id)}" data-course="${safe(cat)}" ${selected.includes(fmt)?'checked':''}>${safe(MENU_NAMES[fmt])}</label>`).join('')||'<span>No print formats enabled by Admin.</span>'}</div><p class="raga-format-hint">Changing these formats updates the dishes above. Other meals and categories are unaffected. Each meal prints separately.</p></section></div></details>`;
   }
@@ -4775,7 +5021,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       const open=openSessions.has(session.id),rows=eventRecords.filter(d=>d.sessionId===session.id);
       const options=sessionChoices(session).map(([value,label])=>`<option value="${safe(value)}" ${sessionMode(session)===value?'selected':''}>${safe(label)}</option>`).join('');
       return `<article class="raga-meal-card" style="--raga-accent:${accent};--raga-wash:${wash};--raga-deep:${deep}" data-raga-session="${safe(session.id)}"><button type="button" class="raga-card-header" data-raga-action="toggle-meal" data-session="${safe(session.id)}" aria-expanded="${open}"><span class="raga-card-icon">${icon}</span><span class="raga-card-heading"><strong>${safe(session.name)}</strong><small>${safe(sessionMode(session))} · ${rows.length} selected dishes</small></span><span class="raga-card-count">${rows.length} dishes</span><span class="raga-card-chevron">${open?'⌃':'⌄'}</span></button>
-        ${open?`<div class="raga-card-body"><div class="raga-card-top"><label>Meal serving style<select data-raga-action="meal-service" data-session="${safe(session.id)}">${options}</select></label><label>Meal time<input type="time" value="${safe(session.time||'')}" data-raga-action="meal-time" data-session="${safe(session.id)}"></label><div class="raga-card-note">All choices are saved with this meal. Expand any category to choose its service, dishes and print formats.</div></div><div class="raga-course-list">${categoryNames.map(cat=>category(session,cat)).join('')}</div></div>`:''}</article>`;
+        ${open?`<div class="raga-card-body"><div class="raga-card-top"><label>Meal serving style<select data-raga-action="meal-service" data-session="${safe(session.id)}">${options}</select></label><label>Meal time<input type="time" value="${safe(session.time||'')}" data-raga-action="meal-time" data-session="${safe(session.id)}"></label><div class="raga-card-note">All choices are saved with this meal. Expand any category to choose its service, dishes and print formats.</div></div><div class="raga-course-list">${availableCourses(session).map(cat=>category(session,cat)).join('')}</div>${isMultiStationMode(session)?`<button type="button" class="raga-btn-add" style="margin-top:12px" data-raga-action="add-station" data-session="${safe(session.id)}">+ Add station</button>`:''}</div>`:''}</article>`;
     }).join('');
   }
   window.ragaRenderMealCards=render;
@@ -4791,6 +5037,10 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   document.addEventListener('click',ev=>{
     const b=ev.target.closest('[data-raga-action]');if(!b||!holder()?.contains(b))return;
     const act=b.dataset.ragaAction,sid=b.dataset.session,course=b.dataset.course,session=byId(sid);
+    if(act==='add-station'&&session){ragaAddCardStation(session);return;}
+    if(act==='remove-station'&&session){ragaRemoveCardStation(session,b.dataset.stationId);return;}
+    if(act==='add-live-station'&&session){ragaAddCardStation(session,true);return;}
+    if(act==='remove-live-station'&&session){ragaRemoveCardStation(session,b.dataset.stationId,true);return;}
     if(act==='toggle-meal'){if(openSessions.has(sid))openSessions.delete(sid);else openSessions.add(sid);currentBuilderSession=sid;render();}
     if(act==='toggle-category'){ev.preventDefault();const k=idKey(sid,course);if(openCategories.has(k))openCategories.delete(k);else openCategories.add(k);render();}
     if(act==='search')search(sid,course);
@@ -4800,11 +5050,11 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     }
     if(act==='manual-add'){
       const panel=b.closest('.raga-card-manual');const get=name=>panel?.querySelector(`[data-raga-manual="${name}"]`);
-      const name=get('name')?.value.trim(),confirmed=get('verified')?.checked,allergens=get('allergens')?.value.trim();
+      const name=ragaDisplayText(get('name')?.value.trim()||'','dish'),confirmed=get('verified')?.checked,selected=field=>[...panel.querySelectorAll('[data-raga-manual-check="'+field+'"]:checked')].map(x=>x.value),allergens=selected('allergens');
       if(!name)return alert('Enter the dish name.');
-      if(!confirmed||!allergens)return alert('Confirm allergen information, including none when verified.');
+      if(!confirmed)return alert('Confirm you have checked the allergen information, including none if verified.');
       const csv=value=>String(value||'').split(',').map(x=>x.trim()).filter(x=>x&&x.toLowerCase()!=='none');
-      insertDish(session,course,{id:'manual-'+eventUid(),name,category:course,desc:get('desc')?.value||'',allergens:csv(allergens),mayContain:csv(get('mayContain')?.value),manual:true});
+      insertDish(session,course,{id:'manual-'+eventUid(),name,category:course,desc:ragaDisplayText(get('desc')?.value||'','description'),allergens:allergens,mayContain:selected('mayContain'),manual:true});
     }
     if(act==='edit'){if(editItems.has(b.dataset.uid))editItems.delete(b.dataset.uid);else editItems.add(b.dataset.uid);render();}
     if(act==='remove'){if(confirm('Remove this dish from the event?'))removeEventRecord(b.dataset.uid);}
@@ -4815,14 +5065,17 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   document.addEventListener('change',ev=>{
     const el=ev.target;if(!holder()?.contains(el))return;
     const sid=el.dataset.session,course=el.dataset.course,session=byId(sid);
+    if(el.dataset.ragaAction==='station-name'&&session){ragaRenameCardStation(session,el.dataset.stationId,el.value);return;}
+    if(el.dataset.ragaAction==='live-station-name'&&session){ragaRenameCardStation(session,el.dataset.stationId,el.value,true);return;}
+    if(el.dataset.ragaCheck){
+      const group=el.closest('fieldset'),field=el.dataset.ragaCheck;
+      if(group&&['allergens','mayContain'].includes(field))ragaEditSelectedDish(el.dataset.uid,field,[...group.querySelectorAll('input:checked')].map(x=>x.value));
+      return;
+    }
     if(el.dataset.ragaAction==='meal-service'&&session){sessionServiceChange(session,el.value);return;}
     if(el.dataset.ragaAction==='meal-time'&&session){session.time=el.value;onEventRecordsChanged();return;}
     if(el.dataset.ragaAction==='course-service'&&session){
-      ensureSessionServices(session)[course]=el.value;
-      // Re-choose defaults when course transitions from Buffet to Plated (or vice versa).
-      if(session.categoryFormats)delete session.categoryFormats[course];
-      catItems(session,course).forEach(item=>item.printFormats=initialFormats(session,course));
-      onEventRecordsChanged();return;
+      updateCourseService(session.id,course,el.value);return;
     }
     if(el.dataset.ragaFormat&&session){
       const current=new Set(formats(session,course));if(el.checked)current.add(el.dataset.ragaFormat);else current.delete(el.dataset.ragaFormat);
@@ -4835,7 +5088,32 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   document.addEventListener('DOMContentLoaded',()=>{render();});
 })();
 </script>
-  <script src="./security-app.js"></script>
+  <script id="raga-print-studio-navigation">
+(function(){
+  'use strict';
+  let index=0,all=false;
+  const sheets=()=>[...document.querySelectorAll('#paper-render-target > .print-sheet')];
+  const studio=()=>!document.getElementById('tab-export')?.classList.contains('hidden');
+  function draw(){
+    const pages=sheets(),sel=document.getElementById('raga-studio-page-choice');if(!sel)return;
+    index=Math.max(0,Math.min(index,pages.length-1));
+    const opts=pages.map((p,i)=>'<option value="'+i+'">Page '+(i+1)+' of '+pages.length+'</option>').join('');
+    if(sel.innerHTML!==opts)sel.innerHTML=opts;
+    sel.value=String(index);
+    pages.forEach((p,i)=>p.classList.toggle('raga-preview-only-hidden',studio()&&!all&&i!==index));
+  }
+  window.ragaStudioChoose=function(n){index=Math.max(0,Math.min(sheets().length-1,Number(n)||0));all=false;draw();};
+  window.ragaStudioStep=function(delta){window.ragaStudioChoose(index+delta);};
+  window.ragaStudioShowAll=function(){all=true;draw();};
+  document.addEventListener('DOMContentLoaded',()=>{
+    const mount=document.getElementById('paper-render-target');
+    if(mount)new MutationObserver(draw).observe(mount,{childList:true});
+    document.querySelectorAll('.tab-btn').forEach(button=>button.addEventListener('click',()=>requestAnimationFrame(draw)));
+    draw();
+  });
+})();
+</script>
+<script src="./security-app.js"></script>
 <script id="ragasaan-word-export-actions">
 /* Self-contained Word actions. These replace the old CDN-only DOCX actions.
    Documents are genuine, editable OOXML .docx files; exact visual fidelity
@@ -4894,10 +5172,15 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     w.paragraph([state.event.date,state.event.venue].filter(Boolean).join(' · '),{size:9,align:'center',after:90}),
     inlineImage(w,company)
   ];}
-  function menuItem(w,item,index){
+  function menuItem(w,item,index,format='a4'){
     const desc=String(item.desc||item.description||'').trim();
-    const out=[w.paragraph(`${index}. ${item.name||'Unnamed dish'}`,{bold:true,size:10,after:desc?20:70})];
-    if(desc)out.push(w.paragraph(desc,{size:9,color:'505050',after:70}));
+    const a=(item.allergens||[]).map(value=>ragaDisplayText(value,'allergen',format));
+    const m=(item.mayContain||[]).map(value=>ragaDisplayText(value,'allergen',format));
+    const name=ragaDisplayText(item.name||'Unnamed dish','dish',format);
+    const out=[w.paragraph(name,{bold:true,size:10,after:desc||a.length||m.length?20:70})];
+    if(desc)out.push(w.paragraph(ragaDisplayText(desc,'description',format),{size:9,color:'505050',after:a.length||m.length?20:70}));
+    if(a.length)out.push(w.paragraph(a.join(', '),{bold:true,color:'8B1E20',size:9,after:m.length?10:70}));
+    if(m.length)out.push(w.paragraph(m.join(', '),{bold:true,color:'704600',size:9,after:70}));
     return out;
   }
   function selectedForFormat(fmt){
@@ -4905,7 +5188,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     return eventRecords.filter(x=>effectiveItemFormats(x).includes(fmt));
   }
   function getGroupName(session,item){
-    return isCourseWise(session)?(item.menuCourse||'Other'):'All Items';
+    return courseDisplay(session,item.menuCourse||'Main Course');
   }
   const offlineSummary=async function(){
     if(!includeClientSummary){alert('Enable A4 Client Summary before downloading its Word document.');return;}
@@ -4928,9 +5211,12 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           const ct=isCourseWise(s)?String(s.courseTimes?.[item.menuCourse]||''):'';
           const group=[course,service,ct].filter(Boolean).join(' · ');
           if(group!==last){cols[idx].push(w.paragraph(group,{bold:true,size:9,color:color(),after:45,keep:true}));last=group;}
-          const allergens=Array.isArray(item.allergens)&&item.allergens.length?'Allergens: '+item.allergens.join(', '):'Allergens not declared';
-          const may=Array.isArray(item.mayContain)&&item.mayContain.length?'; May contain: '+item.mayContain.join(', '):'';
-          cols[idx].push(w.paragraph(`${++num}. ${item.name||'Unnamed dish'}`,{bold:true,size:9,after:10}),w.paragraph(allergens+may,{size:8,after:75}));
+          const allergens=Array.isArray(item.allergens)?item.allergens.map(value=>ragaDisplayText(value,'allergen','a4')):[];
+          const may=Array.isArray(item.mayContain)?item.mayContain.map(value=>ragaDisplayText(value,'allergen','a4')):[];
+          cols[idx].push(w.paragraph(`${++num}. ${ragaDisplayText(item.name||'Unnamed dish','dish','a4')}`,{bold:true,size:9,after:10}));
+          cols[idx].push(w.paragraph(allergens.length?'Allergens: '+allergens.join(', '):'Allergens not declared',
+            {bold:!!allergens.length,color:allergens.length?'8B1E20':'555555',size:8,after:may.length?10:75}));
+          if(may.length)cols[idx].push(w.paragraph('May contain: '+may.join(', '),{bold:true,color:'704600',size:8,after:75}));
         }
       }
       if(!counts.some(Boolean))part.push(w.paragraph('No menu items have been selected.',{size:10,align:'center'}));
@@ -4944,18 +5230,29 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     try{
       const w=W(),parts=[],items=selectedForFormat(format),a4=format==='a4',d=state.designs?.[format]||{},assets=await wordAssets(format);
       if(a4){
-        const grouped=eventSessions.map(s=>({s,rows:items.filter(x=>x.sessionId===s.id)})).filter(x=>x.rows.length);
+        const grouped=[];
+        for(const session of eventSessions){
+          const rows=items.filter(x=>x.sessionId===session.id);
+          if(!rows.length)continue;
+          if(isMultiStationMode(session)){
+            for(const station of ragaEnsureStations(session)){
+              const stationRows=rows.filter(item=>item.menuCourse===ragaStationKey(station.id));
+              if(stationRows.length)grouped.push({s:session,rows:stationRows,stationName:station.name});
+            }
+          }else grouped.push({s:session,rows,stationName:''});
+        }
         if(!grouped.length){parts.push(...eventLine(w,assets.company),w.paragraph('No A4 Buffet Menu dishes selected.',{size:10,align:'center'}));}
         for(let i=0;i<grouped.length;i++){
-          const {s,rows}=grouped[i];if(i)parts.push(w.pageBreak());
+          const {s,rows,stationName}=grouped[i];if(i)parts.push(w.pageBreak());
           parts.push(...eventLine(w,assets.company));
           if(d.showMenuHeading!==false)parts.push(w.paragraph(d.menuHeading||'Menu',{bold:true,size:18,serif:true,align:'center',color:color(),after:110}));
           if(s.showPrintHeading!==false)parts.push(w.paragraph(s.printHeading??s.name,{bold:true,size:13,align:'center',after:160,color:color()}));
+          if(stationName)parts.push(w.paragraph(stationName,{bold:true,size:14,align:'center',after:120,color:color()}));
           let prev='',count=0;
-          for(const item of rows){
+          for(const item of (isCourseWise(s)?rows:[...rows].sort((a,b)=>{const rank=c=>c==='Main Course'?0:c==='Dessert'?1:c==='Canapé'?2:c==='Live Station'?3:4;return rank(a.menuCourse)-rank(b.menuCourse)}))){
             const group=getGroupName(s,item);
-            if(group!==prev&&isCourseWise(s)){parts.push(w.paragraph(group,{bold:true,size:11,color:color(),align:'center',after:100}));prev=group;}
-            parts.push(...menuItem(w,item,++count));
+            if(group!==prev&&!stationName){parts.push(w.paragraph(group,{bold:true,size:11,color:color(),align:'center',after:100}));prev=group;}
+            parts.push(...menuItem(w,item,++count,format));
           }
           parts.push(w.paragraph('RAGASAAN',{bold:true,size:11,align:'center',color:color(),after:0}));
         }
@@ -4973,7 +5270,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           const s=eventSessions.find(s=>s.id===item.sessionId)||eventSessions[0]||{};
           const group=isCourseWise(s)?item.menuCourse||'Other':'';
           if(group&&group!==prev){right.push(w.paragraph(group,{bold:true,size:11,color:color(),after:75}));prev=group;}
-          right.push(...menuItem(w,item,++num));
+          right.push(...menuItem(w,item,++num,format));
         }
         if(!items.length)right.push(w.paragraph('No Table Menu Card dishes selected.',{size:10}));
         right.push(inlineImage(w,assets.company));
@@ -4988,8 +5285,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         // Respect the Admin-managed QR only; never generate a dummy QR.
         if(assets.backRight)rightBack.push(inlineImage(w,assets.backRight));
         if(assets.qr){
-          rightBack.push(w.paragraph('We Value Your Feedback',{bold:true,size:14,serif:true,align:'center',color:color(),after:150}));
-          rightBack.push(w.paragraph('Thank you for celebrating with us. Please scan the QR code below to share your experience.',{size:10,align:'center',after:140}));
+          if(d.feedbackTitle!=='')rightBack.push(w.paragraph(d.feedbackTitle ?? 'We Value Your Feedback',{bold:true,size:14,serif:true,align:'center',color:color(),after:150}));
+          if(d.feedbackMessage!=='')rightBack.push(w.paragraph(d.feedbackMessage ?? 'Thank you for celebrating with us. Please scan the QR code below to share your experience.',{size:10,align:'center',after:140}));
           rightBack.push(inlineImage(w,assets.qr));
         }
         rightBack.push(inlineImage(w,assets.company));

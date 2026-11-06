@@ -59,23 +59,130 @@ async function publishFeedbackQR(remove=false){
 const CHOICE_NAMES={serviceModes:'Service types',mealSessions:'Meal sessions',menuCategories:'Menu categories',printFormats:'Menu / tag formats'};
 const CHOICE_LABELS={'a4':'Buffet Menu A4','a4-live':'Live Station A4','half-a4':'Table Menu Card','a8-grid':'A8 Tags','foldtags-grid':'FoldTags','a6-grid':'A6 Tags','canape-grid':'Canapé Labels'};
 let loadedChoiceOptions=null;
+function companyLogoStatus(message,isError=false){
+  const el=$('rs-company-status');
+  if(el){el.textContent=message;el.style.color=isError?'#fecaca':'#bbf7d0';el.setAttribute('role','status');el.setAttribute('aria-live','polite');}
+}
+async function companyLogoData(file){
+  if(!file||!['image/png','image/jpeg','image/webp'].includes(file.type))throw Error('Choose a PNG, JPG or WebP logo.');
+  if(file.size>12_000_000)throw Error('Original file is too large (maximum 12 MB). Choose a smaller image.');
+  const read=source=>new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result||''));reader.onerror=()=>reject(Error('Cannot read logo file'));reader.readAsDataURL(source);});
+  if(file.size<=125000){const data=await read(file);if(data.length<=190000)return data;}
+  const objectURL=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((resolve,reject)=>{const picture=new Image();picture.onload=()=>resolve(picture);picture.onerror=()=>reject(Error('Cannot decode logo image'));picture.src=objectURL;});
+    const maxSide=Math.max(img.naturalWidth||img.width,img.naturalHeight||img.height);
+    if(!maxSide)throw Error('Empty logo image');
+    for(const target of [1200,900,700,520,380,260,170]){
+      const scale=Math.min(1,target/maxSide),canvas=document.createElement('canvas');
+      canvas.width=Math.max(1,Math.round((img.naturalWidth||img.width)*scale));
+      canvas.height=Math.max(1,Math.round((img.naturalHeight||img.height)*scale));
+      const ctx=canvas.getContext('2d');if(!ctx)throw Error('Browser cannot resize the logo');
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      for(const quality of [0.88,0.72,0.56]){
+        const data=canvas.toDataURL('image/webp',quality);
+        if(data.startsWith('data:image/webp;')&&data.length<=190000)return data;
+      }
+      // JPEG fallback for browsers with no WebP encoder.
+      for(const quality of [0.82,0.65,0.48]){
+        const data=canvas.toDataURL('image/jpeg',quality);
+        if(data.length<=190000)return data;
+      }
+    }
+    throw Error('Unable to compress this logo under 150 KB. Use a simpler, smaller image.');
+  }finally{URL.revokeObjectURL(objectURL);}
+}
 async function fetchCompanyLogo(){
- try{const r=await call('/public/company-logo','GET',undefined,false);
+ const info=$('rs-company-status');
+ try{
+   const r=await call('/public/company-logo','GET',undefined,false);
    const image=typeof r.image==='string'&&/^data:image\/(png|jpeg|webp);base64,/.test(r.image)?r.image:'';
    window.ragaPublishedCompanyLogo=image;
    if(image)window.ragaSetPublishedCompanyLogo?.(image);
-   const img=$('rs-company-image');if(img){img.hidden=!image;if(image)img.src=image;else img.removeAttribute('src');}
-   const info=$('rs-company-status');if(info)info.textContent=image?'Published company logo is active.':'No published logo; using existing GitHub logo.';
- }catch(err){if($('rs-company-status'))$('rs-company-status').textContent='Could not load company logo: '+err.message;}
+   else window.ragaClearPublishedCompanyLogo?.();
+   const img=$('rs-company-image');
+   if(img){img.hidden=!image;if(image)img.src=image;else img.removeAttribute('src');}
+   if(info)info.textContent=image?'Published company logo is active.':'No published company logo; using the GitHub fallback.';
+   return image;
+ }catch(err){
+   if(info)info.textContent='Unable to verify cloud company logo: '+err.message;
+   return null;
+ }
 }
-async function publishCompanyLogo(remove=false){if(s.user?.role!=='admin')return;
- let image='';if(!remove){const file=$('rs-company-upload')?.files?.[0];if(!file)return msg('Select company logo first.','error');
- if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>150000)return msg('Use PNG/JPG/WebP up to 150 KB.','error');
- image=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=()=>reject(Error('Cannot read logo'));reader.readAsDataURL(file);});}
- else if(!confirm('Remove D1 company logo and return to the GitHub logo?'))return;
- try{await call('/admin/company-logo','PUT',{image});if($('rs-company-upload'))$('rs-company-upload').value='';
- if(!image)window.ragaClearPublishedCompanyLogo?.();await fetchCompanyLogo();msg(image?'Company logo published.':'GitHub company logo restored.');}
- catch(err){msg(err.message,'error');}
+function ragaReadLogoDataUrl(blob){
+ return new Promise((resolve,reject)=>{
+   const reader=new FileReader();
+   reader.onload=()=>resolve(String(reader.result||''));
+   reader.onerror=()=>reject(reader.error||Error('Could not read the selected logo file.'));
+   reader.readAsDataURL(blob);
+ });
+}
+async function ragaOptimiseCompanyLogo(file,progress){
+ if(!file)throw Error('Choose a company logo image first.');
+ if(!['image/png','image/jpeg','image/webp'].includes(file.type))throw Error('Use a PNG, JPG or WebP logo.');
+ if(file.size>12000000)throw Error('This file is larger than 12 MB. Please choose a smaller image.');
+ if(file.size<=150000)return ragaReadLogoDataUrl(file);
+ progress?.('Optimising logo for cloud publishing...');
+ // Canvas WebP preserves PNG transparency. No third-party image compressor or server upload is used.
+ const url=URL.createObjectURL(file);
+ let picture;
+ try{
+   picture=await new Promise((resolve,reject)=>{
+     const im=new Image();
+     im.onload=()=>resolve(im);
+     im.onerror=()=>reject(Error('The selected image cannot be decoded.'));
+     im.src=url;
+   });
+   const iw=picture.naturalWidth,ih=picture.naturalHeight;
+   if(!iw||!ih)throw Error('Invalid company logo image dimensions.');
+   const canvas=document.createElement('canvas');
+   const ctx=canvas.getContext('2d');
+   if(!ctx)throw Error('Image resizing is unavailable in this browser.');
+   for(const size of [1400,1150,950,780,620,500,390,300]){
+     const scale=Math.min(1,size/Math.max(iw,ih));
+     canvas.width=Math.max(1,Math.round(iw*scale));
+     canvas.height=Math.max(1,Math.round(ih*scale));
+     ctx.clearRect(0,0,canvas.width,canvas.height);
+     ctx.drawImage(picture,0,0,canvas.width,canvas.height);
+     for(const quality of [0.91,0.80,0.67]){
+       const compressed=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',quality));
+       if(compressed&&['image/png','image/jpeg','image/webp'].includes(compressed.type)&&compressed.size<=145000){
+         return await ragaReadLogoDataUrl(compressed);
+       }
+     }
+   }
+   throw Error('Could not reduce the company logo to 150 KB while preserving legibility. Please use a simpler or smaller image.');
+ }finally{URL.revokeObjectURL(url);}
+}
+async function publishCompanyLogo(remove=false){
+ const status=$('rs-company-status'),button=$('rs-company-publish'),removeButton=$('rs-company-remove');
+ const setStatus=value=>{if(status)status.textContent=value;};
+ if(s.user?.role!=='admin'){setStatus('Only a signed-in Administrator can publish the shared company logo.');return;}
+ if(remove&&!confirm('Remove the cloud company logo and return to the GitHub fallback?'))return;
+ if(!remove&&!$('rs-company-upload')?.files?.[0]){setStatus('Please select a company logo before publishing.');return;}
+ if(button)button.disabled=true;
+ if(removeButton)removeButton.disabled=true;
+ try{
+   const image=remove?'':await ragaOptimiseCompanyLogo($('rs-company-upload').files[0],setStatus);
+   setStatus(remove?'Removing cloud logo...':'Publishing company logo to cloud...');
+   const response=await call('/admin/company-logo','PUT',{image});
+   if(response?.updated!==true)throw Error('The Security API did not confirm that the logo was saved.');
+   setStatus('Verifying the saved logo...');
+   const confirmed=await fetchCompanyLogo();
+   if(confirmed===null)throw Error('The logo update was accepted but its saved version could not be checked. Please verify the Security API connection.');
+   if(confirmed!==image)throw Error('The returned cloud logo does not match the upload. Please verify the Worker deployment.');
+   if(!remove&&$('rs-company-upload'))$('rs-company-upload').value='';
+   if(remove){window.ragaClearPublishedCompanyLogo?.();setStatus('Cloud company logo removed. The GitHub logo is active.');}
+   else setStatus('Company logo published and verified. It will appear for all users on refresh.');
+   msg(remove?'GitHub company logo restored.':'Company logo published and verified.');
+ }catch(err){
+   setStatus('Company logo not confirmed: '+(err?.message||err));
+   msg(err?.message||String(err),'error');
+ }finally{
+   if(button)button.disabled=false;
+   if(removeButton)removeButton.disabled=false;
+ }
 }
 async function loadChoiceOptions(){
  try{const r=await call('/settings/choices');const out={};
@@ -256,8 +363,22 @@ function opt(rows,idKey='id',labelKey='name'){return rows.map(r=>`<option value=
 async function refreshCloudList(){
  const r=await call(s.user?'/events':'/public/events','GET',undefined,!!s.user);s.events=r.events||[];
  const list=$('rs-cloud-events');if(!list)return;
- const folder={};for(const x of s.events){const day=String(x.eventDate||'No date').slice(0,10),planner=String(x.eventData?.plannerName||'General planner').slice(0,100);(folder[day]??={})[planner]??=[];folder[day][planner].push(x);}
- list.innerHTML=s.events.length?Object.entries(folder).map(([day,planners])=>`<details class="raga-list-item" open><summary><b>📅 ${e(day)}</b></summary>${Object.entries(planners).map(([planner,events])=>`<details class="raga-list-item" open><summary>👤 ${e(planner)} · ${events.length} events</summary>${events.map(x=>`<div class="raga-list-item"><strong>${e(x.name)}</strong> <span class="raga-pill">${e(x.status)}</span><div class="raga-small">${e(x.eventDate||'Date not set')} · ${e(x.venue||'No venue')}</div><div class="raga-actions"><button class="raga-btn" data-load-cloud="${e(x.id)}">Load</button><button class="raga-btn" data-manage-cloud="${e(x.id)}">Manage</button></div></div>`).join('')}</details>`).join('')}</details>`).join(''):'<p class="raga-help">No cloud events yet. Save the event in your current builder using “Save to Cloud”.</p>';
+ // Display the latest five by default while retaining all server-returned records.
+ const plannerOf=x=>String(x.eventData?.plannerName||x.plannerName||'Unassigned planner').trim()||'Unassigned planner';
+ const planners=[...new Set(s.events.map(plannerOf))].sort((a,b)=>a.localeCompare(b));
+ const selected=String(s.cloudPlannerFilter||'');
+ const relevant=s.events.filter(x=>!selected||plannerOf(x)===selected);
+ const sorted=[...relevant].sort((a,b)=>{
+   const timestamp=x=>Date.parse(x.updatedAt||x.updated_at||x.createdAt||x.created_at||x.eventDate||'')||0;
+   return timestamp(b)-timestamp(a);
+ });
+ const visible=s.cloudShowArchive?sorted:sorted.slice(0,5);
+ const folder={};for(const x of visible){const day=String(x.eventDate||'No date').slice(0,10),planner=String(x.eventData?.plannerName||'General planner').slice(0,100);(folder[day]??={})[planner]??=[];folder[day][planner].push(x);}
+ list.innerHTML='<div class="raga-list-item"><label class="raga-small">Filter by planner <select id="rs-cloud-planner-filter" class="raga-input"><option value="">All planners</option>'+planners.map(p=>'<option value="'+e(p)+'" '+(selected===p?'selected':'')+'>'+e(p)+'</option>').join('')+'</select></label><div class="raga-actions"><span class="raga-small">Showing '+visible.length+' of '+relevant.length+' matching events</span><button type="button" class="raga-btn" id="rs-cloud-archive-toggle">'+(s.cloudShowArchive?'Show latest five':'View older events')+'</button></div></div>'+(visible.length?Object.entries(folder).map(([day,planners])=>`<details class="raga-list-item" open><summary><b>📅 ${e(day)}</b></summary>${Object.entries(planners).map(([planner,events])=>`<details class="raga-list-item" open><summary>👤 ${e(planner)} · ${events.length} events</summary>${events.map(x=>`<div class="raga-list-item"><strong>${e(x.name)}</strong> <span class="raga-pill">${e(x.status)}</span><div class="raga-small">${e(x.eventDate||'Date not set')} · ${e(x.venue||'No venue')}</div><div class="raga-actions"><button class="raga-btn" data-load-cloud="${e(x.id)}">Load</button><button class="raga-btn" data-manage-cloud="${e(x.id)}">Manage</button></div></div>`).join('')}</details>`).join('')}</details>`).join(''):'<p class="raga-help">No matching cloud events. Choose All planners, or save a new event.</p>');
+ const f=list.querySelector('#rs-cloud-planner-filter');
+ if(f)f.onchange=()=>{s.cloudPlannerFilter=f.value;refreshCloudList().catch(err=>msg(err.message,'error'));};
+ const archive=list.querySelector('#rs-cloud-archive-toggle');
+ if(archive)archive.onclick=()=>{s.cloudShowArchive=!s.cloudShowArchive;refreshCloudList().catch(err=>msg(err.message,'error'));};
  list.querySelectorAll('[data-load-cloud]').forEach(b=>b.onclick=()=>loadCloud(b.dataset.loadCloud));
  list.querySelectorAll('[data-manage-cloud]').forEach(b=>b.onclick=()=>selectCloud(b.dataset.manageCloud));
  const current=s.cloudEvent&&s.events.find(x=>x.id===s.cloudEvent.id);
@@ -478,8 +599,28 @@ function attach(){
  // The form uses an inline fail-closed submit handler so missing JS cannot silently reload the page.
  $('rs-open-cloud')?.addEventListener('click',openCloud);
  $('rs-open-admin-qr')?.addEventListener('click',()=>{openCloud();setTimeout(()=>document.getElementById('rs-admin-feedback-panel')?.scrollIntoView({block:'center',behavior:'smooth'}),30);});
- $('rs-company-publish')?.addEventListener('click',()=>publishCompanyLogo(false));
- $('rs-company-remove')?.addEventListener('click',()=>publishCompanyLogo(true));
+ // Delegated handler survives Cloud Settings panel rerenders and always acknowledges clicks.
+ document.addEventListener('click',event=>{
+   const button=event.target.closest?.('#rs-company-publish, #rs-company-remove');
+   if(!button)return;
+   event.preventDefault();
+   const status=$('rs-company-status');
+   if(status){
+     status.hidden=false;
+     status.setAttribute('role','status');
+     status.setAttribute('aria-live','polite');
+     status.textContent='Checking administrator session...';
+   }
+   publishCompanyLogo(button.id==='rs-company-remove').catch(error=>{
+     const detail='Company logo publish action failed: '+(error?.message||String(error));
+     if(status)status.textContent=detail;
+     msg(detail,'error');
+   });
+ });
+ $('rs-company-upload')?.addEventListener('change',event=>{
+   const file=event.target.files?.[0],status=$('rs-company-status');
+   if(status&&file)status.textContent='Selected '+file.name+' ('+Math.ceil(file.size/1024)+' KB). Click Publish Company Logo to save for all users.';
+ });
  $('rs-save-choices')?.addEventListener('click',saveChoiceOptions);
  $('rs-save-meal-defaults')?.addEventListener('click',saveMealDefaults);
  $('rs-save-print-rules')?.addEventListener('click',savePrintingRules);
@@ -504,7 +645,7 @@ function attach(){
  $('rs-cloud')?.addEventListener('click',evt=>{if(evt.target===evt.currentTarget)closeCloud();});
  loadThemeGallery();
  // QR fetch is independent of staff login so client links show the exact printed QR.
- fetchFeedbackQR();fetchCompanyLogo();
+ fetchFeedbackQR();fetchCompanyLogo().catch(()=>{});
  if(initClient())return;
  const stored=JSON.parse(sessionStorage.getItem('raga_session')||'null');
  if(stored?.token && new Date(stored.expiresAt)>new Date()){

@@ -1,0 +1,51 @@
+name: Menu Studio review checks (no deployment)
+on:
+  pull_request:
+    paths:
+      - index.html
+      - security-app.js
+      - security/**
+      - scripts/**
+      - .github/workflows/**
+      - wrangler.toml
+      - .gitignore
+      - docs/**
+      - README.md
+  workflow_dispatch:
+
+# Avoid redundant push + pull-request runs and cancel stale checks.
+concurrency:
+  group: menustudio-review-chrome-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  syntax-and-contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate Menu Studio without deploying
+        run: node scripts/test-menu-studio-review.mjs
+      - name: Build static site
+        run: node scripts/build-menustudio.mjs
+      - name: Prepare preinstalled Chrome for release smoke test
+        run: |
+          npm install --no-save playwright@1.57.0
+          command -v google-chrome
+          google-chrome --version
+      - name: Browser smoke test for new serving styles and print previews
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 --directory dist/menustudio >/tmp/menustudio-http.log 2>&1 &
+          node scripts/smoke-menu-studio-browser.mjs
+      - name: Save browser screenshots for release review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: menu-studio-browser-smoke
+          path: browser-smoke/
+          if-no-files-found: ignore

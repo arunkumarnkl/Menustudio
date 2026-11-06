@@ -25,10 +25,27 @@ jobs:
         uses: actions/checkout@v4
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
-      - name: Upload static site
+      - name: Build curated Menu Studio static site
+        run: node scripts/build-menustudio.mjs
+      - name: Upload Menu Studio files only
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: dist/menustudio
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify Cloudflare website picked up the release (informational)
+        run: |
+          echo "Checking whether Cloudflare Git integration updated the separate workers.dev website"
+          for i in 1 2 3 4 5 6; do
+            if curl -fsSL --connect-timeout 10 --max-time 30 \
+                "https://menustudio.arunkumarnkl.workers.dev/?release=$GITHUB_SHA" \
+                -o /tmp/menustudio-live.html &&
+               grep -Fq 'ragasaan-allergen-print-emphasis' /tmp/menustudio-live.html &&
+               grep -Fq 'raga-ux-scale-2026' /tmp/menustudio-live.html; then
+              echo "::notice title=Cloudflare frontend::The live Cloudflare HTML contains the new Menu Studio features."
+              exit 0
+            fi
+            sleep 20
+          done
+          echo "::warning title=Cloudflare frontend::GitHub Pages published, but workers.dev is not yet confirmed updated. Cloudflare requires its own Git integration or deployment."
