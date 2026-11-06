@@ -629,6 +629,8 @@ function applyTheme(id,scope='all'){
  const theme=allThemes().find(t=>t.id===id);if(!theme)return;
  const f=scope==='all'?FMT:[state.layout];for(const fmt of f)Object.assign(state.designs[fmt],styleFrom(theme),{bgColor:'#ffffff'});
  state.design=state.designs[state.layout];s.activeTheme=id;window.ragaActiveThemeId=id;
+ // Persist the selected print style locally; Cloud Save remains a separate operation.
+ if(typeof window.saveStyle==='function')window.saveStyle();
  renderContextualControls();renderPreview();renderThemeGallery();msg('Theme applied: '+theme.name+'. Save to Cloud to share changes.');
 }
 function themeCard(t,context='staff'){
@@ -719,9 +721,10 @@ async function saveClientPdf(){
  const sheets=[...($('rs-client-paper')?.querySelectorAll('.print-sheet')||[])];
  if(!sheets.length){if(status)status.textContent='No client pages available';return;}
  const root=document.createElement('div');
- root.style.cssText='position:fixed;left:-20000px;top:0;width:210mm;background:#fff';
+ // html2pdf/html2canvas needs a measurable capture root in normal document flow.
+ root.style.cssText='position:relative;display:block;width:210mm;max-width:210mm;background:#fff;pointer-events:none;margin:0;padding:0';
  sheets.forEach((page,i)=>{const el=page.cloneNode(true);el.style.cssText+=';width:210mm!important;height:297mm!important;zoom:1!important;transform:none!important;margin:0!important';el.removeAttribute('contenteditable');root.appendChild(el);if(i<sheets.length-1){const br=document.createElement('div');br.className='html2pdf__page-break';root.appendChild(br);}});
- $('rs-client-panel').appendChild(root);
+ document.body.appendChild(root);
  try{await window.html2pdf().set({margin:0,filename:'Ragasaan_Client_Design.pdf',image:{type:'jpeg',quality:.97},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(root).save();if(status)status.textContent='PDF saved.';}
  catch(err){if(status)status.textContent='Unable to save PDF: '+err.message;}
  finally{root.remove();}
