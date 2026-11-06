@@ -2868,18 +2868,22 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     
     function ragaAllowedFormats(session,course){
       const mode=sessionMode(session);
+      let formats;
       if(mode==='Plated Service'){
-        if(course==='Canapé')return ['canape-grid','a8-grid','a6-grid','foldtags-grid'];
-        if(course==='Live Station')return ['a4-live'];
-        return normalizeGroupService(session,course)==='Plated Service'?['half-a4']:['a4','foldtags-grid','a8-grid','a6-grid','canape-grid'];
-      }
-      if(mode==='Canapé')return ['canape-grid','a8-grid','a6-grid','foldtags-grid'];
-      if(mode==='Live Station')return ['a4-live'];
-      return [...RAGA_LABEL_FORMATS];
+        if(course==='Canapé')formats=['canape-grid','a8-grid','a6-grid','foldtags-grid'];
+        else if(course==='Live Station')formats=['a4-live'];
+        else formats=normalizeGroupService(session,course)==='Plated Service'?['half-a4']:['a4','foldtags-grid','a8-grid','a6-grid','canape-grid'];
+      }else if(mode==='Canapé')formats=['canape-grid','a8-grid','a6-grid','foldtags-grid'];
+      else if(mode==='Live Station')formats=['a4-live'];
+      else formats=[...RAGA_LABEL_FORMATS];
+      // Table Menu Card is an optional EXTRA for Dinner regardless of serving style;
+      // adding it here must not silently make it a default for Buffet/Thali/Stations.
+      if(sessionKind(session)==='dinner'&&!formats.includes('half-a4'))formats.push('half-a4');
+      return formats;
     }
     function ragaInitialFormats(session,course){
       const allowed=ragaAllowedFormats(session,course);
-      if(allowed.includes('half-a4'))return ['half-a4'];
+      if(sessionMode(session)==='Plated Service'&&['Starter','Main Course','Dessert'].includes(course)&&normalizeGroupService(session,course)==='Plated Service')return ['half-a4'];
       if(allowed.includes('a4-live'))return ['a4-live'];
       if(sessionMode(session)==='Canapé'||course==='Canapé')return ['foldtags-grid'];
       return ['a4','foldtags-grid'].filter(fmt=>allowed.includes(fmt));
@@ -3421,7 +3425,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
               <label class="block text-slate-400"><input type="checkbox" ${d.showCoupleLogo?'checked':''} onchange="state.design.showCoupleLogo=this.checked;renderPreview()"> Display Logo</label>
               ${compactNumber('coupleLogoWidth','Bride/Groom Logo Width (px)',100,400)}
               ${compactNumber('coupleOffsetX','Horizontal position (px)',-120,120)}
-              ${compactNumber('coupleOffsetY','Vertical position (px)',-100,100)}
+              ${compactNumber('coupleOffsetY','Vertical position (px)',0,200)}
             </div>` : ''}
         </details>
         ${state.layout==='foldtags-grid'?`<details data-compact="foldtags" class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-3 text-xs">
@@ -4233,13 +4237,13 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           groups.forEach(({session,rows,stationName})=>fitPaginated(rows,subset=>makeBuffet(subset,session,stationName)));
         }else fitPaginated([],subset=>makeBuffet(subset,null));
       } else if(fmt==='a4-live') {
-        const makeLiveStation=(records,session,stationName)=>{
+        const makeLiveStation=(records,session,stationName,stationId)=>{
           const p=page();p.style.padding=`${Math.max(2.5,Number(d.borderOutsetCm)+.5)}cm`;
           p.style.paddingTop=`${Math.max(0.8,Number(d.borderOutsetCm)+Number(d.borderWidth||1)/10+0.2)}cm`;
           p.classList.add('flex','flex-col','justify-between');
-          const stationTitle=stationName?`<h3 class="menu-body-font text-center" style="color:${d.accentColor};font-weight:700;font-size:calc(17px * var(--ragasaan-fit,1));margin:10px 0">${escText(stationName)}</h3>`:'';
+          const stationTitle=stationName?`<h3 class="menu-body-font text-center" contenteditable="true" spellcheck="false" data-live-title="true" data-session="${esc(session?.id||'')}" data-station="${esc(stationId||'')}" onblur="ragaEditLiveStationTitle(this)" title="Click to edit this station title" style="color:${d.accentColor};font-weight:700;font-size:calc(17px * var(--ragasaan-fit,1));margin:10px 0">${escText(stationName)}</h3>`:'';
           const collection=records.length?records.map(({item,idx})=>`<div style="margin-bottom:13px">${itemBlock(item,idx,1.12)}</div>`).join(''):`<p contenteditable="true" data-preview-text="emptyLiveMessage">${escText(d.emptyLiveMessage ?? 'Add menu items for Live Station')}</p>`;
-          p.innerHTML=`${frame()}${bodyHeader()}${formatHeading(d.liveTitle,true)}${stationTitle}
+          p.innerHTML=`${frame()}${bodyHeader()}${stationTitle}
             <div data-auto-fit-area class="menu-body-font text-center" style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:center">
               <div data-auto-fit-flow style="flex:0 0 auto;margin:auto 0">${collection}</div>
             </div><div>${brand()}</div>`;
@@ -4252,10 +4256,10 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           const stations=ragaEnsureLiveStations(session);
           for(const station of stations){
             const rows=entries.filter(row=>(row.item.ragaLiveStationId||stations[0]?.id)===station.id);
-            if(rows.length)groups.push({session,stationName:station.name,rows});
+            if(rows.length)groups.push({session,stationName:station.name,stationId:station.id,rows});
           }
         }
-        if(groups.length)groups.forEach(group=>fitPaginated(group.rows,subset=>makeLiveStation(subset,group.session,group.stationName)));
+        if(groups.length)groups.forEach(group=>fitPaginated(group.rows,subset=>makeLiveStation(subset,group.session,group.stationName,group.stationId)));
         else fitPaginated([],subset=>makeLiveStation(subset,null,''));
       } else if(fmt==='half-a4') {
         const makeTableFront=(records)=>{
@@ -5025,6 +5029,13 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     }).join('');
   }
   window.ragaRenderMealCards=render;
+  window.ragaEditLiveStationTitle=function(element){
+    const session=byId(element?.dataset?.session);
+    const stationId=element?.dataset?.station;
+    if(!session||!stationId)return;
+    ragaRenameCardStation(session,stationId,element.innerText,true);
+  };
+
   function resultBox(session,course){return [...(holder()?.querySelectorAll('[data-raga-results]')||[])].find(n=>n.dataset.ragaResults===idKey(session,course));}
   function search(sid,course){
     const root=holder();const box=resultBox(sid,course);if(!box)return;
