@@ -15,7 +15,7 @@ const $=id=>document.getElementById(id);
 const e=x=>String(x??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const escAttr=e;
 const data=x=>JSON.parse(JSON.stringify(x));
-function msg(t,kind=''){const el=$('rs-cloud-message');if(el){el.textContent=t;el.className='raga-alert '+(kind==='error'?'raga-error':'');}}
+function msg(t,kind=''){for(const id of ['rs-cloud-message','rs-admin-message']){const el=$(id);if(el){el.textContent=t;el.className='raga-alert '+(kind==='error'?'raga-error':'');el.setAttribute('aria-live','polite');}}}
 function onLoginError(t){const el=$('rs-login-error');if(el)el.textContent=t;}
 async function call(path,method='GET',body,auth=true){
   const headers={'Content-Type':'application/json'};
@@ -326,6 +326,7 @@ async function savePrintingRules(){
  }catch(err){const status=$('rs-print-rules-status');if(status)status.textContent='Save failed: '+err.message;}
 }
 function showPublic(){
+ closeAdminSettings();
  document.body.classList.remove('ragasaan-locked');
  $('ragasaan-auth-root')?.classList.remove('raga-client-on');
  const form=$('rs-login-form');if(form)form.hidden=false;
@@ -357,8 +358,17 @@ document.querySelectorAll('[data-rs-admin]').forEach(n=>n.hidden=s.user?.role!==
   // Existing local master UI is not an authorization boundary; publication is still checked by the separate GitHub Worker.
   {const master=$('tab-master');if(master)master.querySelectorAll('button[onclick*="requestMasterAuthorization"], #github-save-button').forEach(b=>b.hidden=s.user?.role!=='admin');}
 }
-function openCloud(){ $('ragasaan-cloud').classList.add('open');refreshCloudList().catch(err=>msg(err.message,'error'));}
+function openCloud(){if(s.clientToken)return; $('ragasaan-cloud').classList.add('open');refreshCloudList().catch(err=>msg(err.message,'error'));}
 function closeCloud(){$('ragasaan-cloud').classList.remove('open');}
+function openAdminSettings(){
+  if(s.clientToken)return;
+  if(s.user?.role!=='admin'){msg('Administrator sign-in required for Admin Settings.','error');window.ragaOpenAdminLogin();return;}
+  $('ragasaan-admin')?.classList.add('open');
+  window.ragaSyncFeedbackCopyEditor?.();
+  refreshPlanners().catch(err=>msg('User Profile loading failed: '+err.message,'error'));
+  loadFeedbackCopy().catch(err=>msg('Feedback wording loading failed: '+err.message,'error'));
+}
+function closeAdminSettings(){$('ragasaan-admin')?.classList.remove('open');}
 function opt(rows,idKey='id',labelKey='name'){return rows.map(r=>`<option value="${escAttr(r[idKey])}">${e(r[labelKey])}</option>`).join('');}
 async function refreshCloudList(){
  const r=await call(s.user?'/events':'/public/events','GET',undefined,!!s.user);s.events=r.events||[];
@@ -472,9 +482,25 @@ async function loadSubmissions(){if(!s.cloudEvent)return;try{const r=await call(
 function showSubmissionDesign(item){const d=item.design||{};const root=$('rs-design-inspector');
  root.innerHTML=`<b>Revision ${item.revision} · ${e(item.status)}</b><p>Theme: ${e(d.themeId||'Custom')}<br>Table name: ${e(d.coupleTitle||[d.brideName,d.groomName].filter(Boolean).join(' & '))}<br>Welcome message: ${e(d.welcomeMessage||'')}</p><div class="raga-small">${Object.entries(d.designs||{}).map(([fmt,x])=>e(FN[fmt]||fmt)+': '+e(x.titleFont||'')+', '+e(x.accentColor||'')).join(' · ')}</div>`;}
 async function approvePrint(){if(!s.cloudEvent)return;try{await call('/events/'+s.cloudEvent.id+'/approve-print','POST',{});msg('Printing approved for this cloud event.');await refreshCloudList();}catch(err){msg(err.message,'error');}}
-async function createPlanner(){if(s.user?.role!=='admin')return;
- const email=$('rs-new-planner-email').value.trim(),name=$('rs-new-planner-name').value.trim(),password=$('rs-new-planner-password').value;
- try{await call('/users/planners','POST',{email,name,password});$('rs-new-planner-password').value='';msg('Event Planner created. Share their initial password through a secure channel.');await refreshPlanners();}catch(err){msg(err.message,'error');}}
+async function createPlanner(){
+ const status=$('rs-new-planner-status'),button=$('rs-create-planner');
+ const set=(message,isError=false)=>{if(status){status.textContent=message;status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.style.color=isError?'#a42342':'#256746';}msg(message,isError?'error':'');};
+ if(s.user?.role!=='admin'){set('Only an Administrator can create an Event Planner.',true);return;}
+ const email=String($('rs-new-planner-email')?.value||'').trim().toLowerCase();
+ const name=String($('rs-new-planner-name')?.value||'').trim();
+ const password=String($('rs-new-planner-password')?.value||'');
+ if(!name||!/^\S+@\S+\.\S+$/.test(email)||password.length<8){set('Enter a name, valid email and an initial password of at least 8 characters.',true);return;}
+ if(button){button.disabled=true;button.textContent='Creating Event Planner…';}
+ set('Checking account details and submitting user creation…');
+ try{
+  const created=await call('/users/planners','POST',{email,name,password});
+  if(!created?.id)throw Error('The server did not return a new user ID; account creation is not confirmed.');
+  $('rs-new-planner-password').value='';
+  set('Event Planner '+name+' created successfully. Share the initial password securely.');
+  await refreshPlanners();
+ }catch(err){set('Could not create Event Planner: '+(err?.message||String(err)),true);}
+ finally{if(button){button.disabled=false;button.textContent='Create Event Planner';}}
+}
 // The public HTML can be bypassed; this guard provides operational UI workflow protection only.
 // The backend independently authorizes cloud event, client link, submission, approval and print-status calls.
 async function canPrint(){return true;}
@@ -598,7 +624,10 @@ function copyLink(){const x=$('rs-link-output').value;if(!x)return;try{navigator
 function attach(){
  // The form uses an inline fail-closed submit handler so missing JS cannot silently reload the page.
  $('rs-open-cloud')?.addEventListener('click',openCloud);
- $('rs-open-admin-qr')?.addEventListener('click',()=>{openCloud();setTimeout(()=>document.getElementById('rs-admin-feedback-panel')?.scrollIntoView({block:'center',behavior:'smooth'}),30);});
+ $('rs-open-admin-qr')?.addEventListener('click',openAdminSettings);
+ $('rs-close-admin')?.addEventListener('click',closeAdminSettings);
+ $('ragasaan-admin')?.addEventListener('click',evt=>{if(evt.target===evt.currentTarget)closeAdminSettings();});
+ $('rs-feedback-copy-save')?.addEventListener('click',()=>saveFeedbackCopy().catch(err=>msg(err.message,'error')));
  // Delegated handler survives Cloud Settings panel rerenders and always acknowledges clicks.
  document.addEventListener('click',event=>{
    const button=event.target.closest?.('#rs-company-publish, #rs-company-remove');
@@ -616,6 +645,10 @@ function attach(){
      if(status)status.textContent=detail;
      msg(detail,'error');
    });
+ });
+ document.addEventListener('click',event=>{
+   const button=event.target.closest?.('#rs-create-planner');
+   if(button&&!event.defaultPrevented){event.preventDefault();createPlanner().catch(err=>msg(err.message,'error'));}
  });
  $('rs-company-upload')?.addEventListener('change',event=>{
    const file=event.target.files?.[0],status=$('rs-company-status');
@@ -640,7 +673,7 @@ function attach(){
  $('rs-list-links')?.addEventListener('click',()=>listLinks().catch(x=>msg(x.message,'error')));
  $('rs-load-submissions')?.addEventListener('click',loadSubmissions);
  $('rs-approve-print')?.addEventListener('click',approvePrint);
- $('rs-create-planner')?.addEventListener('click',createPlanner);
+ $('rs-create-planner')?.addEventListener('click',event=>{event.preventDefault();createPlanner().catch(err=>msg(err.message,'error'));});
  $('rs-load-selected')?.addEventListener('click',()=>loadCloud(s.cloudEvent?.id).catch(x=>msg(x.message,'error')));
  $('rs-cloud')?.addEventListener('click',evt=>{if(evt.target===evt.currentTarget)closeCloud();});
  loadThemeGallery();
