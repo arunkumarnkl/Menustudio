@@ -31,6 +31,8 @@ jobs:
           node-version: '22'
       - name: Validate Menu Studio without deploying
         run: node scripts/test-menu-studio-review.mjs
+      - name: Verify review-only Security Worker roles against mock D1
+        run: node scripts/test-final-worker-mock.mjs
       - name: Build static site
         run: node scripts/build-menustudio.mjs
       - name: Prepare preinstalled Chrome for release smoke test
