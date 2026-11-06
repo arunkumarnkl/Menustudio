@@ -4841,7 +4841,10 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         exportRoot.appendChild(copy);
         if(i<originals.length-1){const br=document.createElement('div');br.className='html2pdf__page-break';exportRoot.appendChild(br);}
       });
-      exportRoot.style.position='fixed';exportRoot.style.left='-20000px';exportRoot.style.top='0';
+      // html2canvas cannot reliably rasterise elements positioned far outside the viewport.
+      // Keep the temporary export root in the viewport, behind the visible UI, while capturing.
+      exportRoot.style.position='fixed';exportRoot.style.left='0';exportRoot.style.top='0';
+      exportRoot.style.zIndex='-1';exportRoot.style.pointerEvents='none';
       document.body.appendChild(exportRoot);
       try{
         await window.html2pdf().set({
