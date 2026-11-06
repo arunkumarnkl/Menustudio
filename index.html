@@ -4844,7 +4844,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       // html2canvas cannot reliably rasterise elements positioned far outside the viewport.
       // Keep the temporary export root in the viewport, behind the visible UI, while capturing.
       exportRoot.style.position='fixed';exportRoot.style.left='0';exportRoot.style.top='0';
-      exportRoot.style.zIndex='-1';exportRoot.style.pointerEvents='none';
+      exportRoot.style.zIndex='2147483647';exportRoot.style.pointerEvents='none';
       document.body.appendChild(exportRoot);
       try{
         await window.html2pdf().set({
