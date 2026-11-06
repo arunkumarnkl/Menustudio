@@ -1882,6 +1882,17 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           </div>
           <small style="color:#cbd5e1">Choose a page to inspect. Print/PDF includes all pages regardless of selection.</small>
         </section>
+        <details id="raga-feedback-copy-editor" class="no-print bg-slate-950 px-3 py-2 rounded-lg border border-slate-800 space-y-2">
+          <summary class="text-xs font-semibold text-gold-400 cursor-pointer">Table Menu Card — Edit Guest Feedback Text</summary>
+          <p class="text-[11px] text-slate-400">These fields are editable even before an Admin QR is published. The back-page preview and Word export use this wording.</p>
+          <label class="block text-xs text-slate-300">Heading
+            <input id="raga-feedback-title-input" type="text" oninput="ragaUpdateFeedbackCopy('feedbackTitle',this.value)" class="block w-full mt-1 p-2 bg-slate-900 border border-slate-700 rounded text-white">
+          </label>
+          <label class="block text-xs text-slate-300">Message
+            <textarea id="raga-feedback-message-input" rows="3" oninput="ragaUpdateFeedbackCopy('feedbackMessage',this.value)" class="block w-full mt-1 p-2 bg-slate-900 border border-slate-700 rounded text-white"></textarea>
+          </label>
+          <button type="button" onclick="setLayout('half-a4')" class="raga-page-button">Preview Table Menu Card</button>
+        </details>
         <!-- Buffet Menu (A4) -->
         <div class="bg-slate-950 px-2 py-2 rounded-lg border border-slate-800 space-y-1">
           <div class="flex items-center justify-between">
@@ -2408,6 +2419,19 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       // Optional logo changes remain available in the application's controls.
     });
 
+    function ragaUpdateFeedbackCopy(key,value){
+      if(!['feedbackTitle','feedbackMessage'].includes(key))return;
+      const design=state.designs?.['half-a4'];if(!design)return;
+      design[key]=value;saveStyle();
+      if(state.layout==='half-a4')renderPreview();
+    }
+    function ragaSyncFeedbackCopyEditor(){
+      const design=state.designs?.['half-a4'];if(!design)return;
+      const title=document.getElementById('raga-feedback-title-input');
+      const message=document.getElementById('raga-feedback-message-input');
+      if(title && title!==document.activeElement)title.value=design.feedbackTitle ?? 'We Value Your Feedback';
+      if(message && message!==document.activeElement)message.value=design.feedbackMessage ?? 'Thank you for celebrating with us. Please scan the QR code below to share your experience.';
+    }
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.tab-btn').forEach(el => {
@@ -2433,6 +2457,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       sidebar.classList.toggle('hidden', tabId === 'master' || tabId === 'venues' || tabId === 'summary');
       master.classList.toggle('master-preview-split', tabId === 'master');
       previewMain.classList.toggle('hidden', tabId !== 'design' && tabId !== 'export');
+      if(tabId==='export')ragaSyncFeedbackCopyEditor();
       if (tabId === 'master') renderMasterDB();
       else if (tabId === 'venues') renderVenueDB();
       else if (tabId === 'summary') {if(!includeClientSummary){setClientSummaryEnabled(true);}renderEventSummary();}
