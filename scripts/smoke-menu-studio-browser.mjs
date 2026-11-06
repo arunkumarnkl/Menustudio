@@ -45,7 +45,7 @@ async function run(){
   assert.ok(await breakfast.getByText('Live Pasta Bar').count()>0,'Station name is editable');
 
   await mode().selectOption('Buffet');
-  await breakfast.locator('.raga-course-card summary').click();
+  await breakfast.locator('.raga-course-card > summary[data-raga-action="toggle-category"]').click();
   const manual=breakfast.locator('.raga-card-manual');
   await manual.locator('summary').click();
   await manual.locator('[data-raga-manual="name"]').fill('chicken curry');
