@@ -79,23 +79,10 @@ try{
   active:window.ragaActiveThemeId,
   activeCard:document.querySelector('#rs-theme-gallery .raga-theme-card.active')?.innerText,
   color:state.designs.a4.accentColor,
-  saved:JSON.parse(localStorage.getItem('ragasaan_style_v3')||'{}').designs?.a4?.accentColor,
+  saved:JSON.parse(localStorage.getItem('ragasaan_theme_styles_v1')||'{}').designs?.a4?.accentColor,
   previewText:document.querySelector('#paper-render-target')?.innerHTML.slice(0,15000)
  }));
  console.log('STAFF THEME DIAGNOSTICS',JSON.stringify({before:themeBefore,after:{...themeAfter,previewText:themeAfter.previewText?.includes(themeAfter.color)}}));
- console.log('THEME SAVE FUNCTION DIAGNOSTIC',JSON.stringify(await tp.evaluate(()=>{
-  const before=JSON.parse(localStorage.getItem('ragasaan_style_v3')||'{}').designs?.a4?.accentColor;
-  const fn=String(window.saveStyle).slice(0,400);
-  let success='not-tested';
-  try{window.saveStyle();success='called';}catch(e){success='throws:'+e.message;}
-  let direct='not-tested';
-  try{localStorage.setItem('ragasaan_style_probe_v1',JSON.stringify({designs:state.designs}));direct='ok';}catch(e){direct='throws:'+e.message;}
-  return {before,after:JSON.parse(localStorage.getItem('ragasaan_style_v3')||'{}').designs?.a4?.accentColor,
-   current:state.designs.a4.accentColor,styleFn:fn,saveCall:success,direct,
-   storageLength:(localStorage.getItem('ragasaan_style_v3')||'').length,
-   stylesLength:JSON.stringify({designs:state.designs}).length};
- })));
-
  assert.notEqual(themeAfter.color,themeBefore.color,'Theme selection changes the print accent colour');
  assert.equal(themeAfter.saved,themeAfter.color,'Theme selection persists the print accent colour');
  assert.ok(themeAfter.previewText.includes(themeAfter.color),'Preview uses the newly selected accent colour');
@@ -116,8 +103,6 @@ try{
  assert.ok(await clientThemes.nth(1).evaluate(n=>n.classList.contains('active')),'Client theme click updates active style');
  const clientSheets=await approved.page.locator('#rs-client-paper .print-sheet').count();
  assert.ok(clientSheets>0,'Approved client has menu preview sheets');
- // TEMPORARY DIAGNOSTIC in isolated browser: determine whether the locked layout collapses html2pdf.
- await approved.page.evaluate(()=>document.body.classList.remove('ragasaan-locked'));
  const [clientDownload]=await Promise.all([
    approved.page.waitForEvent('download',{timeout:120000}),
    approved.page.locator('#rs-client-save-pdf').click()
@@ -160,14 +145,14 @@ try{
  assert.ok(await staffThemes.count()>1,'Staff theme presets rendered');
  await staffThemes.nth(1).click();
  const savedTheme=await page.evaluate(()=>{
-   const saved=JSON.parse(localStorage.getItem('ragasaan_style_v3')||'{}');
+   const saved=JSON.parse(localStorage.getItem('ragasaan_theme_styles_v1')||'{}');
    return {selected:window.ragaActiveThemeId,design:saved.designs?.a4,current:state.designs.a4};
  });
  assert.ok(savedTheme.selected,'Selected theme recorded');
  assert.equal(savedTheme.design.borderColor,savedTheme.current.borderColor,'Theme styling saved to local storage');
  await page.reload({waitUntil:'domcontentloaded'});
  await page.waitForTimeout(850);
- const storedTheme=await page.evaluate(()=>JSON.parse(localStorage.getItem('ragasaan_style_v3')||'{}').designs?.a4?.borderColor);
+ const storedTheme=await page.evaluate(()=>JSON.parse(localStorage.getItem('ragasaan_theme_styles_v1')||'{}').designs?.a4?.borderColor);
  assert.equal(storedTheme,savedTheme.current.borderColor,'Theme style persists after page reload');
  console.log('PASS Staff theme selection updates format style and persists after reload');
 
