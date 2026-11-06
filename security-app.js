@@ -736,10 +736,18 @@ async function saveClientPdf(){
  try{
   const job=window.html2pdf().set({margin:0,filename:'Ragasaan_Client_Design.pdf',image:{type:'jpeg',quality:.97},
    html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',onclone:doc=>{
-    window.__clientCloneMetrics={locked:doc.body.classList.contains('ragasaan-locked'),
-     htmlContainer:!!doc.querySelector('.html2pdf__container'),
-     visibleCapture:doc.querySelector('.html2pdf__container')?.getBoundingClientRect().toJSON()};
+    const capture=doc.querySelector('.html2pdf__container');
+    const prior=capture?.getBoundingClientRect().toJSON();
     doc.body.classList.remove('ragasaan-locked');
+    if(capture){
+      capture.style.setProperty('display','block','important');
+      capture.style.setProperty('width','210mm','important');
+      capture.style.setProperty('min-height','297mm','important');
+    }
+    window.__clientCloneMetrics={hadCapture:!!capture,prior,
+      after:capture?.getBoundingClientRect().toJSON(),
+      display:capture?doc.defaultView.getComputedStyle(capture).display:null,
+      parent:capture?.parentElement?.tagName,bodyClass:doc.body.className};
    }},
    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(root);
   await job.toCanvas();
