@@ -64,6 +64,21 @@ try{
  await client.context.close();
  console.log('PASS Browser client token is isolated to design/preview, print disabled before approval');
 
+ // Public menu users can select themes without creating or signing into a cloud account.
+ const guestTheme=await setupPage(false);
+ await guestTheme.page.evaluate(()=>switchTab('design'));
+ await guestTheme.page.locator('#rs-theme-gallery .raga-theme-card').nth(1).waitFor({state:'visible',timeout:20000});
+ const guestBefore=await guestTheme.page.evaluate(()=>state.designs.a4.accentColor);
+ await guestTheme.page.locator('#rs-theme-gallery .raga-theme-card').nth(1).click();
+ const guestResult=await guestTheme.page.evaluate(()=>({
+  color:state.designs.a4.accentColor,
+  saved:JSON.parse(localStorage.getItem('ragasaan_theme_styles_v1')||'{}').designs?.a4?.accentColor
+ }));
+ assert.notEqual(guestResult.color,guestBefore,'Public theme click changes preview design');
+ assert.equal(guestResult.saved,guestResult.color,'Public theme selection saves compact styling');
+ console.log('PASS Public theme picker updates preview without an Event Planner login');
+ await guestTheme.context.close();
+
  // Staff design theme: exercise the real gallery click and the visible A4 preview.
  const themeTest=await setupPage(true);
  const tp=themeTest.page;
@@ -155,6 +170,22 @@ try{
  const storedTheme=await page.evaluate(()=>JSON.parse(localStorage.getItem('ragasaan_theme_styles_v1')||'{}').designs?.a4?.borderColor);
  assert.equal(storedTheme,savedTheme.current.borderColor,'Theme style persists after page reload');
  console.log('PASS Staff theme selection updates format style and persists after reload');
+ // Event records stay in memory and are not written into localStorage on every edit.
+ await page.evaluate(()=>{
+   const session=eventSessions[0];
+   eventRecords.push({id:'temp-event',eventUid:'temp-event',sessionId:session.id,menuCourse:'Other',
+    name:'Do Not Persist This Draft',desc:'Transient menu item',allergens:[],mayContain:[],printFormats:['a4']});
+   onEventRecordsChanged();
+ });
+ assert.equal(await page.evaluate(()=>localStorage.getItem('ragasaan_style_v3')),null,
+   'Automatic local event snapshot storage must be disabled');
+ assert.ok(await page.evaluate(()=>eventRecords.some(r=>r.name==='Do Not Persist This Draft')),
+   'Unsaved draft remains editable in memory');
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.waitForTimeout(500);
+ assert.equal(await page.evaluate(()=>eventRecords.some(r=>r.name==='Do Not Persist This Draft')),false,
+   'Unsaved draft is not silently persisted in browser storage');
+ console.log('PASS Event menu edits are memory-only until Cloud Save / explicit JSON export');
 
  await page.evaluate(()=>{window.__printCount=0;window.print=()=>{window.__printCount++};});
  await page.evaluate(()=>{
