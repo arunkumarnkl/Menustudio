@@ -4902,11 +4902,13 @@ body.ragasaan-locked.raga-client-pdf-active > :not(#ragasaan-auth-root):not(scri
           else n.removeAttribute('contenteditable');
         });
         page.classList.remove('raga-preview-only-hidden');
-        page.style.cssText+=';width:210mm!important;min-height:297mm;height:297mm;box-sizing:border-box;transform:none!important;display:block!important;margin:0!important;break-inside:avoid';
+        // Preserve each page's original CSS display (grid/flex/block). Forcing
+        // display:block here destroys A8/A6/FoldTag and Canape grid alignment.
+        page.style.cssText+=';width:210mm!important;min-height:297mm;height:297mm;box-sizing:border-box;transform:none!important;margin:0!important;break-inside:avoid';
         if(i<sheets.length-1){const br=document.createElement('div');br.className='html2pdf__page-break';page.after(br);}
       });
       if(!sheets.length){exportRoot.remove();if(status)status.textContent='Nothing to save: choose a menu with pages first.';return false;}
-      window.__lastPdfExportMetrics={sheets:sheets.length,width:exportRoot.getBoundingClientRect().width,height:exportRoot.getBoundingClientRect().height,sheetWidth:sheets[0].getBoundingClientRect().width,sheetHeight:sheets[0].getBoundingClientRect().height};
+      window.__lastPdfExportMetrics={sheets:sheets.length,width:exportRoot.getBoundingClientRect().width,height:exportRoot.getBoundingClientRect().height,sheetWidth:sheets[0].getBoundingClientRect().width,sheetHeight:sheets[0].getBoundingClientRect().height,sheetDisplay:getComputedStyle(sheets[0]).display};
       try{
         await window.html2pdf().set({
           margin:0,filename:(String(state.event.title||'Ragasaan_Menu').replace(/[^a-z0-9_-]+/gi,'_')||'Ragasaan_Menu')+'_'+(summaryVisible?'Event_Summary':state.layout)+'.pdf',
