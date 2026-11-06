@@ -3276,6 +3276,17 @@ body.ragasaan-locked.raga-client-pdf-active > :not(#ragasaan-auth-root):not(scri
         if(typeof saved.includeClientSummary==='boolean')includeClientSummary=saved.includeClientSummary;
         if(saved.event) Object.assign(state.event,{title:saved.event.title||state.event.title,date:saved.event.date||state.event.date,venue:saved.event.venue||state.event.venue});
       } catch(e){console.warn('Saved style unavailable',e);}
+      // Apply the compact saved theme AFTER legacy styles; it remains usable when
+      // legacy storage was too large to update.
+      try {
+        const savedTheme=JSON.parse(localStorage.getItem('ragasaan_theme_styles_v1')||'null');
+        if(savedTheme?.designs)MENU_FORMATS.forEach(fmt=>{
+          const design=savedTheme.designs[fmt];
+          if(!design || typeof design!=='object')return;
+          ragaThemeStyleKeys.forEach(k=>{if(design[k]!==undefined)state.designs[fmt][k]=design[k];});
+        });
+        if(savedTheme?.id)window.ragaActiveThemeId=savedTheme.id;
+      }catch(e){console.warn('Stored menu theme unavailable',e);}
       applySharedLogos(); applyAppTheme('light');
       updateSessionPicker();renderFormatCheckboxes();renderBuilderSessionTabs();
       state.design=state.designs[state.layout];
@@ -3324,9 +3335,23 @@ body.ragasaan-locked.raga-client-pdf-active > :not(#ragasaan-auth-root):not(scri
     function applySharedLogos() {
       MENU_FORMATS.forEach(fmt=>{state.designs[fmt].logoUrl=state.sharedCompanyLogo||'';state.designs[fmt].coupleLogoUrl=state.sharedCoupleLogo||'';});
     }
+    const ragaThemeStyleKeys=['titleFont','bodyFont','textColor','accentColor','bgColor','borderColor','borderStyle','borderWidth','borderOutsetCm','titleFontSize','dishNameFontSize','descFontSize','allergenFontSize','frameMotif'];
+    function saveThemeStyles() {
+      // Store only typography/colours/borders; large embedded images must not prevent theme persistence.
+      const designs=Object.fromEntries(MENU_FORMATS.map(fmt=>[fmt,
+        Object.fromEntries(ragaThemeStyleKeys.filter(k=>state.designs[fmt]?.[k]!==undefined)
+          .map(k=>[k,state.designs[fmt][k]]))]));
+      try {
+        localStorage.setItem('ragasaan_theme_styles_v1',JSON.stringify({
+          id:window.ragaActiveThemeId||'',designs
+        }));
+        return true;
+      } catch(e){console.warn('Unable to store selected menu theme',e);return false;}
+    }
     function saveStyle() {
+      saveThemeStyles();
       try {localStorage.setItem('ragasaan_style_v3',JSON.stringify({designs:state.designs,eventSessions,eventRecords,companyLogo:state.sharedCompanyLogo||'',coupleLogo:state.sharedCoupleLogo||'',appTheme:'light',includeClientSummary,event:{title:state.event.title,date:state.event.date,venue:state.event.venue,partyNo:state.event.partyNo||''}}));}
-      catch(e){console.warn('Storage full; consider smaller logo images',e);}
+      catch(e){console.warn('Full style storage unavailable; compact menu theme remains saved',e);}
     }
     function applyAppTheme() {
       // One official interface palette. Print-format themes remain independent.
