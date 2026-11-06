@@ -727,6 +727,11 @@ async function saveClientPdf(){
  // Explicitly allow ONLY this temporary capture element in locked client view.
  // Other body children remain hidden and protected API routes remain inaccessible.
  document.body.appendChild(root);
+ window.__clientPdfCaptureMetrics={outer:root.getBoundingClientRect().toJSON(),cssDisplay:getComputedStyle(root).display,
+  sheets:root.querySelectorAll('.print-sheet').length,
+  firstSheet:root.querySelector('.print-sheet')?.getBoundingClientRect().toJSON(),
+  text:root.innerText.slice(0,240),locked:document.body.classList.contains('ragasaan-locked'),
+  scrollHeight:document.body.scrollHeight};
  try{await window.html2pdf().set({margin:0,filename:'Ragasaan_Client_Design.pdf',image:{type:'jpeg',quality:.97},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(root).save();if(status)status.textContent='PDF saved.';}
  catch(err){if(status)status.textContent='Unable to save PDF: '+err.message;}
  finally{root.remove();}
