@@ -174,3 +174,23 @@ body.ragasaan-locked #ragasaan-auth-root.raga-client-on {display:block;padding:0
   body.app-light :is(input,textarea,select):not([type="color"]) {color-scheme:light;}
   /* Browser print canvases and layout artwork are deliberately excluded. */
 }
+
+
+/* Client link is a fail-closed standalone design + print-preview workspace. */
+body.ragasaan-locked #ragasaan-auth-root.raga-client-on{display:block!important}
+#rs-client-print-controls{display:flex;align-items:center;flex-wrap:wrap;gap:9px;background:#f0f4ff;border:1px solid #cbd8ef;border-radius:8px;padding:8px;margin:8px 0;color:#273553}
+#rs-client-print-controls .raga-btn:disabled{opacity:.5;cursor:not-allowed}
+.raga-client-paper--actual>.print-sheet{box-sizing:border-box!important;flex-shrink:0!important;overflow:hidden!important}
+.raga-client-preview{box-sizing:border-box;min-width:0}
+@media print{
+ body.raga-client-print{display:block!important;background:#fff!important;overflow:visible!important}
+ body.raga-client-print #ragasaan-auth-root{display:block!important;position:static!important;inset:auto!important;width:210mm!important;padding:0!important;overflow:visible!important;background:#fff!important}
+ body.raga-client-print #rs-client-panel{display:block!important;position:static!important;padding:0!important}
+ body.raga-client-print .raga-client-shell{display:block!important;max-width:none!important;padding:0!important;margin:0!important}
+ body.raga-client-print .raga-client-side,body.raga-client-print .raga-client-preview-head,
+ body.raga-client-print .raga-client-preview>p,body.raga-client-print #rs-client-print-controls,body.raga-client-print #rs-client-pages{display:none!important}
+ body.raga-client-print .raga-client-preview{display:block!important;width:210mm!important;max-width:210mm!important;padding:0!important;margin:0!important;border:0!important;overflow:visible!important;background:#fff!important}
+ body.raga-client-print #rs-client-paper{display:block!important;zoom:1!important;width:210mm!important;max-width:210mm!important;min-height:0!important;margin:0!important;padding:0!important;overflow:visible!important;background:#fff!important}
+ body.raga-client-print #rs-client-paper .print-sheet{display:block!important;width:210mm!important;height:297mm!important;min-height:297mm!important;margin:0!important;padding:0!important;page-break-after:always;break-after:page;box-shadow:none!important}
+ body.raga-client-print #rs-client-paper .print-sheet:last-child{page-break-after:auto;break-after:auto}
+}
