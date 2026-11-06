@@ -1679,6 +1679,32 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   #summary-print-root .summary-item-may {color:#704600!important;font-weight:650!important;}
 }
 </style>
+
+<style id="raga-final-export-layout">
+@media screen and (min-width:850px){
+ body:has(#tab-export:not(.hidden)) #sidebar-controls.print-format-compact{width:20%!important;flex:0 0 20%!important;min-width:240px!important;max-width:27%!important;border-right:1px solid #cbd5e1!important}
+ body:has(#tab-export:not(.hidden)) #preview-main-panel{width:80%!important;flex:1 1 80%!important;min-width:0!important}
+ body:has(#tab-export:not(.hidden)) #preview-scroll-area{padding:14px!important}
+}
+@media screen and (max-width:849px){
+ body:has(#tab-export:not(.hidden)) #sidebar-controls.print-format-compact{width:35%!important;min-width:180px!important;max-width:35%!important;flex:0 0 35%!important}
+ body:has(#tab-export:not(.hidden)) #preview-main-panel{flex:1 1 65%!important;min-width:0!important}
+ body:has(#tab-export:not(.hidden)) #preview-scroll-area{padding:6px!important}
+}
+@media screen{
+ #tab-export{gap:7px!important}
+ #tab-export .grid.grid-cols-2.gap-1.pt-0{display:flex!important;flex-wrap:wrap!important;justify-content:flex-start!important;gap:7px!important}
+ #tab-export button[onclick*="downloadPDF"],#tab-export button[onclick*="triggerPrint"]{width:1cm!important;height:.5cm!important;min-width:1cm!important;min-height:.5cm!important;max-width:1cm!important;max-height:.5cm!important;padding:0!important;font-size:0!important;line-height:1!important;position:relative!important;overflow:visible!important}
+ #tab-export button[onclick*="downloadPDF"] i,#tab-export button[onclick*="triggerPrint"] i{font-size:10px!important;line-height:.5cm!important;margin:0!important}
+ #tab-export button[onclick*="downloadPDF"]::after,#tab-export button[onclick*="triggerPrint"]::after{content:'';position:absolute;inset:-7px -3px}
+ #raga-print-studio-preview-controls{background:#eaf4ff!important;color:#273853!important;border-color:#abc2dd!important;padding:6px!important;gap:5px!important}
+ #raga-print-studio-preview-controls strong{color:#4c397f!important}
+ #raga-print-studio-preview-controls small{color:#405574!important;font-size:10px!important}
+ #raga-print-studio-preview-controls .raga-page-button{padding:3px 6px!important;font-size:11px!important}
+ #preview-main-panel,#preview-scroll-area{background:#f8f6ff!important}
+}
+@media print{#ragasaan-admin,#ragasaan-cloud,#raga-print-studio-preview-controls{display:none!important}}
+</style>
 </head>
 <body class="app-light h-full flex flex-col font-sans antialiased overflow-hidden">
 
@@ -1950,17 +1976,6 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           </div>
           <small style="color:#cbd5e1">Choose a page to inspect. Print/PDF includes all pages regardless of selection.</small>
         </section>
-        <details id="raga-feedback-copy-editor" class="no-print bg-slate-950 px-3 py-2 rounded-lg border border-slate-800 space-y-2">
-          <summary class="text-xs font-semibold text-gold-400 cursor-pointer">Table Menu Card — Edit Guest Feedback Text</summary>
-          <p class="text-[11px] text-slate-400">These fields are editable even before an Admin QR is published. The back-page preview and Word export use this wording.</p>
-          <label class="block text-xs text-slate-300">Heading
-            <input id="raga-feedback-title-input" type="text" oninput="ragaUpdateFeedbackCopy('feedbackTitle',this.value)" class="block w-full mt-1 p-2 bg-slate-900 border border-slate-700 rounded text-white">
-          </label>
-          <label class="block text-xs text-slate-300">Message
-            <textarea id="raga-feedback-message-input" rows="3" oninput="ragaUpdateFeedbackCopy('feedbackMessage',this.value)" class="block w-full mt-1 p-2 bg-slate-900 border border-slate-700 rounded text-white"></textarea>
-          </label>
-          <button type="button" onclick="setLayout('half-a4')" class="raga-page-button">Preview Table Menu Card</button>
-        </details>
         <!-- Buffet Menu (A4) -->
         <div class="bg-slate-950 px-2 py-2 rounded-lg border border-slate-800 space-y-1">
           <div class="flex items-center justify-between">
@@ -2521,12 +2536,19 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       const sidebar = document.getElementById('sidebar-controls');
       const master = document.getElementById('tab-master');
       // Full-page meal planning. Only Styling & Graphics displays the live canvas beside controls.
-      sidebar.classList.remove('print-format-compact');
-      sidebar.classList.toggle('workspace-wide', tabId === 'builder' || tabId === 'export');
+      sidebar.classList.toggle('print-format-compact',tabId==='export');
+      sidebar.classList.toggle('workspace-wide', tabId === 'builder');
       sidebar.classList.toggle('hidden', tabId === 'master' || tabId === 'venues' || tabId === 'summary');
       master.classList.toggle('master-preview-split', tabId === 'master');
       previewMain.classList.toggle('hidden', tabId !== 'design' && tabId !== 'export');
-      if(tabId==='export')ragaSyncFeedbackCopyEditor();
+      if(tabId==='export')requestAnimationFrame(()=>{
+        const area=document.getElementById('preview-scroll-area'),sheet=document.querySelector('#paper-render-target .print-sheet');
+        if(area&&sheet){
+          state.zoom=Math.min(.98,Math.max(.32,(area.clientWidth-46)/(sheet.offsetWidth||794)));
+          document.getElementById('print-canvas-wrapper').style.transform='scale('+state.zoom+')';
+          const label=document.getElementById('zoom-level-text');if(label)label.textContent=Math.round(state.zoom*100)+'%';
+        }
+      });
       if (tabId === 'master') renderMasterDB();
       else if (tabId === 'venues') renderVenueDB();
       else if (tabId === 'summary') {if(!includeClientSummary){setClientSummaryEnabled(true);}renderEventSummary();}
@@ -4865,12 +4887,22 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <div id="rs-links-list" class="raga-list"></div>
         </section>
         <section class="raga-panel" data-rs-staff>
-          <h3>Client Design Submissions</h3>
-          <p>The client submits a theme, per-format fonts/colors/decorative borders and Table Menu Card couple details only. Review here; no JSON exchange is required.</p>
+          <h3>Pending Client Designs</h3>
+          <p>Client design submissions update the shared event immediately. Review the pending design before approving printing.</p>
           <div class="raga-actions"><button id="rs-load-submissions" class="raga-btn">Refresh Submissions</button><button id="rs-approve-print" class="raga-btn primary">Approve Printing</button></div>
           <p class="raga-help">Only the assigned Event Planner approves submitted designs and printing. Admin has oversight and may print without approval. Approval applies to the last saved cloud event.</p>
           <div id="rs-submissions-list" class="raga-list"></div><div id="rs-design-inspector" class="raga-help"></div>
         </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin-only configuration uses a separate panel, not the Cloud Events dialog. -->
+  <div id="ragasaan-admin" class="raga-cloud-backdrop no-print" role="dialog" aria-modal="true" aria-label="Admin Settings">
+    <div class="raga-cloud-sheet">
+      <header class="raga-cloud-header"><div><h2>Admin Settings</h2><p class="raga-help">Print Rule · User Profile · QR code · Logo</p></div><button type="button" id="rs-close-admin" class="raga-btn">Close ×</button></header>
+      <p id="rs-admin-message" class="raga-alert" role="status" aria-live="polite"></p>
+      <div class="raga-cloud-grid">
         <section class="raga-panel" data-rs-admin>
           <details>
             <summary class="raga-section-title" style="cursor:pointer">Local Browser Backup &amp; Restore · Advanced</summary>
@@ -4884,9 +4916,21 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           </details>
         </section>
         <section class="raga-panel" data-rs-admin id="rs-admin-feedback-panel">
-          <h3>Admin Settings · Guest Feedback QR</h3>
+          <h3>QR code</h3>
           <p class="raga-help">Upload the official guest-feedback QR image (PNG, JPG or WebP, maximum 150 KB). One approved image is shared across all events. Only the Admin can change or remove it.</p>
           <p class="raga-help"><strong>We Value Your Feedback</strong><br>Thank you for celebrating with us. Please scan the QR code below to share your experience.</p>
+        <details id="raga-feedback-copy-editor" class="no-print bg-slate-950 px-3 py-2 rounded-lg border border-slate-800 space-y-2">
+          <summary class="text-xs font-semibold text-gold-400 cursor-pointer">Guest Feedback Text · Admin</summary>
+          <p class="text-[11px] text-slate-400">Shared wording for the Table Menu Card back page, managed only by Admin.</p>
+          <label class="block text-xs text-slate-300">Heading
+            <input id="raga-feedback-title-input" type="text" oninput="ragaUpdateFeedbackCopy('feedbackTitle',this.value)" class="block w-full mt-1 p-2 bg-slate-900 border border-slate-700 rounded text-white">
+          </label>
+          <label class="block text-xs text-slate-300">Message
+            <textarea id="raga-feedback-message-input" rows="3" oninput="ragaUpdateFeedbackCopy('feedbackMessage',this.value)" class="block w-full mt-1 p-2 bg-slate-900 border border-slate-700 rounded text-white"></textarea>
+          </label>
+          <button type="button" onclick="setLayout('half-a4')" class="raga-page-button">Preview Table Menu Card</button>
+          <button type="button" id="rs-feedback-copy-save" class="raga-btn primary">Save Guest Feedback Wording</button><p id="rs-feedback-copy-status" class="raga-help" role="status"></p>
+        </details>
           <label for="rs-feedback-upload">Official QR code image</label>
           <input id="rs-feedback-upload" type="file" accept="image/png,image/jpeg,image/webp" class="raga-input">
           <div class="raga-actions"><button type="button" id="rs-feedback-save" class="raga-btn primary">Publish QR to All Events</button><button type="button" id="rs-feedback-remove" class="raga-btn danger">Remove QR</button></div>
@@ -4895,7 +4939,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <p class="raga-help">Printed position: Table Menu Card → back page → right side. If a right-side image is present, feedback appears below it; otherwise feedback is centered. If no QR is uploaded, this section is hidden.</p>
         </section>
         <section class="raga-panel" data-rs-admin id="rs-admin-company">
-          <h3>Official Company Logo · Admin</h3>
+          <h3>Logo</h3>
           <p class="raga-help">Publish one company logo to all users through D1. Select PNG, JPG or WebP; larger images up to 12 MB will be automatically resized to meet the server's 150 KB limit. The existing GitHub logo remains the fallback.</p>
           <input id="rs-company-upload" type="file" class="raga-input" accept="image/png,image/jpeg,image/webp">
           <div class="raga-actions"><button id="rs-company-publish" type="button" class="raga-btn primary">Publish Company Logo</button><button id="rs-company-remove" type="button" class="raga-btn danger">Use GitHub Logo Instead</button></div>
@@ -4903,7 +4947,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <p id="rs-company-status" class="raga-help" role="status" aria-live="polite"></p>
         </section>
         <section class="raga-panel" data-rs-admin id="rs-admin-options">
-          <h3>Meal Defaults &amp; Printing Rules · Admin</h3>
+          <h3>Print Rule</h3>
           <p class="raga-help">Choose the options shown to planners and the default used for new selections. Previously saved event values are retained.</p>
           <div id="rs-choices-editor"></div>
           <button id="rs-save-choices" type="button" class="raga-btn primary">Save Shared Defaults</button>
@@ -4928,7 +4972,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <div id="rs-client-format-choices"></div><button type="button" class="raga-btn primary" id="rs-save-client-formats">Save Client Formats</button>
         </section>
         <section class="raga-panel" data-rs-admin>
-          <h3>User Management · Admin</h3>
+          <h3>User Profile</h3>
           <p>Create and manage accounts. Edit profiles, reset passwords (8+ characters), and deactivate or reactivate users. Passwords cannot be viewed. Existing sessions are revoked after password changes.</p>
           <label>Name</label><input id="rs-new-planner-name" class="raga-input" maxlength="100">
           <label>Email</label><input id="rs-new-planner-email" class="raga-input" type="email" maxlength="254">
