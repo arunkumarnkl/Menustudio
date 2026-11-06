@@ -75,6 +75,8 @@ try{
  assert.ok(await clientThemes.nth(1).evaluate(n=>n.classList.contains('active')),'Client theme click updates active style');
  const clientSheets=await approved.page.locator('#rs-client-paper .print-sheet').count();
  assert.ok(clientSheets>0,'Approved client has menu preview sheets');
+ // TEMPORARY DIAGNOSTIC in isolated browser: determine whether the locked layout collapses html2pdf.
+ await approved.page.evaluate(()=>document.body.classList.remove('ragasaan-locked'));
  const [clientDownload]=await Promise.all([
    approved.page.waitForEvent('download',{timeout:120000}),
    approved.page.locator('#rs-client-save-pdf').click()
