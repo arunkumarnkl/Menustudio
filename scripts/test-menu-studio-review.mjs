@@ -281,3 +281,12 @@ pass('QR heading and message saved through an Admin-only D1 endpoint',
  client.includes("call('/admin/feedback-copy','PUT'")&&
  html.indexOf('id="raga-feedback-copy-editor"')>html.indexOf('id="ragasaan-admin"'));
 console.log('REVIEW CHECKS COMPLETE. Real browser, D1 and Word/PDF layout checks are required before production deployment.');
+
+// Regression checks: production client PDF and persisted staff design themes.
+pass('Client PDF uses visible normal-flow capture rather than offscreen fixed position',
+  client.includes("root.style.cssText='position:relative;display:block;width:210mm") &&
+  client.includes("document.body.appendChild(root);") &&
+  !client.includes("left:-20000px"));
+pass('Staff theme selection persists to local style and updates preview',
+  client.includes("if(typeof window.saveStyle==='function')window.saveStyle();") &&
+  client.includes("renderContextualControls();renderPreview();renderThemeGallery();"));
