@@ -89,7 +89,7 @@ body.ragasaan-locked #ragasaan-auth-root.raga-client-on {display:block;padding:0
 .raga-paper-dish{margin:4px 0 10px;font-size:12px;overflow-wrap:anywhere}
 .raga-paper-dish b{display:block}
 .raga-paper-desc{font-size:11px;margin:4px 0}
-.raga-paper-dish small{display:block;font-size:10px;color:#8d2c14;margin-top:3px}
+.raga-paper-dish small{display:block;font-size:10px;color:#8B1E20;font-weight:800;margin-top:3px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .raga-paper-welcome{font-style:italic;max-width:390px;margin:6px auto 11px;white-space:pre-wrap}
 .raga-paper-footer{margin-top:18px;border-top:1px solid #d1d5db;padding:13px 0;font-size:10px;color:#666}
 @media(max-width:850px){.raga-theme-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
