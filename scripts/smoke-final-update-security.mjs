@@ -87,7 +87,13 @@ try{
 
  await page.evaluate(()=>{window.__printCount=0;window.print=()=>{window.__printCount++};});
  await page.evaluate(()=>{
-  state.layout='a4';state.design=state.designs.a4;normalizeEventFormatRecords();renderPreview();
+  const breakfast=eventSessions.find(row=>row.id==='breakfast')||eventSessions[0];
+  eventRecords.push({id:'pdf-sample',eventUid:'pdf-sample',sessionId:breakfast.id,menuCourse:'Other',
+    name:'Bright Strawberry Salad with Almonds',desc:'Fresh berries, toasted almonds and creamy dressing',
+    allergens:['Tree nuts','Milk'],mayContain:['Eggs'],printFormats:['a4'],manual:true});
+  state.layout='a4';state.design=state.designs.a4;
+  state.design.showDescription=true;
+  normalizeEventFormatRecords();renderPreview();
  });
  assert.equal(await page.evaluate(()=>typeof window.html2pdf),'function','Real html2pdf.js library is available');
  const [pdfDownload]=await Promise.all([
@@ -96,7 +102,7 @@ try{
  ]);
  const pdfPath=await pdfDownload.path(),pdfBytes=readFileSync(pdfPath);
  assert.ok(pdfBytes.subarray(0,5).toString('ascii')==='%PDF-','Downloaded file is a real PDF');
- assert.ok(pdfBytes.length>3000,'PDF is not empty');
+ assert.ok(pdfBytes.length>10000,'Populated PDF seems blank or incomplete: '+pdfBytes.length+' bytes');
  assert.equal(await page.evaluate(()=>window.__printCount),0,'PDF Save does not launch native Print');
  console.log('PASS Real html2pdf.js conversion produces a downloadable PDF without invoking Print, bytes:',pdfBytes.length);
  await page.evaluate(()=>switchTab('export'));
