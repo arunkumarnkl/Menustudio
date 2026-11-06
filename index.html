@@ -2424,6 +2424,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       const design=state.designs?.['half-a4'];if(!design)return;
       design[key]=value;saveStyle();
       if(state.layout==='half-a4')renderPreview();
+      // The separate text controls remain editable even when the official QR has not been published.
     }
     function ragaSyncFeedbackCopyEditor(){
       const design=state.designs?.['half-a4'];if(!design)return;
@@ -4296,7 +4297,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       const node=event.target.closest?.('[data-preview-text]');
       if(!node || !document.getElementById('paper-render-target')?.contains(node)) return;
       const key=node.dataset.previewText;
-      if(previewTextKeys.has(key) && state.design) {state.design[key]=node.innerText;saveStyle();}
+      if(previewTextKeys.has(key) && state.design) {state.design[key]=node.innerText;saveStyle();if(key==='feedbackTitle'||key==='feedbackMessage')ragaSyncFeedbackCopyEditor();}
     });
     document.addEventListener('focusout', function(event) {
       const node=event.target.closest?.('[data-preview-text],[data-course-original]');
