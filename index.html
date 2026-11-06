@@ -3378,6 +3378,7 @@ body.ragasaan-locked.raga-client-pdf-active > :not(#ragasaan-auth-root):not(scri
         return true;
       } catch(e){console.warn('Unable to store selected menu theme',e);return false;}
     }
+    window.saveThemeStyles=saveThemeStyles;
     function saveStyle() {
       // Do not store event menus, records, images or sessions in the browser.
       // They remain in memory until explicitly saved to Cloud D1 or exported as JSON.
