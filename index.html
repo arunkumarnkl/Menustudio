@@ -3042,7 +3042,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       // Each dimension receives its own settings, not merely a shared A4 width slider.
       state.designs = Object.fromEntries(MENU_FORMATS.map(fmt => [fmt, {
         ...template, titleFontSize:10, dishNameFontSize:15, descFontSize:10, allergenFontSize:12, autoFitText:true,
-        logoWidth: 110, menuHeading:'Menu',
+        logoWidth: 110, menuHeading:'Menu', feedbackTitle:'We Value Your Feedback', feedbackMessage:'Thank you for celebrating with us. Please scan the QR code below to share your experience.',
         coupleLogoWidth: 100, borderOutsetCm:0.2, coupleOffsetX:0, coupleOffsetY:0, showDescription:false,
         foldTagsBottomHeightCm:3, foldTagsDividerWidthMm:0.3, foldTagsDividerColor:'#8f8572', foldTagsPanelInsetMm:2.5, foldTagsLogoWidth:100,
         showHalfBackLeftImage:false, showHalfBackRightImage:false,
@@ -4107,7 +4107,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           // Never show a placeholder QR that guests might mistakenly scan.
           const qrSource = window.ragaFeedbackQrData || '';
           const hasQR = /^data:image\/(?:png|jpeg|webp);base64,[a-z0-9+/=]+$/i.test(qrSource);
-          const formalFeedback = hasQR ? `<section aria-label="Guest feedback" style="text-align:center;max-width:85mm;margin:0 auto;padding:4mm 2mm;break-inside:avoid;color:${d.textColor}"><h3 class="menu-body-font" style="font-size:15px;line-height:1.3;color:${d.accentColor};font-weight:700;margin:0 0 2mm">We Value Your Feedback</h3><p class="menu-body-font" style="font-size:12px;line-height:1.45;margin:0 0 4mm">Thank you for celebrating with us. Please scan the QR code below to share your experience.</p><img src="${qrSource}" alt="Scan to share your feedback" style="display:block;width:38mm;height:38mm;max-width:100%;object-fit:contain;margin:0 auto;padding:2mm;background:#fff;border:.25mm solid #bbb;border-radius:1.5mm;image-rendering:auto"></section>` : '';
+          const formalFeedback = hasQR ? `<section aria-label="Guest feedback" style="text-align:center;max-width:85mm;margin:0 auto;padding:4mm 2mm;break-inside:avoid;color:${d.textColor}"><h3 contenteditable="true" data-preview-text="feedbackTitle" aria-label="Edit feedback heading" class="menu-body-font" style="font-size:15px;line-height:1.3;color:${d.accentColor};font-weight:700;margin:0 0 2mm">${escText(d.feedbackTitle ?? 'We Value Your Feedback')}</h3><p contenteditable="true" data-preview-text="feedbackMessage" aria-label="Edit feedback message" class="menu-body-font" style="font-size:12px;line-height:1.45;margin:0 0 4mm">${escText(d.feedbackMessage ?? 'Thank you for celebrating with us. Please scan the QR code below to share your experience.')}</p><img src="${qrSource}" alt="Scan to share your feedback" style="display:block;width:38mm;height:38mm;max-width:100%;object-fit:contain;margin:0 auto;padding:2mm;background:#fff;border:.25mm solid #bbb;border-radius:1.5mm;image-rendering:auto"></section>` : '';
           const rightBackPanel = `<div style="display:flex;flex-direction:column;min-width:0;height:100%;overflow:hidden"><div style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:${rightHasImage?'space-evenly':'center'};overflow:hidden">${rightHasImage?halfBackCenterImage('right',hasQR):''}${formalFeedback}</div><div style="padding-top:5px;text-align:center;flex-shrink:0">${brand()}</div></div>`;
           back.innerHTML=`${frame()}<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;height:100%"><div style="padding-right:8px;border-right:1px solid ${d.accentColor}55">${leftBackPanel}</div><div style="padding-left:8px">${rightBackPanel}</div></div>`;
           return back;
@@ -4266,7 +4266,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 
     // All static/format-specific preview strings are editable and saved per format.
     // Do not re-render during typing: it would move the cursor out of the field.
-    const previewTextKeys = new Set(['noticeTitle','noticeMessage','tableMenuHeading','emptyMenuMessage','emptyLiveMessage']);
+    const previewTextKeys = new Set(['noticeTitle','noticeMessage','tableMenuHeading','emptyMenuMessage','emptyLiveMessage','feedbackTitle','feedbackMessage']);
     document.addEventListener('input', function(event) {
       const node=event.target.closest?.('[data-preview-text]');
       if(!node || !document.getElementById('paper-render-target')?.contains(node)) return;
@@ -5088,8 +5088,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         // Respect the Admin-managed QR only; never generate a dummy QR.
         if(assets.backRight)rightBack.push(inlineImage(w,assets.backRight));
         if(assets.qr){
-          rightBack.push(w.paragraph('We Value Your Feedback',{bold:true,size:14,serif:true,align:'center',color:color(),after:150}));
-          rightBack.push(w.paragraph('Thank you for celebrating with us. Please scan the QR code below to share your experience.',{size:10,align:'center',after:140}));
+          if(d.feedbackTitle!=='')rightBack.push(w.paragraph(d.feedbackTitle ?? 'We Value Your Feedback',{bold:true,size:14,serif:true,align:'center',color:color(),after:150}));
+          if(d.feedbackMessage!=='')rightBack.push(w.paragraph(d.feedbackMessage ?? 'Thank you for celebrating with us. Please scan the QR code below to share your experience.',{size:10,align:'center',after:140}));
           rightBack.push(inlineImage(w,assets.qr));
         }
         rightBack.push(inlineImage(w,assets.company));
