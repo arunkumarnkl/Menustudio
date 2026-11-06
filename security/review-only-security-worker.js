@@ -70,12 +70,16 @@ function authorized(who,roles){return who&&roles.includes(who.role);}
 async function canEditEvent(env,who,eventId){
   const event=await env.DB.prepare('SELECT * FROM events WHERE id=?').bind(eventId).first();
   if(!event)return null;
+  if(event.status==='archived')return null;
   if(authorized(who,['admin','planner']))return event;
   return false;
 }
 function publicEvent(event){
   return {id:event.id,name:event.name,eventDate:event.event_date,venue:event.venue,partyNo:event.party_no,
-    plannerUserId:event.planner_user_id,status:event.status,createdAt:event.created_at,updatedAt:event.updated_at,eventData:parsedJson(event.event_json,{})};
+    plannerUserId:event.planner_user_id,createdBy:event.created_by,status:event.status,createdAt:event.created_at,updatedAt:event.updated_at,
+    clientDesignUpdatedAt:parsedJson(event.event_json,{})?.clientDesignUpdatedAt||null,
+    clientDesignPendingReview:parsedJson(event.event_json,{})?.clientDesignPendingReview===true,
+    eventData:parsedJson(event.event_json,{})};
 }
 function clientEvent(event){
   const e=parsedJson(event.event_json,{});
@@ -263,12 +267,21 @@ async function handle(req,env){
     const enabled=await allowedClientFormats(env);
     if(Object.keys(design.designs).some(f=>!enabled.includes(f)))return error('Client design format not permitted',403);
     const revisionRow=await env.DB.prepare('SELECT COALESCE(MAX(revision),0) n FROM design_submissions WHERE event_id=?').bind(link.event_id).first();
-    const submissionId=id();
-    await env.DB.prepare(`INSERT INTO design_submissions(id,event_id,client_link_id,revision,design_json,status)
-      VALUES(?,?,?,?,?,'submitted')`).bind(submissionId,link.event_id,link.id,(revisionRow?.n||0)+1,JSON.stringify(design)).run();
-    await env.DB.prepare("UPDATE events SET status='review',updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(link.event_id).run();
-    await audit(env,'client_design_submitted',null,link.event_id,{target_type:'design',target_id:submissionId});
-    return reply({submitted:true,id:submissionId,status:'submitted'},201);
+    const submissionId=id(),revision=(revisionRow?.n||0)+1;
+    // Commit allowlisted design changes to the event immediately, preserving all dish and allergen data.
+    const updated=applyApprovedDesign(parsedJson(link.event_json,{}),design);
+    updated.clientDesignUpdatedAt=new Date().toISOString();
+    updated.clientDesignPendingReview=true;
+    updated.clientDesignRevision=revision;
+    const eventJSON=JSON.stringify(updated);
+    if(eventJSON.length>500000)return error('Client design exceeds event storage limit',413);
+    await env.DB.batch([
+      env.DB.prepare(`INSERT INTO design_submissions(id,event_id,client_link_id,revision,design_json,status)
+        VALUES(?,?,?,?,?,'submitted')`).bind(submissionId,link.event_id,link.id,revision,JSON.stringify(design)),
+      env.DB.prepare("UPDATE events SET event_json=?,status='review',updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(eventJSON,link.event_id)
+    ]);
+    await audit(env,'client_design_immediately_applied',null,link.event_id,{target_type:'design',target_id:submissionId,revision});
+    return reply({submitted:true,applied:true,pendingReview:true,id:submissionId,revision,status:'submitted'},201);
   }
   // Ordinary cloud event storage is open by explicit owner request.
   // Admin settings, user management, master allergen editing, and client approval
@@ -586,7 +599,11 @@ async function handle(req,env){
     return reply({deactivated:true});
   }
   if(path==='/events'&&method==='GET'){
-    const result=await env.DB.prepare('SELECT * FROM events ORDER BY COALESCE(updated_at,created_at) DESC,created_at DESC LIMIT 500').all();
+    const includeArchived=url.searchParams.get('includeArchived')==='1';
+    const sql=includeArchived
+      ? 'SELECT * FROM events ORDER BY COALESCE(updated_at,created_at) DESC,created_at DESC LIMIT 500'
+      : "SELECT * FROM events WHERE status!='archived' ORDER BY COALESCE(updated_at,created_at) DESC,created_at DESC LIMIT 500";
+    const result=await env.DB.prepare(sql).all();
     return reply({events:(result.results||[]).map(publicEvent)});
   }
   if(path==='/events'&&method==='POST'){
@@ -626,6 +643,28 @@ async function handle(req,env){
       .bind(name,cleanString(body.eventDate??event.event_date,40),cleanString(body.venue??event.venue,200),cleanString(body.partyNo??event.party_no,40),planner,JSON.stringify(data),who.id,event.id).run();
     await audit(env,'event_updated',who,event.id,{target_type:'event',target_id:event.id});
     return reply({updated:true,status:'draft'});
+  }
+
+  m=path.match(/^\/events\/([0-9a-f-]{36})\/restore$/);
+  if(m&&method==='POST'){
+    const event=await env.DB.prepare('SELECT * FROM events WHERE id=?').bind(m[1]).first();
+    if(!event||event.status!=='archived')return error('Deleted event unavailable',404);
+    if(!(who.role==='admin'||who.role==='planner'&&(event.planner_user_id===who.id||event.created_by===who.id)))
+      return error('Only Admin or the event owner may restore this record',403);
+    await env.DB.prepare("UPDATE events SET status='draft',updated_by=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(who.id,event.id).run();
+    await audit(env,'event_restored',who,event.id,{target_type:'event',target_id:event.id});
+    return reply({restored:true,status:'draft'});
+  }
+  m=path.match(/^\/events\/([0-9a-f-]{36})$/);
+  if(m&&method==='DELETE'){
+    const event=await env.DB.prepare('SELECT * FROM events WHERE id=?').bind(m[1]).first();
+    if(!event)return error('Event unavailable',404);
+    if(!(who.role==='admin'||who.role==='planner'&&(event.planner_user_id===who.id||event.created_by===who.id)))
+      return error('Only Admin may delete any event; a planner may delete their own event',403);
+    if(event.status==='archived')return reply({deleted:true,recoverable:true,status:'archived'});
+    await env.DB.prepare("UPDATE events SET status='archived',updated_by=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(who.id,event.id).run();
+    await audit(env,'event_soft_deleted',who,event.id,{target_type:'event',target_id:event.id});
+    return reply({deleted:true,recoverable:true,status:'archived'});
   }
   m=path.match(/^\/events\/([0-9a-f-]{36})\/client-links$/);
   if(m&&method==='POST'){
@@ -689,7 +728,9 @@ async function handle(req,env){
     let mergedJson=null;
     if(status==='approved'){
       const design=normaliseDesign(parsedJson(sub.design_json,{}));
-      mergedJson=JSON.stringify(applyApprovedDesign(parsedJson(event.event_json,{}),design));
+      const snapshot=applyApprovedDesign(parsedJson(event.event_json,{}),design);
+      snapshot.clientDesignPendingReview=false;
+      mergedJson=JSON.stringify(snapshot);
       if(mergedJson.length>500000)return error('Approved design exceeds event storage limit',413);
     }
     const statements=[env.DB.prepare(`UPDATE design_submissions SET status=?,reviewed_by=?,reviewed_at=CURRENT_TIMESTAMP,review_note=? WHERE id=?`)
