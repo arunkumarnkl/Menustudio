@@ -25,10 +25,10 @@ async function network(route){
    if(path==='/client/view')return json(route,{event:{name:'Private wedding',venue:'Event venue',eventDate:'2026-11-18',menu:[],sessions:[],items:[]},clientFormats:['half-a4','a4'],expiresAt:'2027-11-01T00:00:00Z',canPrint:false});
    if(path==='/me')return json(route,{id:'admin-1',email:'admin@test.invalid',name:'Test Admin',role:'admin'});
    if(path==='/events')return json(route,{events:mockEvents});
+   if(path==='/users/planners'&&request.method()==='POST')return json(route,{id:'planner-created',role:'planner'},201);
    if(path==='/users/planners')return json(route,{planners:[{id:'p1',display_name:'Planner One',email:'one@test.invalid',active:1},{id:'p2',display_name:'Planner Two',email:'two@test.invalid',active:1}]});
    if(path==='/users')return json(route,{users:[{id:'admin-1',display_name:'Test Admin',email:'admin@test.invalid',role:'admin',active:1}]});
    if(path==='/admin/feedback-copy')return json(route,{title:'We Value Your Feedback',message:'Tell us about the evening.'});
-   if(path==='/users/planners'&&request.method()==='POST')return json(route,{id:'planner-created',role:'planner'},201);
    if(path.startsWith('/public/'))return json(route,{image:''});
    return json(route,{settings:{},available:{mealSpecs:{},serviceTypes:[]},planners:[],events:[],formats:['a4']});
  }
@@ -73,6 +73,12 @@ try{
  assert.equal(await page.locator('#ragasaan-cloud').evaluate(n=>n.classList.contains('open')),false);
  assert.equal(await page.locator('#rs-feedback-copy-save').count(),1,'Feedback belongs to Admin');
  assert.equal(await page.locator('#raga-feedback-copy-editor').count(),1);
+ await page.locator('#rs-new-planner-name').fill('New Planner');
+ await page.locator('#rs-new-planner-email').fill('new.planner@test.invalid');
+ await page.locator('#rs-new-planner-password').fill('SamplePassphrase2026!');
+ await page.locator('#rs-create-planner').click();
+ await page.locator('#rs-new-planner-status').getByText(/created successfully/i).waitFor({state:'visible',timeout:20000});
+ console.log('PASS Browser: Create Event Planner returns explicit confirmation');
  await page.locator('#rs-close-admin').click();
  console.log('PASS Browser: latest 20 cloud events, planner filter and standalone Admin settings');
 
