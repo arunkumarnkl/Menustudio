@@ -2799,50 +2799,35 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       return [item.menuCourse,item.category,item.subcategory,item.serviceType]
         .some(value=>/\bcanapes?\b/i.test(String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')));
     }
+    
+    function ragaAllowedFormats(session,course){
+      const mode=sessionMode(session);
+      if(mode==='Plated Service'){
+        if(course==='Canapé')return ['canape-grid','a8-grid','a6-grid','foldtags-grid'];
+        if(course==='Live Station')return ['a4-live'];
+        return normalizeGroupService(session,course)==='Plated Service'?['half-a4']:['a4','foldtags-grid','a8-grid','a6-grid','canape-grid'];
+      }
+      if(mode==='Canapé')return ['canape-grid','a8-grid','a6-grid','foldtags-grid'];
+      if(mode==='Live Station')return ['a4-live'];
+      return [...RAGA_LABEL_FORMATS];
+    }
+    function ragaInitialFormats(session,course){
+      const allowed=ragaAllowedFormats(session,course);
+      if(allowed.includes('half-a4'))return ['half-a4'];
+      if(allowed.includes('a4-live'))return ['a4-live'];
+      if(sessionMode(session)==='Canapé'||course==='Canapé')return ['foldtags-grid'];
+      return ['a4','foldtags-grid'].filter(fmt=>allowed.includes(fmt));
+    }
     function effectiveItemFormats(item){
-      const selected=new Set((Array.isArray(item.printFormats)?item.printFormats:[]).filter(f=>MENU_FORMATS.includes(f)));
-      const rule=ragaCurrentPrintRules||RAGA_PRINT_RULE_FALLBACK;
-      const companions=Array.isArray(rule.a4Companions)?rule.a4Companions:[];
-      const expandA4=chosen=>{
-        const out=new Set(chosen);
-        if(out.has('a4'))companions.filter(f=>MENU_FORMATS.includes(f)).forEach(f=>out.add(f));
-        return [...out];
-      };
-      const session=eventSessions.find(s=>s.id===item.sessionId);
-      const course=String(item.menuCourse||'Other');
-      // Category rules take precedence over the meal-wide service selection.
-      if(course==='Live Station')return ['a4-live'];
-      if(isCanapeDish(item)){
-        const allowed=['canape-grid','a8-grid','foldtags-grid'];
-        const configured=(session?.id==='dinner'&&Array.isArray(rule.dinnerCanape))?rule.dinnerCanape:allowed;
-        const valid=allowed.filter(f=>configured.includes(f));
-        const chosen=valid.filter(f=>selected.has(f));
-        return chosen.length?chosen:(selected.size?[]:valid);
-      }
-      const mode=session?sessionMode(session):'Buffet';
-      if(mode==='Plated Service')return ['half-a4'];
-      if(mode==='Buffet-Selective'&&session){
-        const served=normalizeGroupService(session,course);
-        if(served==='Plated Service')return ['half-a4'];
-        if(served==='Bowl Food')return [...selected].filter(f=>['foldtags-grid','a8-grid','a6-grid','canape-grid'].includes(f));
-        return expandA4([...selected].filter(f=>['a4','a8-grid','a6-grid','canape-grid','foldtags-grid'].includes(f)));
-      }
-      if(mode==='Bowl Food')return [...selected].filter(f=>['foldtags-grid','a8-grid','a6-grid','canape-grid'].includes(f));
-      return expandA4([...selected].filter(f=>['a4','a8-grid','a6-grid','canape-grid','foldtags-grid'].includes(f)));
+      const session=eventSessions.find(row=>row.id===item.sessionId);
+      if(!session)return [];
+      const selected=Array.isArray(item.printFormats)?item.printFormats:ragaInitialFormats(session,item.menuCourse);
+      return ragaAllowedFormats(session,item.menuCourse).filter(fmt=>selected.includes(fmt));
     }
     function normalizeEventFormatRecords(){
-      eventRecords.forEach(item=>{
-        const ses=eventSessions.find(x=>x.id===item.sessionId);
-        if(!ses||isCourseWise(ses)||!['Other','Starter',''].includes(String(item.menuCourse||'')))return;
-        const hint=String([item.category,item.subcategory].filter(Boolean).join(' ')).toLowerCase();
-        item.menuCourse=/dessert|sweet|pudding|cake|pastry/.test(hint)?'Dessert':/canap/.test(hint)?'Canapé':/live station/.test(hint)?'Live Station':'Main Course';
-      });
+      eventSessions.forEach(session=>ragaEnsureValidCourses(session));
       state.formatMenus=Object.fromEntries(MENU_FORMATS.map(fmt=>[fmt,[]]));
-      eventRecords.forEach(item=>{
-        effectiveItemFormats(item).forEach(fmt=>{
-          if(state.formatMenus[fmt])state.formatMenus[fmt].push(item);
-        });
-      });
+      eventRecords.forEach(item=>effectiveItemFormats(item).forEach(fmt=>state.formatMenus[fmt]?.push(item)));
       state.event.items=state.formatMenus[state.layout]||[];
     }
     function selectedEventSession(){return currentBuilderSession || eventSessions[0]?.id || 'breakfast'}
@@ -2884,7 +2869,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       if(event.target.matches('#builder-print-formats input[type="checkbox"]')){const session=selectedBuilderSession();if(session)session.formatSelection=selectedPrintFormats();syncRelevantTagCopies();}
     });
     function addEventDish(dish,menuCourse){
-      const formats=selectedPrintFormats();
+      const formats=ragaInitialFormats(selectedBuilderSession(),menuCourse);
       const copies={};
       const newItem={...JSON.parse(JSON.stringify(dish)),eventUid:eventUid(),sessionId:selectedEventSession(),menuCourse,serviceType:'',printFormats:formats,tagCopies:copies};
       eventRecords.push(newItem);
@@ -3834,7 +3819,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     }
     function selectedMenuCourse() {
       const select = document.getElementById('builder-course-select');
-      const session=selectedBuilderSession();if(!isCourseWise(session))return 'Other';
+      const session=selectedBuilderSession();if(!isCourseWise(session)&&!isMultiStationMode(session))return availableCourses(session)[0]||'Other';
       const course = String(select?.value || '').trim();
       if (!course) { alert('Please select a course (Starter, Main Course, Dessert, etc.) before adding the dish.'); select?.focus(); return ''; }
       return course;
