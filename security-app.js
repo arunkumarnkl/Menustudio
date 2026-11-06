@@ -733,7 +733,7 @@ async function saveClientPdf(){
   firstSheet:root.querySelector('.print-sheet')?.getBoundingClientRect().toJSON(),
   text:root.innerText.slice(0,240),locked:document.body.classList.contains('ragasaan-locked'),
   scrollHeight:document.body.scrollHeight};
- try{await window.html2pdf().set({margin:0,filename:'Ragasaan_Client_Design.pdf',image:{type:'jpeg',quality:.97},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(root).save();if(status)status.textContent='PDF saved.';}
+ try{await window.html2pdf().set({margin:0,filename:'Ragasaan_Client_Design.pdf',image:{type:'jpeg',quality:.97},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',onclone:doc=>doc.body.classList.remove('ragasaan-locked')},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(root).save();if(status)status.textContent='PDF saved.';}
  catch(err){if(status)status.textContent='Unable to save PDF: '+err.message;}
  finally{root.remove();document.body.classList.remove('raga-client-pdf-active');}
 }
