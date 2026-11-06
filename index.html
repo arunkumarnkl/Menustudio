@@ -1705,7 +1705,23 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 }
 @media print{#ragasaan-admin,#ragasaan-cloud,#raga-print-studio-preview-controls{display:none!important}}
 </style>
-</head>
+<style id="raga-library-final-styles">
+@media screen{
+ .raga-cloud-record{border:1px solid #d4daec!important;background:#fff!important;padding:0!important;margin-bottom:5px!important}
+ .raga-cloud-record>summary{cursor:pointer;list-style:disclosure-closed;padding:7px 10px;min-height:30px}
+ .raga-cloud-record[open]>summary{border-bottom:1px solid #dae0ef;background:#f5f5ff!important}
+ .raga-cloud-one-line{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:nowrap;font-size:12px;color:#304163!important}
+ .raga-cloud-one-line>strong{flex:1 1 36%;min-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .raga-cloud-one-line>span,.raga-cloud-one-line>small{flex:0 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .raga-cloud-details{padding:10px 12px;background:#fff}
+ .raga-cloud-filters{background:#f4f3ff!important}
+ .raga-cloud-filters label{font-size:13px}
+ .raga-pending-task{border-left:3px solid #7859ae!important}
+ #rs-client-pending-badge{background:#f2e8ff;border:1px solid #a28bd9;color:#39236b;cursor:pointer;font-size:11px;font-weight:700;border-radius:8px;padding:7px}
+ #ragasaan-admin .raga-cloud-sheet{max-width:1300px}
+ #ragasaan-admin .raga-panel{scroll-margin-top:15px}
+}
+</style></head>
 <body class="app-light h-full flex flex-col font-sans antialiased overflow-hidden">
 
   <!-- Top Navigation Bar -->
@@ -1742,6 +1758,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 
     <!-- Quick Actions -->
     <div class="flex items-center gap-2">
+      <button type="button" id="rs-client-pending-badge" class="raga-btn" hidden aria-label="Pending client designs">Design tasks</button>
       <button type="button" id="rs-open-cloud" class="px-3 py-1.5 bg-slate-800 border border-amber-800 text-amber-300 font-semibold rounded-lg text-xs">☁ Cloud Events</button>
       <button type="button" data-rs-admin hidden id="rs-open-admin-qr" class="px-3 py-1.5 bg-slate-800 border border-amber-800 text-amber-300 font-semibold rounded-lg text-xs">⚙ Admin Settings</button>
       <span id="rs-user-info" class="text-[10px] text-slate-300"></span>
@@ -4888,6 +4905,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         </section>
         <section class="raga-panel" data-rs-staff>
           <h3>Pending Client Designs</h3>
+          <p id="rs-pending-designs-description" class="raga-help">In-app tasks assigned to Event Planners. Review each client design, then open the Print Studio.</p>
+          <div id="rs-pending-designs" class="raga-list" aria-live="polite"></div>
           <p>Client design submissions update the shared event immediately. Review the pending design before approving printing.</p>
           <div class="raga-actions"><button id="rs-load-submissions" class="raga-btn">Refresh Submissions</button><button id="rs-approve-print" class="raga-btn primary">Approve Printing</button></div>
           <p class="raga-help">Only the assigned Event Planner approves submitted designs and printing. Admin has oversight and may print without approval. Approval applies to the last saved cloud event.</p>
@@ -4977,7 +4996,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <label>Name</label><input id="rs-new-planner-name" class="raga-input" maxlength="100">
           <label>Email</label><input id="rs-new-planner-email" class="raga-input" type="email" maxlength="254">
           <label>Initial password (8+ characters)</label><input id="rs-new-planner-password" class="raga-input" type="password" minlength="8" autocomplete="new-password">
-          <div class="raga-actions"><button id="rs-create-planner" class="raga-btn primary">Create Event Planner</button></div>
+          <div class="raga-actions"><button id="rs-create-planner" type="button" class="raga-btn primary">Create Event Planner</button></div>
+          <p id="rs-new-planner-status" class="raga-help" role="status" aria-live="polite"></p>
           <div id="rs-planner-list" class="raga-list"></div>
         </section>
       </div>
