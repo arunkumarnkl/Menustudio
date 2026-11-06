@@ -2592,7 +2592,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       {id:'hi-tea',name:'HI Tea',time:'16:00',serviceMode:'Buffet',formatSelection:[...RAGA_INITIAL_MEAL_DEFAULTS['hi-tea'].formats]},
       {id:'late-night',name:'Late Night Snack',time:'22:30',serviceMode:'Other',formatSelection:[...RAGA_INITIAL_MEAL_DEFAULTS['late-night'].formats]}
     ];
-    const SERVICE_TYPES=['Buffet','Plated Service','Bowl Food','Canapé','Live Station','Thali','Other'];
+    const SERVICE_TYPES=['Buffet','Thali','Multi Stations','Plated Service','Bowl Food','Canapé','Live Station','Other'];
     let currentBuilderSession='breakfast';
     const SUMMARY_PREF='ragasaan_include_client_summary_v1';
     let includeClientSummary = localStorage.getItem(SUMMARY_PREF)==='true';
@@ -2605,45 +2605,93 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       if(id==='late-night'||name==='late night snack')return 'late-night';
       return 'custom';
     }
-    function sessionChoices(session){
-      const kind=sessionKind(session);
-      const adminChoices=window.ragaAdminChoices?.serviceModes?.enabled;
-      const mealChoices=window.ragaMealDefaults?.[kind]?.enabledServices;
-      const filter=values=>{
-        if(!Array.isArray(adminChoices)&&!Array.isArray(mealChoices))return values;
-        // Existing Admin choice lists predate the new Dinner Buffet-Selective mode.
-        // Offer it until the administrator explicitly includes it in a newly saved list.
-        const allowed=values.filter(([id])=>((!Array.isArray(adminChoices)||adminChoices.includes(id)) || (id==='Buffet-Selective' && sessionKind(session)==='dinner'))&&(!Array.isArray(mealChoices)||mealChoices.includes(id)));
-        const old=String(session.serviceMode||'');
-        if(old&&values.some(([id])=>id===old)&&!allowed.some(([id])=>id===old))allowed.push([old,old+' (saved event)']);
-        return allowed.length?allowed:values.slice(0,1);
-      };
-
-      if(kind==='breakfast'||kind==='hi-tea')return filter([['Buffet','Buffet']]);
-      if(kind==='lunch')return filter([['Buffet','Buffet · one section'],['Regular Buffet','Regular Buffet (saved events)'],['Thali','Thali · one section'],['Plated Service','Plated Service · course-wise']]);
-      if(kind==='dinner')return filter([['Plated Service','Plated Service · course-wise'],['Buffet-Selective','Buffet-Selective · choose Plated / Buffet by course'],['Buffet','Buffet · one section'],['Thali','Thali · one section'],['Bowl Food','Bowl Food · one section']]);
-      if(kind==='late-night')return filter([['Other','Other']]);
-      return filter([['Buffet','Buffet'],['Plated Service','Plated Service · course-wise'],['Other','Other']]);
+    
+    // All meal sessions offer all styles; old "Regular Buffet" becomes Multi Stations.
+    const RAGA_SESSION_MODES=['Buffet','Thali','Multi Stations','Plated Service','Bowl Food','Canapé','Live Station','Other'];
+    const RAGA_PLATED_COURSES=['Canapé','Live Station','Starter','Main Course','Dessert'];
+    const RAGA_LABEL_FORMATS=['a4','foldtags-grid','a6-grid','a8-grid','canape-grid'];
+    const ragaCanonicalMode=value=>value==='Regular Buffet'||value==='Buffet – (saved Events)'||value==='Buffet - (saved Events)'?'Multi Stations':value==='Buffet-Selective'||value==='Table Service'||value==='Mixed Courses'?'Plated Service':value;
+    const ragaStationKey=id=>'station:'+id;
+    const ragaIsStationCourse=course=>String(course||'').startsWith('station:');
+    function ragaEnsureStations(session){
+      if(!Array.isArray(session.stations))
+        session.stations=Array.from({length:6},(_,i)=>({id:'station-'+(i+1),name:'Station '+(i+1)}));
+      session.stations=session.stations.filter(x=>x&&x.id).map((x,i)=>({id:String(x.id).slice(0,80),name:String(x.name||('Station '+(i+1))).slice(0,100)}));
+      return session.stations;
     }
+    function ragaEnsureLiveStations(session){
+      if(!Array.isArray(session.liveStations))session.liveStations=[{id:'live-1',name:'Live Station 1'}];
+      session.liveStations=session.liveStations.filter(x=>x&&x.id).map((x,i)=>({id:String(x.id).slice(0,80),name:String(x.name||('Live Station '+(i+1))).slice(0,100)}));
+      return session.liveStations;
+    }
+    function sessionChoices(session){return RAGA_SESSION_MODES.map(mode=>[mode,mode]);}
     function sessionMode(session){
-      if(session.serviceMode==='Table Service'||session.serviceMode==='Mixed Courses')session.serviceMode='Plated Service';
-      const modes=sessionChoices(session).map(([v])=>v);
-      if(modes.includes(session.serviceMode))return session.serviceMode;
-      const d={breakfast:'Buffet',lunch:'Regular Buffet',dinner:'Plated Service','hi-tea':'Buffet','late-night':'Other',custom:'Buffet'};
-      const preferred=window.ragaAdminChoices?.serviceModes?.default;const allowed=sessionChoices(session).map(x=>x[0]);
-      return allowed.includes(preferred)?preferred:(allowed.includes(d[sessionKind(session)])?d[sessionKind(session)]:allowed[0]);
+      const previous=String(session.serviceMode||'');
+      if(previous)session.serviceMode=ragaCanonicalMode(previous);
+      if(RAGA_SESSION_MODES.includes(session.serviceMode))return session.serviceMode;
+      const defaults={breakfast:'Buffet',lunch:'Buffet',dinner:'Plated Service','hi-tea':'Buffet','late-night':'Buffet',custom:'Buffet'};
+      return defaults[sessionKind(session)]||'Buffet';
     }
-    function isCourseWise(session){return ['Plated Service','Buffet-Selective'].includes(sessionMode(session));}
+    function isMultiStationMode(session){return sessionMode(session)==='Multi Stations';}
+    function isCourseWise(session){return sessionMode(session)==='Plated Service';}
     function availableCourses(session){
-      if(!isCourseWise(session))return ['Main Course','Dessert','Canapé','Live Station'];const all=['Starter','Main Course','Dessert','Canapé','Live Station'];const allowed=window.ragaAdminChoices?.menuCategories?.enabled;return Array.isArray(allowed)?(all.filter(x=>allowed.includes(x)).length?all.filter(x=>allowed.includes(x)):['Starter']):all;
+      const mode=sessionMode(session);
+      if(mode==='Multi Stations')return ragaEnsureStations(session).map(station=>ragaStationKey(station.id));
+      if(mode==='Plated Service')return [...RAGA_PLATED_COURSES];
+      if(mode==='Live Station')return ['Live Station'];
+      if(mode==='Canapé')return ['Canapé'];
+      return ['Other'];
     }
-    function courseDisplay(session,course){return isCourseWise(session)?({'Main Course':'Main'}[course]||course||'Other'):({'Main Course':'Mains Menu','Dessert':'Desserts','Other':'Mains Menu'}[course]||course||'Mains Menu');}
+    function courseDisplay(session,course){
+      if(isMultiStationMode(session))
+        return ragaEnsureStations(session).find(station=>ragaStationKey(station.id)===course)?.name||'Unassigned Station';
+      if(course==='Other'||!course)return 'General / Buffet Items';
+      return course==='Main Course'?'Main Course':String(course);
+    }
+    function ragaDefaultPlatedCourse(item){
+      if(RAGA_PLATED_COURSES.includes(item?.ragaPlatedCourse))return item.ragaPlatedCourse;
+      if(RAGA_PLATED_COURSES.includes(item?.menuCourse))return item.menuCourse;
+      const hint=String([item?.category,item?.subcategory].filter(Boolean).join(' ')).toLowerCase();
+      return /dessert|sweet|pudding|cake|pastry/.test(hint)?'Dessert':/canap/.test(hint)?'Canapé':/live station/.test(hint)?'Live Station':'Main Course';
+    }
+    function ragaRouteSessionItems(session,newValue){
+      const next=ragaCanonicalMode(newValue),old=sessionMode(session);
+      if(!RAGA_SESSION_MODES.includes(next)||old===next)return false;
+      const records=eventRecords.filter(item=>item.sessionId===session.id);
+      if(old==='Multi Stations')records.forEach(item=>{if(ragaIsStationCourse(item.menuCourse))item.ragaStationCourse=item.menuCourse;});
+      if(old==='Plated Service')records.forEach(item=>{if(RAGA_PLATED_COURSES.includes(item.menuCourse))item.ragaPlatedCourse=item.menuCourse;});
+      session.serviceMode=next;
+      if(next==='Multi Stations')ragaEnsureStations(session);
+      if(next==='Plated Service'||next==='Live Station')ragaEnsureLiveStations(session);
+      const courses=availableCourses(session);
+      for(const item of records){
+        if(next==='Multi Stations'){
+          item.menuCourse=courses.includes(item.ragaStationCourse)?item.ragaStationCourse:(courses[0]||'Other');
+        }else if(next==='Plated Service')item.menuCourse=ragaDefaultPlatedCourse(item);
+        else item.menuCourse=courses[0]||'Other';
+      }
+      // Keep all dish records, but replace the print defaults for the new style.
+      session.categoryFormats={};
+      session.formatSelection=[...new Set(courses.flatMap(course=>ragaInitialFormats(session,course)))];
+      for(const item of records)item.printFormats=[...ragaInitialFormats(session,item.menuCourse)];
+      return true;
+    }
+    function ragaEnsureValidCourses(session){
+      const courses=availableCourses(session);
+      for(const item of eventRecords.filter(row=>row.sessionId===session.id)){
+        if(courses.includes(item.menuCourse))continue;
+        if(isCourseWise(session))item.menuCourse=ragaDefaultPlatedCourse(item);
+        else if(isMultiStationMode(session))item.menuCourse=courses.includes(item.ragaStationCourse)?item.ragaStationCourse:(courses[0]||'Other');
+        else item.menuCourse=courses[0]||'Other';
+      }
+    }
     function normalizeGroupService(session,course){
-      if(!isCourseWise(session))return sessionMode(session)==='Regular Buffet'?'Buffet':sessionMode(session);
-      if(course==='Canapé')return 'Canapé';
-      if(course==='Live Station')return 'Live Station';
-      if(['Starter','Main Course','Dessert'].includes(course))return ensureSessionServices(session)[course]||'Plated Service';
-      return 'Plated Service';
+      const mode=sessionMode(session);
+      if(mode==='Multi Stations')return 'Buffet';
+      if(mode!=='Plated Service')return mode;
+      if(course==='Canapé'||course==='Live Station')return course;
+      return ['Starter','Main Course','Dessert'].includes(course)
+        ?ensureSessionServices(session)[course]||'Plated Service':'Plated Service';
     }
     function defaultServiceTypes(session){return {'Canapé':'Canapé','Live Station':'Live Station','Starter':'Plated Service','Main Course':'Plated Service','Dessert':'Plated Service','Other':'Buffet'};}
     function ensureSessionServices(session){session.courseServices={...defaultServiceTypes(session),...(session.courseServices||{})};for(const key of Object.keys(session.courseServices)){if(session.courseServices[key]==='Table Service')session.courseServices[key]='Plated Service';}return session.courseServices;}
@@ -2685,31 +2733,22 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       renderBuilderSessionTabs();renderFormatCheckboxes();renderActiveMenuItems();window.ragaRenderMealCards?.();
     }
     function setActiveSessionTime(time){const session=selectedBuilderSession();if(session)editEventSession(session.id,'time',time);}
-    function setSessionMode(value){
-      const session=selectedBuilderSession();if(!session||!sessionChoices(session).some(x=>x[0]===value))return;
-      session.serviceMode=value;
-      if(!isCourseWise(session))session.courseTimes={};
-      if(value==='Buffet-Selective'){
-        const services=ensureSessionServices(session);
-        for(const course of ['Starter','Main Course','Dessert']){
-          if(!['Plated Service','Buffet'].includes(services[course]))services[course]='Plated Service';
-        }
-      }
-      onEventRecordsChanged();
-    }
+    function setSessionMode(value){const session=selectedBuilderSession();if(session&&ragaRouteSessionItems(session,value))onEventRecordsChanged();}
     function setCourseTime(sessionId,course,time){
       const session=eventSessions.find(s=>s.id===sessionId);if(!session)return;
       session.courseTimes={...(session.courseTimes||{}),[course]:time};
       saveStyle();renderEventSummary();
     }
     function updateCourseService(sessionId,course,type){
-      const session=eventSessions.find(s=>s.id===sessionId);if(!session||!isCourseWise(session))return;
-      const standard={'Starter':['Plated Service','Buffet'],'Main Course':['Buffet','Plated Service','Bowl Food'],'Dessert':['Buffet','Plated Service']};
-      if(sessionMode(session)==='Buffet-Selective') standard['Main Course']=['Plated Service','Buffet'];
-      const configured=window.ragaMealDefaults?.[sessionKind(session)]?.courses?.[course]?.enabled;
-      const allowed=Array.isArray(configured)?standard[course]?.filter(v=>configured.includes(v)):standard[course];
-      if(!allowed?.includes(type))return;
-      ensureSessionServices(session)[course]=type;onEventRecordsChanged();
+      const session=eventSessions.find(row=>row.id===sessionId);
+      if(!session||!isCourseWise(session)||!['Starter','Main Course','Dessert'].includes(course))return;
+      if(!['Plated Service','Buffet','Bowl Food','Thali'].includes(type))return;
+      ensureSessionServices(session)[course]=type;
+      session.categoryFormats={...(session.categoryFormats||{})};
+      delete session.categoryFormats[course];
+      eventRecords.filter(item=>item.sessionId===session.id&&item.menuCourse===course)
+        .forEach(item=>{item.printFormats=[...ragaInitialFormats(session,course)];});
+      onEventRecordsChanged();
     }
     function setClientSummaryEnabled(checked){
       includeClientSummary=!!checked;
