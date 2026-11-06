@@ -5168,17 +5168,28 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     try{
       const w=W(),parts=[],items=selectedForFormat(format),a4=format==='a4',d=state.designs?.[format]||{},assets=await wordAssets(format);
       if(a4){
-        const grouped=eventSessions.map(s=>({s,rows:items.filter(x=>x.sessionId===s.id)})).filter(x=>x.rows.length);
+        const grouped=[];
+        for(const session of eventSessions){
+          const rows=items.filter(x=>x.sessionId===session.id);
+          if(!rows.length)continue;
+          if(isMultiStationMode(session)){
+            for(const station of ragaEnsureStations(session)){
+              const stationRows=rows.filter(item=>item.menuCourse===ragaStationKey(station.id));
+              if(stationRows.length)grouped.push({s:session,rows:stationRows,stationName:station.name});
+            }
+          }else grouped.push({s:session,rows,stationName:''});
+        }
         if(!grouped.length){parts.push(...eventLine(w,assets.company),w.paragraph('No A4 Buffet Menu dishes selected.',{size:10,align:'center'}));}
         for(let i=0;i<grouped.length;i++){
-          const {s,rows}=grouped[i];if(i)parts.push(w.pageBreak());
+          const {s,rows,stationName}=grouped[i];if(i)parts.push(w.pageBreak());
           parts.push(...eventLine(w,assets.company));
           if(d.showMenuHeading!==false)parts.push(w.paragraph(d.menuHeading||'Menu',{bold:true,size:18,serif:true,align:'center',color:color(),after:110}));
           if(s.showPrintHeading!==false)parts.push(w.paragraph(s.printHeading??s.name,{bold:true,size:13,align:'center',after:160,color:color()}));
+          if(stationName)parts.push(w.paragraph(stationName,{bold:true,size:14,align:'center',after:120,color:color()}));
           let prev='',count=0;
           for(const item of (isCourseWise(s)?rows:[...rows].sort((a,b)=>{const rank=c=>c==='Main Course'?0:c==='Dessert'?1:c==='Canapé'?2:c==='Live Station'?3:4;return rank(a.menuCourse)-rank(b.menuCourse)}))){
             const group=getGroupName(s,item);
-            if(group!==prev){parts.push(w.paragraph(group,{bold:true,size:11,color:color(),align:'center',after:100}));prev=group;}
+            if(group!==prev&&!stationName){parts.push(w.paragraph(group,{bold:true,size:11,color:color(),align:'center',after:100}));prev=group;}
             parts.push(...menuItem(w,item,++count));
           }
           parts.push(w.paragraph('RAGASAAN',{bold:true,size:11,align:'center',color:color(),after:0}));
