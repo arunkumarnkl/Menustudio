@@ -726,6 +726,7 @@ async function saveClientPdf(){
  sheets.forEach((page,i)=>{const el=page.cloneNode(true);el.style.cssText+=';width:210mm!important;height:297mm!important;zoom:1!important;transform:none!important;margin:0!important';el.removeAttribute('contenteditable');root.appendChild(el);if(i<sheets.length-1){const br=document.createElement('div');br.className='html2pdf__page-break';root.appendChild(br);}});
  // Explicitly allow ONLY this temporary capture element in locked client view.
  // Other body children remain hidden and protected API routes remain inaccessible.
+ document.body.classList.add('raga-client-pdf-active');
  document.body.appendChild(root);
  window.__clientPdfCaptureMetrics={outer:root.getBoundingClientRect().toJSON(),cssDisplay:getComputedStyle(root).display,
   sheets:root.querySelectorAll('.print-sheet').length,
@@ -734,7 +735,7 @@ async function saveClientPdf(){
   scrollHeight:document.body.scrollHeight};
  try{await window.html2pdf().set({margin:0,filename:'Ragasaan_Client_Design.pdf',image:{type:'jpeg',quality:.97},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(root).save();if(status)status.textContent='PDF saved.';}
  catch(err){if(status)status.textContent='Unable to save PDF: '+err.message;}
- finally{root.remove();}
+ finally{root.remove();document.body.classList.remove('raga-client-pdf-active');}
 }
 async function submitClient(){if(!s.clientToken)return;
  const btn=$('rs-submit-design');btn.disabled=true;$('rs-client-notice').textContent='Submitting design…';
