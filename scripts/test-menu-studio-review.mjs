@@ -83,7 +83,9 @@ const sandbox={document:{getElementById:()=>({value:'2026-11-25'})},state:{event
 vm.runInNewContext(fileNameSrc+'globalThis.ragaDownloadFilename=ragaDownloadFilename;',sandbox);
 assert.equal(sandbox.ragaDownloadFilename('Menu_A4.docx'),'25-11-North Mymms Park.docx');
 pass('Word filename removes full venue address and format suffix',true);
-pass('Word regular menu item has no ordinal; summary still uses numbers',html.includes("const out=[w.paragraph(String(item.name||'Unnamed dish')")&&html.includes("cols[idx].push(w.paragraph(`${++num}."));
+pass('Word regular menu item has no ordinal; summary still uses numbers',
+  html.includes("const out=[w.paragraph(name,{bold:true,size:10") &&
+  html.includes("cols[idx].push(w.paragraph(`${++num}. ${ragaDisplayText(item.name"));
 pass('Word two-column layout uses fixed geometry',html.includes('<w:tblLayout w:type="fixed"/>')&&html.includes('<w:vAlign w:val="top"/>'));
 
 pass('Cloud records sorted then limited to latest five in UI',client.includes('const visible=s.cloudShowArchive?sorted:sorted.slice(0,5)'));
