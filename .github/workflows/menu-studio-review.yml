@@ -1,0 +1,26 @@
+name: Menu Studio review checks (no deployment)
+on:
+  push:
+    branches:
+      - menu-studio-completion-2026-11-06
+  pull_request:
+    paths:
+      - index.html
+      - security-app.js
+      - security/**
+      - scripts/test-menu-studio-review.mjs
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  syntax-and-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate Menu Studio without deploying
+        run: node scripts/test-menu-studio-review.mjs
