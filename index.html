@@ -4694,10 +4694,10 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       const logoImage=()=>image(d.logoUrl,d.logoWidth);
       const brideImage=()=>d.showCoupleLogo?image(d.coupleLogoUrl,d.coupleLogoWidth):[];
       const itemContents=(item)=>[
-        P(item.name,d.dishNameFontSize,{bold:true,after:65}),
-        ...(d.showDescription===true && item.desc?[P(item.desc,d.descFontSize,{after:65})]:[]),
-        P('Allergens: '+((item.allergens||[]).join(', ')||'None declared'),d.allergenFontSize,{color:rgb(d.accentColor),after:30}),
-        ...((item.mayContain||[]).length?[P('May Contain: '+item.mayContain.join(', '),d.allergenFontSize,{after:85})]:[])
+        P(ragaDisplayText(item.name,'dish',format),d.dishNameFontSize,{bold:true,after:65}),
+        ...(d.showDescription===true && item.desc?[P(ragaDisplayText(item.desc,'description',format),d.descFontSize,{after:65})]:[]),
+        P('Allergens: '+((item.allergens||[]).map(v=>ragaDisplayText(v,'allergen',format)).join(', ')||'None declared'),d.allergenFontSize,{bold:true,color:'8B1E20',after:30}),
+        ...((item.mayContain||[]).length?[P('May Contain: '+item.mayContain.map(v=>ragaDisplayText(v,'allergen',format)).join(', '),d.allergenFontSize,{bold:true,color:'704600',after:85})]:[])
       ];
       const headings=()=>[P(state.event.title,d.titleFontSize,{bold:true,color:rgb(d.accentColor),after:100}),
         ...brideImage(),P(state.event.venue,d.descFontSize),P(state.event.date,d.descFontSize,{after:250})];
@@ -5172,10 +5172,15 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     w.paragraph([state.event.date,state.event.venue].filter(Boolean).join(' · '),{size:9,align:'center',after:90}),
     inlineImage(w,company)
   ];}
-  function menuItem(w,item,index){
+  function menuItem(w,item,index,format='a4'){
     const desc=String(item.desc||item.description||'').trim();
-    const out=[w.paragraph(String(item.name||'Unnamed dish'),{bold:true,size:10,after:desc?20:70})];
-    if(desc)out.push(w.paragraph(desc,{size:9,color:'505050',after:70}));
+    const a=(item.allergens||[]).map(value=>ragaDisplayText(value,'allergen',format));
+    const m=(item.mayContain||[]).map(value=>ragaDisplayText(value,'allergen',format));
+    const name=ragaDisplayText(item.name||'Unnamed dish','dish',format);
+    const out=[w.paragraph(name,{bold:true,size:10,after:desc||a.length||m.length?20:70})];
+    if(desc)out.push(w.paragraph(ragaDisplayText(desc,'description',format),{size:9,color:'505050',after:a.length||m.length?20:70}));
+    if(a.length)out.push(w.paragraph(a.join(', '),{bold:true,color:'8B1E20',size:9,after:m.length?10:70}));
+    if(m.length)out.push(w.paragraph(m.join(', '),{bold:true,color:'704600',size:9,after:70}));
     return out;
   }
   function selectedForFormat(fmt){
@@ -5206,9 +5211,12 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           const ct=isCourseWise(s)?String(s.courseTimes?.[item.menuCourse]||''):'';
           const group=[course,service,ct].filter(Boolean).join(' · ');
           if(group!==last){cols[idx].push(w.paragraph(group,{bold:true,size:9,color:color(),after:45,keep:true}));last=group;}
-          const allergens=Array.isArray(item.allergens)&&item.allergens.length?'Allergens: '+item.allergens.join(', '):'Allergens not declared';
-          const may=Array.isArray(item.mayContain)&&item.mayContain.length?'; May contain: '+item.mayContain.join(', '):'';
-          cols[idx].push(w.paragraph(`${++num}. ${item.name||'Unnamed dish'}`,{bold:true,size:9,after:10}),w.paragraph(allergens+may,{size:8,after:75}));
+          const allergens=Array.isArray(item.allergens)?item.allergens.map(value=>ragaDisplayText(value,'allergen','a4')):[];
+          const may=Array.isArray(item.mayContain)?item.mayContain.map(value=>ragaDisplayText(value,'allergen','a4')):[];
+          cols[idx].push(w.paragraph(`${++num}. ${ragaDisplayText(item.name||'Unnamed dish','dish','a4')}`,{bold:true,size:9,after:10}));
+          cols[idx].push(w.paragraph(allergens.length?'Allergens: '+allergens.join(', '):'Allergens not declared',
+            {bold:!!allergens.length,color:allergens.length?'8B1E20':'555555',size:8,after:may.length?10:75}));
+          if(may.length)cols[idx].push(w.paragraph('May contain: '+may.join(', '),{bold:true,color:'704600',size:8,after:75}));
         }
       }
       if(!counts.some(Boolean))part.push(w.paragraph('No menu items have been selected.',{size:10,align:'center'}));
@@ -5244,7 +5252,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           for(const item of (isCourseWise(s)?rows:[...rows].sort((a,b)=>{const rank=c=>c==='Main Course'?0:c==='Dessert'?1:c==='Canapé'?2:c==='Live Station'?3:4;return rank(a.menuCourse)-rank(b.menuCourse)}))){
             const group=getGroupName(s,item);
             if(group!==prev&&!stationName){parts.push(w.paragraph(group,{bold:true,size:11,color:color(),align:'center',after:100}));prev=group;}
-            parts.push(...menuItem(w,item,++count));
+            parts.push(...menuItem(w,item,++count,format));
           }
           parts.push(w.paragraph('RAGASAAN',{bold:true,size:11,align:'center',color:color(),after:0}));
         }
@@ -5262,7 +5270,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           const s=eventSessions.find(s=>s.id===item.sessionId)||eventSessions[0]||{};
           const group=isCourseWise(s)?item.menuCourse||'Other':'';
           if(group&&group!==prev){right.push(w.paragraph(group,{bold:true,size:11,color:color(),after:75}));prev=group;}
-          right.push(...menuItem(w,item,++num));
+          right.push(...menuItem(w,item,++num,format));
         }
         if(!items.length)right.push(w.paragraph('No Table Menu Card dishes selected.',{size:10}));
         right.push(inlineImage(w,assets.company));
