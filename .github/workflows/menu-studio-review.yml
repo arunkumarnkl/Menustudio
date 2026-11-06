@@ -35,6 +35,9 @@ jobs:
         run: node scripts/test-final-worker-mock.mjs
       - name: Build static site
         run: node scripts/build-menustudio.mjs
+      - name: Diagnose Cloudflare production assets without changing deployment
+        continue-on-error: true
+        run: node scripts/check-cloudflare-live.mjs
       - name: Prepare preinstalled Chrome for release smoke test
         run: |
           npm install --no-save playwright@1.57.0 html2pdf.js@0.10.1

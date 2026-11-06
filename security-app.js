@@ -624,21 +624,55 @@ async function loadThemeGallery(){// Optional GitHub gallery extends the built-i
  }catch(_){/* built-ins still available */}renderThemeGallery(); if(s.clientEvent&&$('rs-client-themes'))$('rs-client-themes').innerHTML=allThemes().map(x=>themeCard(x,'client')).join('');}
 function allThemes(){const m=new Map(s.themes.map(x=>[x.id,x]));for(const t of savedThemes()){const valid=validTheme(t);if(valid)m.set(valid.id,valid);}return [...m.values()];}
 function styleFrom(theme){const o={};for(const key of SAFE)if(theme[key]!==undefined)o[key]=theme[key];return o;}
+let staffThemeFrame=0,clientThemeFrame=0;
+function markThemeSelected(container,id){
+ if(!container)return;
+ container.querySelectorAll('.raga-theme-card[data-theme-id]').forEach(card=>{
+  const active=card.dataset.themeId===id;
+  card.classList.toggle('active',active);
+  card.setAttribute('aria-pressed',String(active));
+ });
+}
 function applyTheme(id,scope='all'){
- if(!s.user)return;
- const theme=allThemes().find(t=>t.id===id);if(!theme)return;
- const f=scope==='all'?FMT:[state.layout];for(const fmt of f)Object.assign(state.designs[fmt],styleFrom(theme),{bgColor:'#ffffff'});
+ // Public menu design is editable without staff login. Client invitation is isolated.
+ if(s.clientToken)return;
+ const theme=allThemes().find(t=>t.id===id);
+ if(!theme){const status=$('raga-theme-status');if(status)status.textContent='Theme not available. Refresh the gallery.';return;}
+ const fmts=scope==='all'?FMT:[state.layout];
+ for(const fmt of fmts)Object.assign(state.designs[fmt],styleFrom(theme),{bgColor:'#ffffff'});
  state.design=state.designs[state.layout];s.activeTheme=id;window.ragaActiveThemeId=id;
- renderContextualControls();renderPreview();renderThemeGallery();msg('Theme applied: '+theme.name+'. Save to Cloud to share changes.');
+ // Acknowledge immediately; do not destroy/rebuild the clicked button on each click.
+ markThemeSelected($('rs-theme-gallery'),id);
+ const status=$('raga-theme-status');
+ if(status)status.textContent=theme.name+' selected. Updating menu preview…';
+ // Theme styles are saved independently of large event records/images.
+ let saved=false;
+ try{saved=typeof window.saveThemeStyles==='function'?window.saveThemeStyles():
+     typeof window.saveStyle==='function'?(window.saveStyle(),true):false;
+     localStorage.setItem('ragasaan_selected_theme_v1',id);}catch(err){console.warn('Theme preference could not be saved',err);}
+ if(staffThemeFrame)cancelAnimationFrame(staffThemeFrame);
+ staffThemeFrame=requestAnimationFrame(()=>{
+  staffThemeFrame=0;
+  try{
+   renderContextualControls();renderPreview();
+   // Re-save after controls update in case they synchronise design fields.
+   if(typeof window.saveThemeStyles==='function')saved=window.saveThemeStyles();
+   if(status)status.textContent=theme.name+' applied to all formats.'+(saved?' Saved in this browser.':' Could not save locally; use Cloud Save.');
+  }catch(err){
+   console.error('Theme preview update failed',err);
+   if(status)status.textContent='Theme selected, but preview failed: '+(err?.message||String(err));
+  }
+ });
 }
 function themeCard(t,context='staff'){
  const active=(context==='client'?s.clientDesign.themeId:s.activeTheme)===t.id;
  const action=context==='client'?`ragaSelectClientTheme('${t.id}')`:`ragaApplyTheme('${t.id}')`;
- return `<button type="button" onclick="${action}" class="raga-theme-card${active?' active':''}" style="--themetext:${e(t.textColor||'#25272d')};--themeaccent:${e(t.accentColor||'#8b7551')};--themeborder:${e(t.borderColor||'#b5a78b')}"><span class="raga-theme-swatch"><span class="raga-theme-emblem">✦</span><span class="raga-theme-preview-title">MENU</span><span class="raga-theme-preview-line"></span><span class="raga-theme-preview-dots">—  ·  —</span></span><strong>${e(t.name)}</strong><span>${e(t.kind)}</span></button>`;
+ return `<button type="button" onclick="${action}" data-theme-id="${e(t.id)}" aria-pressed="${active?'true':'false'}" class="raga-theme-card${active?' active':''}" style="--themetext:${e(t.textColor||'#25272d')};--themeaccent:${e(t.accentColor||'#8b7551')};--themeborder:${e(t.borderColor||'#b5a78b')}"><span class="raga-theme-swatch"><span class="raga-theme-emblem">✦</span><span class="raga-theme-preview-title">MENU</span><span class="raga-theme-preview-line"></span><span class="raga-theme-preview-dots">—  ·  —</span></span><strong>${e(t.name)}</strong><span>${e(t.kind)}</span></button>`;
 }
 function renderThemeGallery(){const root=$('rs-theme-gallery');if(!root)return;const themes=allThemes();
  const list=themes.map(t=>themeCard(t)).join('');
- root.innerHTML=`<div class="raga-gallery-head"><div><h3>Design Theme Gallery</h3><p>20 complete presets · 10 bold and 10 mild · professional and wedding · all seven menu/tag formats</p></div><div class="raga-actions"><button class="raga-btn" onclick="ragaSaveCurrentTheme()">Save custom theme</button><button class="raga-btn" onclick="ragaExportThemes()">Export</button><label class="raga-btn" style="cursor:pointer">Import <input type="file" accept="application/json,.json" onchange="ragaImportThemes(event)" hidden></label></div></div><div class="raga-theme-grid">${list}</div><p class="raga-help">Choose a gallery theme to update fonts, typography sizes, colors and decorative borders across all formats. You can still fine-tune each format below. Custom themes stay in this browser unless exported or added to <code>themes/gallery.json</code> on GitHub.</p>`;
+ if(!s.activeTheme){const stored=localStorage.getItem('ragasaan_selected_theme_v1');if(themes.some(t=>t.id===stored))s.activeTheme=stored;}
+ root.innerHTML=`<div class="raga-gallery-head"><div><h3>Design Theme Gallery</h3><p>20 complete presets · 10 bold and 10 mild · professional and wedding · all seven menu/tag formats</p></div><div class="raga-actions"><button class="raga-btn" onclick="ragaSaveCurrentTheme()">Save custom theme</button><button class="raga-btn" onclick="ragaExportThemes()">Export</button><label class="raga-btn" style="cursor:pointer">Import <input type="file" accept="application/json,.json" onchange="ragaImportThemes(event)" hidden></label></div></div><p id="raga-theme-status" class="raga-help" role="status" aria-live="polite">${s.activeTheme?'Selected theme: '+e(themes.find(t=>t.id===s.activeTheme)?.name||s.activeTheme):'Select a theme for instant menu preview'}</p><div class="raga-theme-grid">${list}</div><p class="raga-help">Choose a gallery theme to update fonts, typography sizes, colors and decorative borders across all formats. You can still fine-tune each format below. Custom themes stay in this browser unless exported or added to <code>themes/gallery.json</code> on GitHub.</p>`;
 }
 function saveCurrentTheme(){if(!s.user)return;const name=prompt('Custom theme name:');if(!name?.trim())return;
  const id='custom-'+crypto.randomUUID().slice(0,13),style=styleFrom(state.design),theme={id,name:name.trim(),kind:'custom',...style};
@@ -662,10 +696,19 @@ async function openClient(){const result=await call('/client/view','POST',{token
  const root=$('rs-client-panel');root.innerHTML=`<div class="raga-client-shell"><section class="raga-client-side"><h2>Ragasaan Client Design</h2><p class="raga-muted">${e(result.event.name)} · ${e(result.event.eventDate||'')}<br>${e(result.event.venue||'')} · Link expires ${new Date(result.expiresAt).toLocaleString()}</p><div class="raga-rule"></div><h3 class="raga-section-title">1. Select a theme</h3><div class="raga-client-themes" id="rs-client-themes"></div><div class="raga-rule"></div><h3 class="raga-section-title">2. Design format &amp; type</h3><select id="rs-client-fmt" class="raga-input" onchange="ragaClientChangeFormat(this.value)">${s.clientAllowed.map(f=>`<option value="${f}" ${f===s.clientFmt?'selected':''}>${e(FN[f])}</option>`).join('')}</select><div id="rs-client-controls"></div><div class="raga-rule"></div><h3 class="raga-section-title">3. Table Menu Card personalization</h3><p class="raga-help">These fields apply to the Table Menu Card only; event dishes, allergens and other formats remain unchanged.</p><div class="raga-client-form-grid"><label>Bride name<input class="raga-input" maxlength="100" id="rs-bride" oninput="ragaClientDetail('brideName',this.value)"></label><label>Groom name<input class="raga-input" maxlength="100" id="rs-groom" oninput="ragaClientDetail('groomName',this.value)"></label></div><label>Couple display title<input class="raga-input" id="rs-couple-title" maxlength="220" placeholder="${escAttr(result.event.name)}" oninput="ragaClientDetail('coupleTitle',this.value)"></label><label>Welcome message (Table Menu Card only)<textarea class="raga-input" rows="3" maxlength="450" id="rs-welcome" oninput="ragaClientDetail('welcomeMessage',this.value)"></textarea></label><label>Couple monogram / image (PNG, JPG, WebP; max 240 KB)<input type="file" class="raga-input" accept="image/png,image/jpeg,image/webp" onchange="ragaClientLogo(event)"></label><label>Couple logo width (px)<input type="number" class="raga-input" min="30" max="220" value="110" onchange="ragaClientDetail('coupleLogoWidth',Number(this.value))"></label><div class="raga-rule"></div><button id="rs-submit-design" class="raga-btn primary" onclick="ragaSubmitClientDesign()">Submit Design to Event Planner</button><p id="rs-client-notice" class="raga-alert" role="status"></p><p class="raga-help">Submitting saves design choices in Cloudflare D1. The Event Planner must review them. You cannot edit dishes or allergens here.</p></section><section class="raga-client-preview"><div class="raga-client-preview-head"><div><b id="rs-client-preview-title">Table Menu Card</b><p>Read-only design preview · supplied event menu</p></div><span class="raga-pill">Live preview</span></div><div id="rs-client-print-controls" class="raga-actions" aria-label="Client Print Studio"><strong>Print Studio</strong><button type="button" id="rs-client-save-pdf" class="raga-btn" onclick="ragaClientSavePDF()" ${s.clientCanPrint?'':'disabled'}>Save PDF</button><button type="button" id="rs-client-print" class="raga-btn primary" onclick="ragaClientPrintPreview()" ${s.clientCanPrint?'':'disabled'}>Print</button><small id="rs-client-print-status" class="raga-help">${s.clientCanPrint?'Approved for client printing':'Preview available; planner approval required for printing'}</small></div><div id="rs-client-paper" class="raga-client-paper"></div><p class="raga-help">This is the actual Print Studio template at scaled A4 dimensions, using the event menu supplied by your Event Planner. The Event Planner checks final output before printing.</p></section></div>`;
  ragaSelectClientTheme('executive-ivory');
 }
-function selectClientTheme(id){const t=allThemes().find(x=>x.id===id);if(!t)return;
+function selectClientTheme(id){
+ const t=allThemes().find(x=>x.id===id);if(!t)return;
  s.clientDesign.themeId=id;
  for(const fmt of s.clientAllowed)s.clientDesign.designs[fmt]={...styleFrom(t),bgColor:'#ffffff'};
- $('rs-client-themes').innerHTML=allThemes().map(x=>themeCard(x,'client')).join('');renderClientControls();renderClientPreview();}
+ markThemeSelected($('rs-client-themes'),id);
+ const status=$('rs-client-print-status');if(status)status.textContent=t.name+' selected. Updating preview…';
+ if(clientThemeFrame)cancelAnimationFrame(clientThemeFrame);
+ clientThemeFrame=requestAnimationFrame(()=>{
+  clientThemeFrame=0;
+  try{renderClientControls();renderClientPreview();if(status)status.textContent=t.name+' applied to client preview.';}
+  catch(err){console.error('Client theme preview failed',err);if(status)status.textContent='Client theme preview error: '+(err?.message||String(err));}
+ });
+}
 function clientFormat(fmt){if(!s.clientAllowed.includes(fmt))return;s.clientFmt=fmt;renderClientControls();renderClientPreview();}
 function detailClient(key,value){if(!['brideName','groomName','coupleTitle','welcomeMessage','coupleLogoWidth'].includes(key))return;
  if(key==='coupleLogoWidth')value=Math.max(30,Math.min(220,Number(value)||110));
@@ -718,13 +761,46 @@ async function saveClientPdf(){
  if(typeof window.html2pdf!=='function'){if(status)status.textContent='PDF converter unavailable. Reload with internet access.';return;}
  const sheets=[...($('rs-client-paper')?.querySelectorAll('.print-sheet')||[])];
  if(!sheets.length){if(status)status.textContent='No client pages available';return;}
- const root=document.createElement('div');
- root.style.cssText='position:fixed;left:-20000px;top:0;width:210mm;background:#fff';
+ const root=document.createElement('div');root.id='raga-client-pdf-export';root.className='raga-client-pdf-export';
+ // html2pdf/html2canvas needs a measurable capture root in normal document flow.
+ root.style.cssText='position:relative;display:block;width:210mm;max-width:210mm;background:#fff;pointer-events:none;margin:0;padding:0';
  sheets.forEach((page,i)=>{const el=page.cloneNode(true);el.style.cssText+=';width:210mm!important;height:297mm!important;zoom:1!important;transform:none!important;margin:0!important';el.removeAttribute('contenteditable');root.appendChild(el);if(i<sheets.length-1){const br=document.createElement('div');br.className='html2pdf__page-break';root.appendChild(br);}});
- $('rs-client-panel').appendChild(root);
- try{await window.html2pdf().set({margin:0,filename:'Ragasaan_Client_Design.pdf',image:{type:'jpeg',quality:.97},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(root).save();if(status)status.textContent='PDF saved.';}
+ // Explicitly allow ONLY this temporary capture element in locked client view.
+ // Other body children remain hidden and protected API routes remain inaccessible.
+ document.body.classList.add('raga-client-pdf-active');
+ document.body.appendChild(root);
+ window.__clientPdfCaptureMetrics={outer:root.getBoundingClientRect().toJSON(),cssDisplay:getComputedStyle(root).display,
+  sheets:root.querySelectorAll('.print-sheet').length,
+  firstSheet:root.querySelector('.print-sheet')?.getBoundingClientRect().toJSON(),
+  text:root.innerText.slice(0,240),locked:document.body.classList.contains('ragasaan-locked'),
+  scrollHeight:document.body.scrollHeight};
+ try{
+  const job=window.html2pdf().set({margin:0,filename:'Ragasaan_Client_Design.pdf',image:{type:'jpeg',quality:.97},
+   html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',onclone:doc=>{
+    const capture=doc.querySelector('.html2pdf__container');
+    const prior=capture?.getBoundingClientRect().toJSON();
+    doc.body.classList.remove('ragasaan-locked');
+    if(capture){
+      capture.style.setProperty('display','block','important');
+      capture.style.setProperty('width','210mm','important');
+      capture.style.setProperty('min-height','297mm','important');
+    }
+    window.__clientCloneMetrics={hadCapture:!!capture,prior,
+      after:capture?.getBoundingClientRect().toJSON(),
+      display:capture?doc.defaultView.getComputedStyle(capture).display:null,
+      parent:capture?.parentElement?.tagName,bodyClass:doc.body.className};
+   }},
+   jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(root);
+  await job.toCanvas();
+  const canvas=await job.get('canvas');
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+  const values=[];
+  for(const [x,y] of [[4,4],[Math.floor(canvas.width/2),Math.floor(canvas.height/3)],[Math.floor(canvas.width/2),Math.floor(canvas.height/2)]])values.push([...ctx.getImageData(x,y,1,1).data]);
+  window.__clientPdfCanvasMetrics={width:canvas.width,height:canvas.height,pixels:values,clone:window.__clientCloneMetrics};
+  await job.save();if(status)status.textContent='PDF saved.';
+ }
  catch(err){if(status)status.textContent='Unable to save PDF: '+err.message;}
- finally{root.remove();}
+ finally{root.remove();document.body.classList.remove('raga-client-pdf-active');}
 }
 async function submitClient(){if(!s.clientToken)return;
  const btn=$('rs-submit-design');btn.disabled=true;$('rs-client-notice').textContent='Submitting design…';

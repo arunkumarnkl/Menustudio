@@ -19,13 +19,14 @@ const mockEvents=Array.from({length:26},(_,i)=>({
  eventData:{plannerName:i%2?'Planner Two':'Planner One',items:[],sessions:[]}
 }));
 const errors=[];
+let clientApproved=false;
 function json(route,obj,status=200){return route.fulfill({status,contentType:'application/json',body:JSON.stringify(obj),headers:{'access-control-allow-origin':origin,'access-control-allow-headers':'*'}});}
 async function network(route){
  const request=route.request(),url=new URL(request.url()),path=url.pathname;
  if(url.pathname.endsWith('/html2pdf.bundle.min.js'))return route.fulfill({status:200,contentType:'application/javascript',body:readFileSync('node_modules/html2pdf.js/dist/html2pdf.bundle.min.js')});
  if(url.origin===origin)return route.continue();
  if(url.hostname==='ragasaan-security-api.arunkumarnkl.workers.dev'){
-   if(path==='/client/view')return json(route,{event:{name:'Private wedding',venue:'Event venue',eventDate:'2026-11-18',menu:[],sessions:[],items:[]},clientFormats:['half-a4','a4'],expiresAt:'2027-11-01T00:00:00Z',canPrint:false});
+   if(path==='/client/view')return json(route,{event:{name:'Private wedding',venue:'Event venue',eventDate:'2026-11-18',menu:[],sessions:[],items:[]},clientFormats:['half-a4','a4'],expiresAt:'2027-11-01T00:00:00Z',canPrint:clientApproved});
    if(path==='/me')return json(route,{id:'admin-1',email:'admin@test.invalid',name:'Test Admin',role:'admin'});
    if(path==='/events')return json(route,{events:mockEvents});
    if(path==='/users/planners'&&request.method()==='POST')return json(route,{id:'planner-created',role:'planner'},201);
@@ -63,6 +64,90 @@ try{
  await client.context.close();
  console.log('PASS Browser client token is isolated to design/preview, print disabled before approval');
 
+ // Public menu users can select themes without creating or signing into a cloud account.
+ const guestTheme=await setupPage(false);
+ await guestTheme.page.evaluate(()=>switchTab('design'));
+ await guestTheme.page.locator('#rs-theme-gallery .raga-theme-card').nth(1).waitFor({state:'visible',timeout:20000});
+ const guestBefore=await guestTheme.page.evaluate(()=>state.designs.a4.accentColor);
+ await guestTheme.page.locator('#rs-theme-gallery .raga-theme-card').nth(1).click();
+ const guestResult=await guestTheme.page.evaluate(()=>({
+  color:state.designs.a4.accentColor,
+  saved:JSON.parse(localStorage.getItem('ragasaan_theme_styles_v1')||'{}').designs?.a4?.accentColor
+ }));
+ assert.notEqual(guestResult.color,guestBefore,'Public theme click changes preview design');
+ assert.equal(guestResult.saved,guestResult.color,'Public theme selection saves compact styling');
+ console.log('PASS Public theme picker updates preview without an Event Planner login');
+ await guestTheme.context.close();
+
+ // Staff design theme: exercise the real gallery click and the visible A4 preview.
+ const themeTest=await setupPage(true);
+ const tp=themeTest.page;
+ await tp.evaluate(()=>switchTab('design'));
+ await tp.locator('#rs-theme-gallery .raga-theme-card').first().waitFor({state:'visible',timeout:30000});
+ const themeBefore=await tp.evaluate(()=>({
+  saveExposed:typeof window.saveStyle,
+  color:state.designs.a4.accentColor,
+  previewCount:document.querySelectorAll('#paper-render-target .print-sheet').length
+ }));
+ await tp.locator('#rs-theme-gallery .raga-theme-card').nth(1).click();
+ await tp.waitForFunction(()=>document.getElementById('raga-theme-status')?.textContent.includes('applied')&&document.querySelector('#paper-render-target')?.innerHTML.includes(state.designs.a4.accentColor));
+ const themeAfter=await tp.evaluate(()=>({
+  active:window.ragaActiveThemeId,
+  activeCard:document.querySelector('#rs-theme-gallery .raga-theme-card.active')?.innerText,
+  color:state.designs.a4.accentColor,
+  saved:JSON.parse(localStorage.getItem('ragasaan_theme_styles_v1')||'{}').designs?.a4?.accentColor,
+  previewText:document.querySelector('#paper-render-target')?.innerHTML.slice(0,15000)
+ }));
+ console.log('STAFF THEME DIAGNOSTICS',JSON.stringify({before:themeBefore,after:{...themeAfter,previewText:themeAfter.previewText?.includes(themeAfter.color)}}));
+ assert.notEqual(themeAfter.color,themeBefore.color,'Theme selection changes the print accent colour');
+ assert.equal(themeAfter.saved,themeAfter.color,'Theme selection persists the print accent colour');
+ assert.ok(themeAfter.previewText.includes(themeAfter.color),'Preview uses the newly selected accent colour');
+ await tp.reload({waitUntil:'domcontentloaded'});
+ await tp.waitForTimeout(500);
+ assert.equal(await tp.evaluate(()=>state.designs.a4.accentColor),themeAfter.color,'Selected theme survives browser reload');
+ console.log('PASS Staff gallery click changes preview and persists across reload');
+ // Repeated rapid clicks must not lose selection or leave the preview stale.
+ await tp.evaluate(()=>{
+   const buttons=[...document.querySelectorAll('#rs-theme-gallery .raga-theme-card')];
+   if(buttons.length<3)throw new Error('Expected three theme presets for rapid selection test');
+   buttons[0].click();buttons[2].click();buttons[1].click();
+ });
+ await tp.waitForFunction(()=>{
+  const chosen=document.querySelector('#rs-theme-gallery .raga-theme-card.active');
+  return chosen?.getAttribute('aria-pressed')==='true' &&
+   document.querySelector('#paper-render-target')?.innerHTML.includes(state.designs.a4.accentColor) &&
+   JSON.parse(localStorage.getItem('ragasaan_theme_styles_v1')||'{}').designs?.a4?.accentColor===state.designs.a4.accentColor &&
+   document.getElementById('raga-theme-status')?.textContent.includes('applied');
+ },{timeout:20000});
+ assert.equal(await tp.locator('#rs-theme-gallery .raga-theme-card.active').count(),1,'Exactly one theme remains selected');
+ assert.equal(await tp.evaluate(()=>window.ragaActiveThemeId),await tp.locator('#rs-theme-gallery .raga-theme-card').nth(1).getAttribute('data-theme-id'),'Last rapid theme click wins');
+ console.log('PASS Rapid repeated theme clicks update selected card, preview and compact storage');
+ await themeTest.context.close();
+
+ // Approved client route: click a theme and download an actual PDF.
+ clientApproved=true;
+ const approved=await setupPage(false,'#client='+token);
+ await approved.page.locator('#rs-client-save-pdf').waitFor({state:'visible',timeout:30000});
+ assert.equal(await approved.page.locator('#rs-client-save-pdf').isEnabled(),true,'Approved client can download PDF');
+ const clientThemes=approved.page.locator('#rs-client-themes .raga-theme-card');
+ assert.ok(await clientThemes.count()>1,'Client theme presets rendered');
+ await clientThemes.nth(1).click();
+ assert.ok(await clientThemes.nth(1).evaluate(n=>n.classList.contains('active')),'Client theme click updates active style');
+ const clientSheets=await approved.page.locator('#rs-client-paper .print-sheet').count();
+ assert.ok(clientSheets>0,'Approved client has menu preview sheets');
+ const [clientDownload]=await Promise.all([
+   approved.page.waitForEvent('download',{timeout:120000}),
+   approved.page.locator('#rs-client-save-pdf').click()
+ ]);
+ const clientBytes=readFileSync(await clientDownload.path());
+ console.log('CLIENT PDF CAPTURE METRICS',JSON.stringify(await approved.page.evaluate(()=>window.__clientPdfCaptureMetrics)));
+ console.log('CLIENT PDF CANVAS METRICS',JSON.stringify(await approved.page.evaluate(()=>window.__clientPdfCanvasMetrics)));
+ assert.ok(clientBytes.subarray(0,5).toString('ascii')==='%PDF-','Client PDF has correct file signature');
+ assert.ok(clientBytes.length>10000,'Client PDF may be blank: '+clientBytes.length+' bytes');
+ console.log('PASS Approved client changes theme and downloads actual PDF:',clientBytes.length,'bytes');
+ await approved.context.close();
+ clientApproved=false;
+
  const staff=await setupPage(true);
  const page=staff.page;
  await page.locator('#rs-open-cloud').click();
@@ -84,6 +169,40 @@ try{
  console.log('PASS Browser: Create Event Planner returns explicit confirmation');
  await page.locator('#rs-close-admin').click();
  console.log('PASS Browser: latest 20 cloud events, planner filter and standalone Admin settings');
+
+ // Staff theme click must update all print designs, persist in localStorage and survive reload.
+ await page.locator('#tab-btn-builder').click();
+ const staffThemes=page.locator('#rs-theme-gallery .raga-theme-card');
+ await staffThemes.first().waitFor({state:'visible',timeout:20000});
+ assert.ok(await staffThemes.count()>1,'Staff theme presets rendered');
+ await staffThemes.nth(1).click();
+ const savedTheme=await page.evaluate(()=>{
+   const saved=JSON.parse(localStorage.getItem('ragasaan_theme_styles_v1')||'{}');
+   return {selected:window.ragaActiveThemeId,design:saved.designs?.a4,current:state.designs.a4};
+ });
+ assert.ok(savedTheme.selected,'Selected theme recorded');
+ assert.equal(savedTheme.design.borderColor,savedTheme.current.borderColor,'Theme styling saved to local storage');
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.waitForTimeout(850);
+ const storedTheme=await page.evaluate(()=>JSON.parse(localStorage.getItem('ragasaan_theme_styles_v1')||'{}').designs?.a4?.borderColor);
+ assert.equal(storedTheme,savedTheme.current.borderColor,'Theme style persists after page reload');
+ console.log('PASS Staff theme selection updates format style and persists after reload');
+ // Event records stay in memory and are not written into localStorage on every edit.
+ await page.evaluate(()=>{
+   const session=eventSessions[0];
+   eventRecords.push({id:'temp-event',eventUid:'temp-event',sessionId:session.id,menuCourse:'Other',
+    name:'Do Not Persist This Draft',desc:'Transient menu item',allergens:[],mayContain:[],printFormats:['a4']});
+   onEventRecordsChanged();
+ });
+ assert.equal(await page.evaluate(()=>localStorage.getItem('ragasaan_style_v3')),null,
+   'Automatic local event snapshot storage must be disabled');
+ assert.ok(await page.evaluate(()=>eventRecords.some(r=>r.name==='Do Not Persist This Draft')),
+   'Unsaved draft remains editable in memory');
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.waitForTimeout(500);
+ assert.equal(await page.evaluate(()=>eventRecords.some(r=>r.name==='Do Not Persist This Draft')),false,
+   'Unsaved draft is not silently persisted in browser storage');
+ console.log('PASS Event menu edits are memory-only until Cloud Save / explicit JSON export');
 
  await page.evaluate(()=>{window.__printCount=0;window.print=()=>{window.__printCount++};});
  await page.evaluate(()=>{
@@ -108,6 +227,28 @@ try{
  assert.ok(pdfBytes.length>10000,'Populated PDF seems blank or incomplete: '+pdfBytes.length+' bytes');
  assert.equal(await page.evaluate(()=>window.__printCount),0,'PDF Save does not launch native Print');
  console.log('PASS Real html2pdf.js conversion produces a downloadable PDF without invoking Print, bytes:',pdfBytes.length);
+
+ // A8 PDF must preserve the native CSS Grid used by the printed labels.
+ await page.evaluate(()=>{
+   const session=eventSessions[0];
+   eventRecords.push({id:'a8-test',eventUid:'a8-test',sessionId:session.id,menuCourse:'Other',
+    name:'A8 Label Grid Alignment Test',desc:'Sample label',allergens:[],mayContain:[],
+    printFormats:['a8-grid'],tagCopies:{'a8-grid':1},manual:true});
+   state.layout='a8-grid';state.design=state.designs['a8-grid'];
+   normalizeEventFormatRecords();renderPreview();
+ });
+ assert.equal(await page.evaluate(()=>getComputedStyle(document.querySelector('#paper-render-target .print-sheet')).display),'grid',
+   'A8 preview should retain CSS Grid');
+ const [a8Download]=await Promise.all([
+   page.waitForEvent('download',{timeout:120000}),
+   page.evaluate(()=>downloadPDF())
+ ]);
+ const a8Bytes=readFileSync(await a8Download.path());
+ const a8Metrics=await page.evaluate(()=>window.__lastPdfExportMetrics);
+ assert.equal(a8Metrics.sheetDisplay,'grid','PDF capture must retain A8 CSS Grid geometry');
+ assert.ok(a8Bytes.length>10000,'A8 PDF is blank or incomplete: '+a8Bytes.length);
+ console.log('PASS A8 downloadable PDF preserves native CSS Grid for aligned tags:',a8Bytes.length,'bytes');
+
  await page.evaluate(()=>switchTab('export'));
  await page.screenshot({path:'browser-smoke/final-update-export.png'});
  const bounds=await page.evaluate(()=>{

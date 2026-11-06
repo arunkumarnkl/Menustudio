@@ -1,7 +1,7 @@
 /* Ragasaan Menu Studio — authenticated cloud experience.
    The GitHub Pages JavaScript and public JSON remain public; access control
    for D1 resources is enforced server-side by the Cloudflare Security API. */
-body.ragasaan-locked > :not(#ragasaan-auth-root):not(script) {display:none!important}
+body.ragasaan-locked:not(.raga-client-pdf-active) > :not(#ragasaan-auth-root):not(script) {display:none!important}
 #ragasaan-auth-root {display:none; position:fixed;inset:0;z-index:2147480000;overflow:auto;color:#e2e8f0;background:radial-gradient(circle at 10% 10%,#334155 0,#0f172a 45%,#020617 100%);font-family:Inter,system-ui,sans-serif}
 body.ragasaan-locked #ragasaan-auth-root {display:flex;align-items:center;justify-content:center;padding:22px}
 .raga-login-card {width:min(450px,100%);border:1px solid #475569;border-radius:18px;background:#0f172a;box-shadow:0 28px 85px #0008;padding:32px}
@@ -194,3 +194,17 @@ body.ragasaan-locked #ragasaan-auth-root.raga-client-on{display:block!important}
  body.raga-client-print #rs-client-paper .print-sheet{display:block!important;width:210mm!important;height:297mm!important;min-height:297mm!important;margin:0!important;padding:0!important;page-break-after:always;break-after:page;box-shadow:none!important}
  body.raga-client-print #rs-client-paper .print-sheet:last-child{page-break-after:auto;break-after:auto}
 }
+
+/* Client PDF capture is the sole explicit exception to the fail-closed UI gate.
+   The element contains only the approved, read-only client preview and is
+   removed immediately after export. Other body siblings remain hidden. */
+body.ragasaan-locked > #raga-client-pdf-export.raga-client-pdf-export {
+  display:block!important;
+  position:relative!important;
+  width:210mm;
+  height:auto!important;
+  background:#fff;
+  color:#111;
+}
+
+body.ragasaan-locked.raga-client-pdf-active > :not(#ragasaan-auth-root):not(script):not(#raga-client-pdf-export):not(.html2pdf__container){display:none!important}
