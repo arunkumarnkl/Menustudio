@@ -720,12 +720,13 @@ async function saveClientPdf(){
  if(typeof window.html2pdf!=='function'){if(status)status.textContent='PDF converter unavailable. Reload with internet access.';return;}
  const sheets=[...($('rs-client-paper')?.querySelectorAll('.print-sheet')||[])];
  if(!sheets.length){if(status)status.textContent='No client pages available';return;}
- const root=document.createElement('div');
+ const root=document.createElement('div');root.id='raga-client-pdf-export';
  // html2pdf/html2canvas needs a measurable capture root in normal document flow.
  root.style.cssText='position:relative;display:block;width:210mm;max-width:210mm;background:#fff;pointer-events:none;margin:0;padding:0';
  sheets.forEach((page,i)=>{const el=page.cloneNode(true);el.style.cssText+=';width:210mm!important;height:297mm!important;zoom:1!important;transform:none!important;margin:0!important';el.removeAttribute('contenteditable');root.appendChild(el);if(i<sheets.length-1){const br=document.createElement('div');br.className='html2pdf__page-break';root.appendChild(br);}});
- // Keep the export inside the sole visible client auth root: locked pages hide body siblings.
- $('rs-client-panel').appendChild(root);
+ // Explicitly allow ONLY this temporary capture element in locked client view.
+ // Other body children remain hidden and protected API routes remain inaccessible.
+ document.body.appendChild(root);
  try{await window.html2pdf().set({margin:0,filename:'Ragasaan_Client_Design.pdf',image:{type:'jpeg',quality:.97},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(root).save();if(status)status.textContent='PDF saved.';}
  catch(err){if(status)status.textContent='Unable to save PDF: '+err.message;}
  finally{root.remove();}
