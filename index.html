@@ -5038,7 +5038,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     const id=eventUid();
     const name=(live?'Live Station ':'Station ')+(list.length+1);
     list.push({id,name});
-    if(live)session.liveStations=list;
+    if(live){session.liveStations=list;session.selectedLiveStationId=id;}
     else {session.stations=list;openCategories.add(idKey(session.id,ragaStationKey(id)));}
     onEventRecordsChanged();
   }
@@ -5054,7 +5054,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       if(live)item.ragaLiveStationId=other.id;
       else {item.menuCourse=ragaStationKey(other.id);item.ragaStationCourse=item.menuCourse;}
     }
-    if(live)session.liveStations=list.filter(st=>st.id!==id);
+    if(live){session.liveStations=list.filter(st=>st.id!==id);if(session.selectedLiveStationId===id)session.selectedLiveStationId=other.id;}
     else {
       session.stations=list.filter(st=>st.id!==id);
       if(session.categoryFormats)delete session.categoryFormats[ragaStationKey(id)];
@@ -5082,7 +5082,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   }
   function insertDish(session,category,dish){
     if(!session||!dish?.name)return;
-    const assignedLive=category==='Live Station'?ragaEnsureLiveStations(session)[0]?.id:undefined;
+    const assignedLive=category==='Live Station'?(session.selectedLiveStationId||ragaEnsureLiveStations(session)[0]?.id):undefined;
     const record={...JSON.parse(JSON.stringify(dish)),eventUid:eventUid(),sessionId:session.id,menuCourse:category,serviceType:'',ragaLiveStationId:assignedLive,printFormats:[...formats(session,category)],tagCopies:{}};
     eventRecords.push(record);openSessions.add(session.id);openCategories.add(idKey(session.id,category));onEventRecordsChanged();
   }
@@ -5112,7 +5112,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     const rows=catItems(session,cat),opened=openCategories.has(idKey(session.id,cat)),allowed=allowedFormats(session,cat),selected=formats(session,cat);
     const station=isMultiStationMode(session)?ragaEnsureStations(session).find(st=>ragaStationKey(st.id)===cat):null;
     const stationEditor=station?`<div class="raga-card-note"><label>Station name<input type="text" data-raga-action="station-name" data-session="${safe(session.id)}" data-station-id="${safe(station.id)}" value="${safe(station.name)}"></label><button type="button" class="raga-card-remove" data-raga-action="remove-station" data-session="${safe(session.id)}" data-station-id="${safe(station.id)}">Remove station</button></div>`:'';
-    const liveEditor=cat==='Live Station'?`<div class="raga-card-note"><strong>Dedicated A4 per Live Station</strong>${ragaEnsureLiveStations(session).map(st=>`<div style="display:flex;gap:6px;margin:5px 0;align-items:center"><input type="text" aria-label="Live station name" data-raga-action="live-station-name" data-session="${safe(session.id)}" data-station-id="${safe(st.id)}" value="${safe(st.name)}"><button type="button" data-raga-action="remove-live-station" data-session="${safe(session.id)}" data-station-id="${safe(st.id)}">Remove</button></div>`).join('')}<button type="button" data-raga-action="add-live-station" data-session="${safe(session.id)}">+ Add Live Station</button></div>`:'';
+    const liveEditor=cat==='Live Station'?`<div class="raga-card-note"><strong>Dedicated A4 per Live Station</strong><label>Assign new dishes to station<select data-raga-action="add-live-station-choice" data-session="${safe(session.id)}">${ragaEnsureLiveStations(session).map(st=>`<option value="${safe(st.id)}" ${(session.selectedLiveStationId||ragaEnsureLiveStations(session)[0]?.id)===st.id?'selected':''}>${safe(st.name)}</option>`).join('')}</select></label>${ragaEnsureLiveStations(session).map(st=>`<div style="display:flex;gap:6px;margin:5px 0;align-items:center"><input type="text" aria-label="Live station name" data-raga-action="live-station-name" data-session="${safe(session.id)}" data-station-id="${safe(st.id)}" value="${safe(st.name)}"><button type="button" data-raga-action="remove-live-station" data-session="${safe(session.id)}" data-station-id="${safe(st.id)}">Remove</button></div>`).join('')}<button type="button" data-raga-action="add-live-station" data-session="${safe(session.id)}">+ Add Live Station</button></div>`:'';
     const printLabels=selected.length?selected.map(f=>MENU_NAMES[f]||f).join(' · '):'No print formats';
     return `<details class="raga-course-card" data-session="${safe(session.id)}" data-category="${safe(cat)}" ${opened?'open':''}><summary data-raga-action="toggle-category" data-session="${safe(session.id)}" data-course="${safe(cat)}"><span class="raga-course-icon">${(categoryIcons[cat]||'🍽️')}</span><span><strong>${safe(courseDisplay(session,cat))}</strong><small>${rows.length} ${rows.length===1?'dish':'dishes'} · ${safe(printLabels)}</small></span></summary>
       <div class="raga-course-body"><section><h5 class="raga-course-section-title">1. Serving style &amp; add dishes</h5><div class="raga-course-setup">${serviceChoice(session,cat)}${stationEditor}${liveEditor}</div><div class="raga-card-picker"><input type="search" data-raga-search="true" data-session="${safe(session.id)}" data-course="${safe(cat)}" placeholder="Search the master dish database" autocomplete="off"><button type="button" class="raga-btn-add" data-raga-action="search" data-session="${safe(session.id)}" data-course="${safe(cat)}">Find dishes</button></div><div class="raga-card-results" data-raga-results="${safe(idKey(session.id,cat))}"></div><details class="raga-card-manual"><summary>+ Add manual dish to this category</summary><label>Dish name<input data-raga-manual="name" type="text" placeholder="New dish name" onblur="ragaFormatManualField(this,'dish')"></label><label>Description<textarea data-raga-manual="desc" rows="2" placeholder="Optional description" onblur="ragaFormatManualField(this,'description')"></textarea></label>${ragaCardTicks("allergens",[],null,true)}${ragaCardTicks("mayContain",[],null,true)}<label class="raga-verify"><input type="checkbox" data-raga-manual="verified"> Allergen information checked for this event</label><button type="button" class="raga-btn-add" data-raga-action="manual-add" data-session="${safe(session.id)}" data-course="${safe(cat)}">Add manual dish</button></details></section>
@@ -5181,6 +5181,9 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     const sid=el.dataset.session,course=el.dataset.course,session=byId(sid);
     if(el.dataset.ragaAction==='station-name'&&session){ragaRenameCardStation(session,el.dataset.stationId,el.value);return;}
     if(el.dataset.ragaAction==='live-station-name'&&session){ragaRenameCardStation(session,el.dataset.stationId,el.value,true);return;}
+    if(el.dataset.ragaAction==='add-live-station-choice'&&session){
+      if(ragaEnsureLiveStations(session).some(st=>st.id===el.value)){session.selectedLiveStationId=el.value;saveStyle();}return;
+    }
     if(el.dataset.ragaCheck){
       const group=el.closest('fieldset'),field=el.dataset.ragaCheck;
       if(group&&['allergens','mayContain'].includes(field))ragaEditSelectedDish(el.dataset.uid,field,[...group.querySelectorAll('input:checked')].map(x=>x.value));
