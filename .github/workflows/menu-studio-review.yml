@@ -15,7 +15,7 @@ on:
 
 # Avoid redundant push + pull-request runs and cancel stale checks.
 concurrency:
-  group: menustudio-review-${{ github.event.pull_request.number || github.ref }}
+  group: menustudio-review-chrome-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 permissions:
