@@ -4828,7 +4828,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       if(summaryVisible)renderSummaryPaper();else renderPreview();
       const exportRoot=document.createElement('div');
       exportRoot.className='ragasaan-pdf-only';
-      exportRoot.style.cssText='position:fixed;left:0;top:0;z-index:2147483647;pointer-events:none;width:210mm;max-width:210mm;background:#fff;margin:0;padding:0;display:block';
+      exportRoot.style.cssText='position:relative;z-index:0;pointer-events:none;width:210mm;max-width:210mm;background:#fff;margin:0;padding:0;display:block';
       document.body.appendChild(exportRoot);
       // Render outside the hidden preview tab: its source sheets can measure 0x0.
       if(summaryVisible){
