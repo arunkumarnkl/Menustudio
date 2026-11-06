@@ -625,7 +625,8 @@ async function loadThemeGallery(){// Optional GitHub gallery extends the built-i
 function allThemes(){const m=new Map(s.themes.map(x=>[x.id,x]));for(const t of savedThemes()){const valid=validTheme(t);if(valid)m.set(valid.id,valid);}return [...m.values()];}
 function styleFrom(theme){const o={};for(const key of SAFE)if(theme[key]!==undefined)o[key]=theme[key];return o;}
 function applyTheme(id,scope='all'){
- if(!s.user)return;
+ // Public users may personalise their local menu design; only D1 cloud writes require sign-in.
+ if(s.clientToken)return;
  const theme=allThemes().find(t=>t.id===id);if(!theme)return;
  const f=scope==='all'?FMT:[state.layout];for(const fmt of f)Object.assign(state.designs[fmt],styleFrom(theme),{bgColor:'#ffffff'});
  state.design=state.designs[state.layout];s.activeTheme=id;window.ragaActiveThemeId=id;
