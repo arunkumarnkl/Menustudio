@@ -629,9 +629,14 @@ function applyTheme(id,scope='all'){
  const theme=allThemes().find(t=>t.id===id);if(!theme)return;
  const f=scope==='all'?FMT:[state.layout];for(const fmt of f)Object.assign(state.designs[fmt],styleFrom(theme),{bgColor:'#ffffff'});
  state.design=state.designs[state.layout];s.activeTheme=id;window.ragaActiveThemeId=id;
- // Persist the selected print style locally; Cloud Save remains a separate operation.
+ renderContextualControls();renderPreview();renderThemeGallery();
+ // Render first: preview/format controls may synchronise the design state.
+ // Persist the final applied values, not the previous preview settings.
  if(typeof window.saveStyle==='function')window.saveStyle();
- renderContextualControls();renderPreview();renderThemeGallery();msg('Theme applied: '+theme.name+'. Save to Cloud to share changes.');
+ try{localStorage.setItem('ragasaan_selected_theme_v1',id);}catch(_){}
+ const status=$('raga-theme-status');
+ if(status)status.textContent=theme.name+' applied to all menu formats. Preview updated; local settings saved.';
+ msg('Theme applied: '+theme.name+'. Save to Cloud to share changes.');
 }
 function themeCard(t,context='staff'){
  const active=(context==='client'?s.clientDesign.themeId:s.activeTheme)===t.id;
@@ -640,7 +645,8 @@ function themeCard(t,context='staff'){
 }
 function renderThemeGallery(){const root=$('rs-theme-gallery');if(!root)return;const themes=allThemes();
  const list=themes.map(t=>themeCard(t)).join('');
- root.innerHTML=`<div class="raga-gallery-head"><div><h3>Design Theme Gallery</h3><p>20 complete presets · 10 bold and 10 mild · professional and wedding · all seven menu/tag formats</p></div><div class="raga-actions"><button class="raga-btn" onclick="ragaSaveCurrentTheme()">Save custom theme</button><button class="raga-btn" onclick="ragaExportThemes()">Export</button><label class="raga-btn" style="cursor:pointer">Import <input type="file" accept="application/json,.json" onchange="ragaImportThemes(event)" hidden></label></div></div><div class="raga-theme-grid">${list}</div><p class="raga-help">Choose a gallery theme to update fonts, typography sizes, colors and decorative borders across all formats. You can still fine-tune each format below. Custom themes stay in this browser unless exported or added to <code>themes/gallery.json</code> on GitHub.</p>`;
+ if(!s.activeTheme){const stored=localStorage.getItem('ragasaan_selected_theme_v1');if(themes.some(t=>t.id===stored))s.activeTheme=stored;}
+ root.innerHTML=`<div class="raga-gallery-head"><div><h3>Design Theme Gallery</h3><p>20 complete presets · 10 bold and 10 mild · professional and wedding · all seven menu/tag formats</p></div><div class="raga-actions"><button class="raga-btn" onclick="ragaSaveCurrentTheme()">Save custom theme</button><button class="raga-btn" onclick="ragaExportThemes()">Export</button><label class="raga-btn" style="cursor:pointer">Import <input type="file" accept="application/json,.json" onchange="ragaImportThemes(event)" hidden></label></div></div><p id="raga-theme-status" class="raga-help" role="status" aria-live="polite">${s.activeTheme?'Selected theme: '+e(themes.find(t=>t.id===s.activeTheme)?.name||s.activeTheme):'Select a theme for instant menu preview'}</p><div class="raga-theme-grid">${list}</div><p class="raga-help">Choose a gallery theme to update fonts, typography sizes, colors and decorative borders across all formats. You can still fine-tune each format below. Custom themes stay in this browser unless exported or added to <code>themes/gallery.json</code> on GitHub.</p>`;
 }
 function saveCurrentTheme(){if(!s.user)return;const name=prompt('Custom theme name:');if(!name?.trim())return;
  const id='custom-'+crypto.randomUUID().slice(0,13),style=styleFrom(state.design),theme={id,name:name.trim(),kind:'custom',...style};
