@@ -6,6 +6,7 @@ import { join, dirname } from 'node:path';
 const root = process.cwd();
 const output = join(root, 'dist', 'menustudio');
 const allowed = [
+  '.nojekyll',
   'index.html',
   'security.css',
   'security-app.js',
