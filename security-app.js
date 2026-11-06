@@ -94,45 +94,95 @@ async function companyLogoData(file){
   }finally{URL.revokeObjectURL(objectURL);}
 }
 async function fetchCompanyLogo(){
-  try{
-    const r=await call('/public/company-logo','GET',undefined,false);
-    const image=typeof r.image==='string'&&/^data:image\/(png|jpeg|webp);base64,/.test(r.image)?r.image:'';
-    window.ragaPublishedCompanyLogo=image;
-    if(image)window.ragaSetPublishedCompanyLogo?.(image);
-    else window.ragaClearPublishedCompanyLogo?.();
-    const preview=$('rs-company-image');
-    if(preview){preview.hidden=!image;if(image)preview.src=image;else preview.removeAttribute('src');}
-    companyLogoStatus(image?'Published company logo is active.':'No published logo; using the GitHub logo.');
-    return image;
-  }catch(err){
-    companyLogoStatus('Cannot verify the published company logo: '+err.message+'. Check that the Security Worker supports /public/company-logo.',true);
-    throw err;
-  }
+ const info=$('rs-company-status');
+ try{
+   const r=await call('/public/company-logo','GET',undefined,false);
+   const image=typeof r.image==='string'&&/^data:image\/(png|jpeg|webp);base64,/.test(r.image)?r.image:'';
+   window.ragaPublishedCompanyLogo=image;
+   if(image)window.ragaSetPublishedCompanyLogo?.(image);
+   else window.ragaClearPublishedCompanyLogo?.();
+   const img=$('rs-company-image');
+   if(img){img.hidden=!image;if(image)img.src=image;else img.removeAttribute('src');}
+   if(info)info.textContent=image?'Published company logo is active.':'No published company logo; using the GitHub fallback.';
+   return image;
+ }catch(err){
+   if(info)info.textContent='Unable to verify cloud company logo: '+err.message;
+   return null;
+ }
+}
+function ragaReadLogoDataUrl(blob){
+ return new Promise((resolve,reject)=>{
+   const reader=new FileReader();
+   reader.onload=()=>resolve(String(reader.result||''));
+   reader.onerror=()=>reject(reader.error||Error('Could not read the selected logo file.'));
+   reader.readAsDataURL(blob);
+ });
+}
+async function ragaOptimiseCompanyLogo(file,progress){
+ if(!file)throw Error('Choose a company logo image first.');
+ if(!['image/png','image/jpeg','image/webp'].includes(file.type))throw Error('Use a PNG, JPG or WebP logo.');
+ if(file.size>12000000)throw Error('This file is larger than 12 MB. Please choose a smaller image.');
+ if(file.size<=150000)return ragaReadLogoDataUrl(file);
+ progress?.('Optimising logo for cloud publishing...');
+ // Canvas WebP preserves PNG transparency. No third-party image compressor or server upload is used.
+ const url=URL.createObjectURL(file);
+ let picture;
+ try{
+   picture=await new Promise((resolve,reject)=>{
+     const im=new Image();
+     im.onload=()=>resolve(im);
+     im.onerror=()=>reject(Error('The selected image cannot be decoded.'));
+     im.src=url;
+   });
+   const iw=picture.naturalWidth,ih=picture.naturalHeight;
+   if(!iw||!ih)throw Error('Invalid company logo image dimensions.');
+   const canvas=document.createElement('canvas');
+   const ctx=canvas.getContext('2d');
+   if(!ctx)throw Error('Image resizing is unavailable in this browser.');
+   for(const size of [1400,1150,950,780,620,500,390,300]){
+     const scale=Math.min(1,size/Math.max(iw,ih));
+     canvas.width=Math.max(1,Math.round(iw*scale));
+     canvas.height=Math.max(1,Math.round(ih*scale));
+     ctx.clearRect(0,0,canvas.width,canvas.height);
+     ctx.drawImage(picture,0,0,canvas.width,canvas.height);
+     for(const quality of [0.91,0.80,0.67]){
+       const compressed=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',quality));
+       if(compressed&&['image/png','image/jpeg','image/webp'].includes(compressed.type)&&compressed.size<=145000){
+         return await ragaReadLogoDataUrl(compressed);
+       }
+     }
+   }
+   throw Error('Could not reduce the company logo to 150 KB while preserving legibility. Please use a simpler or smaller image.');
+ }finally{URL.revokeObjectURL(url);}
 }
 async function publishCompanyLogo(remove=false){
-  if(s.user?.role!=='admin'){companyLogoStatus('Only an authenticated administrator can publish the company logo.',true);return;}
-  const button=$('rs-company-publish');if(button?.disabled)return;
-  if(remove&&!confirm('Remove the published D1 company logo and return to the GitHub logo?'))return;
-  if(button)button.disabled=true;
-  try{
-    companyLogoStatus(remove?'Removing the published logo…':'Preparing company logo…');
-    const file=remove?null:$('rs-company-upload')?.files?.[0];
-    if(!remove&&!file)throw Error('Select a company logo first.');
-    const image=remove?'':await companyLogoData(file);
-    companyLogoStatus(remove?'Removing published company logo…':'Publishing company logo to Cloudflare D1…');
-    await call('/admin/company-logo','PUT',{image});
-    // Do not falsely claim success if a stale Worker returns a response but cannot read it back.
-    const published=await fetchCompanyLogo();
-    if(Boolean(published)!==Boolean(image))throw Error('The Security Worker did not return the saved logo. Check its D1 binding and /admin/company-logo endpoint.');
-    if(image&&published!==image)throw Error('Saved logo differs from the uploaded logo. Refresh and verify the Security Worker release.');
-    if($('rs-company-upload'))$('rs-company-upload').value='';
-    companyLogoStatus(remove?'GitHub logo restored.':'Company logo published and verified for all menus.');
-    msg(remove?'GitHub company logo restored.':'Company logo published successfully.');
-  }catch(err){
-    const explain=/not found|http 404/i.test(err.message)?'Company logo publishing is not installed in the current Security Worker. Review its release before deployment.':err.message;
-    companyLogoStatus('Company logo was not confirmed as published: '+explain,true);
-    msg('Logo publish failed: '+explain,'error');
-  }finally{if(button)button.disabled=false;}
+ const status=$('rs-company-status'),button=$('rs-company-publish'),removeButton=$('rs-company-remove');
+ const setStatus=value=>{if(status)status.textContent=value;};
+ if(s.user?.role!=='admin'){setStatus('Only a signed-in Administrator can publish the shared company logo.');return;}
+ if(remove&&!confirm('Remove the cloud company logo and return to the GitHub fallback?'))return;
+ if(!remove&&!$('rs-company-upload')?.files?.[0]){setStatus('Please select a company logo before publishing.');return;}
+ if(button)button.disabled=true;
+ if(removeButton)removeButton.disabled=true;
+ try{
+   const image=remove?'':await ragaOptimiseCompanyLogo($('rs-company-upload').files[0],setStatus);
+   setStatus(remove?'Removing cloud logo...':'Publishing company logo to cloud...');
+   const response=await call('/admin/company-logo','PUT',{image});
+   if(response?.updated!==true)throw Error('The Security API did not confirm that the logo was saved.');
+   setStatus('Verifying the saved logo...');
+   const confirmed=await fetchCompanyLogo();
+   if(confirmed===null)throw Error('The logo update was accepted but its saved version could not be checked. Please verify the Security API connection.');
+   if(confirmed!==image)throw Error('The returned cloud logo does not match the upload. Please verify the Worker deployment.');
+   if(!remove&&$('rs-company-upload'))$('rs-company-upload').value='';
+   if(remove){window.ragaClearPublishedCompanyLogo?.();setStatus('Cloud company logo removed. The GitHub logo is active.');}
+   else setStatus('Company logo published and verified. It will appear for all users on refresh.');
+   msg(remove?'GitHub company logo restored.':'Company logo published and verified.');
+ }catch(err){
+   setStatus('Company logo not confirmed: '+(err?.message||err));
+   msg(err?.message||String(err),'error');
+ }finally{
+   if(button)button.disabled=false;
+   if(removeButton)removeButton.disabled=false;
+ }
 }
 async function loadChoiceOptions(){
  try{const r=await call('/settings/choices');const out={};
