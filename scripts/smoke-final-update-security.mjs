@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
 import {execFileSync} from 'node:child_process';
+import {readFileSync} from 'node:fs';
 
 const base=process.env.MENUSTUDIO_URL||'http://127.0.0.1:8765/';
 const chrome=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox']});
@@ -21,6 +22,7 @@ const errors=[];
 function json(route,obj,status=200){return route.fulfill({status,contentType:'application/json',body:JSON.stringify(obj),headers:{'access-control-allow-origin':origin,'access-control-allow-headers':'*'}});}
 async function network(route){
  const request=route.request(),url=new URL(request.url()),path=url.pathname;
+ if(url.pathname.endsWith('/html2pdf.bundle.min.js'))return route.fulfill({status:200,contentType:'application/javascript',body:readFileSync('node_modules/html2pdf.js/dist/html2pdf.bundle.min.js')});
  if(url.origin===origin)return route.continue();
  if(url.hostname==='ragasaan-security-api.arunkumarnkl.workers.dev'){
    if(path==='/client/view')return json(route,{event:{name:'Private wedding',venue:'Event venue',eventDate:'2026-11-18',menu:[],sessions:[],items:[]},clientFormats:['half-a4','a4'],expiresAt:'2027-11-01T00:00:00Z',canPrint:false});
@@ -84,15 +86,19 @@ try{
  console.log('PASS Browser: latest 20 cloud events, planner filter and standalone Admin settings');
 
  await page.evaluate(()=>{window.__printCount=0;window.print=()=>{window.__printCount++};});
- const pdf=await page.evaluate(async()=>{
-  window.html2pdf=()=>({set(){return this;},from(){return this;},save(){return Promise.resolve();}});
+ await page.evaluate(()=>{
   state.layout='a4';state.design=state.designs.a4;normalizeEventFormatRecords();renderPreview();
-  const result=await downloadPDF();
-  return {result,printCount:window.__printCount,status:document.getElementById('raga-pdf-status')?.textContent};
  });
- assert.equal(pdf.result,true,'PDF action completes with converter');
- assert.equal(pdf.printCount,0,'PDF Save never triggers native Print dialog');
- assert.match(pdf.status,/saved/i);
+ assert.equal(await page.evaluate(()=>typeof window.html2pdf),'function','Real html2pdf.js library is available');
+ const [pdfDownload]=await Promise.all([
+   page.waitForEvent('download',{timeout:120000}),
+   page.evaluate(()=>downloadPDF())
+ ]);
+ const pdfPath=await pdfDownload.path(),pdfBytes=readFileSync(pdfPath);
+ assert.ok(pdfBytes.subarray(0,5).toString('ascii')==='%PDF-','Downloaded file is a real PDF');
+ assert.ok(pdfBytes.length>3000,'PDF is not empty');
+ assert.equal(await page.evaluate(()=>window.__printCount),0,'PDF Save does not launch native Print');
+ console.log('PASS Real html2pdf.js conversion produces a downloadable PDF without invoking Print, bytes:',pdfBytes.length);
  await page.evaluate(()=>switchTab('export'));
  await page.screenshot({path:'browser-smoke/final-update-export.png'});
  const bounds=await page.evaluate(()=>{
