@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<html lang="en" class="h-full">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1278,7 +1278,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 
   <script>
     if (window.tailwind) tailwind.config = {
-      darkMode: 'class',
+      darkMode: 'media',
       theme: {
         extend: {
           colors: {
@@ -1655,7 +1655,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 }
 </style>
 </head>
-<body class="h-full flex flex-col font-sans antialiased text-slate-100 bg-slate-950 overflow-hidden">
+<body class="app-light h-full flex flex-col font-sans antialiased overflow-hidden">
 
   <!-- Top Navigation Bar -->
   <header class="no-print bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shrink-0 shadow-xl z-20">
@@ -1691,11 +1691,6 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 
     <!-- Quick Actions -->
     <div class="flex items-center gap-2">
-      <label class="text-xs text-slate-300 flex items-center gap-2 whitespace-nowrap">App Theme
-        <select id="header-app-theme" aria-label="Application Theme" onchange="applyAppTheme(this.value)" class="bg-slate-800 text-slate-100 border border-slate-600 rounded p-1.5">
-          <option value="dark">Dark</option><option value="light">Light</option>
-        </select>
-      </label>
       <button type="button" id="rs-open-cloud" class="px-3 py-1.5 bg-slate-800 border border-amber-800 text-amber-300 font-semibold rounded-lg text-xs">☁ Cloud Events</button>
       <button type="button" data-rs-admin hidden id="rs-open-admin-qr" class="px-3 py-1.5 bg-slate-800 border border-amber-800 text-amber-300 font-semibold rounded-lg text-xs">⚙ Admin Settings</button>
       <span id="rs-user-info" class="text-[10px] text-slate-300"></span>
@@ -3206,11 +3201,11 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         state.event.partyNo=saved.event?.partyNo||'';
         state.sharedCompanyLogo=saved.companyLogo||'';
         state.sharedCoupleLogo=saved.coupleLogo||'';
-        state.appTheme=saved.appTheme||'dark';
+        state.appTheme='light';
         if(typeof saved.includeClientSummary==='boolean')includeClientSummary=saved.includeClientSummary;
         if(saved.event) Object.assign(state.event,{title:saved.event.title||state.event.title,date:saved.event.date||state.event.date,venue:saved.event.venue||state.event.venue});
       } catch(e){console.warn('Saved style unavailable',e);}
-      applySharedLogos(); applyAppTheme(state.appTheme||'dark');
+      applySharedLogos(); applyAppTheme('light');
       updateSessionPicker();renderFormatCheckboxes();renderBuilderSessionTabs();
       state.design=state.designs[state.layout];
       syncFormatLabels();
@@ -3259,14 +3254,13 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       MENU_FORMATS.forEach(fmt=>{state.designs[fmt].logoUrl=state.sharedCompanyLogo||'';state.designs[fmt].coupleLogoUrl=state.sharedCoupleLogo||'';});
     }
     function saveStyle() {
-      try {localStorage.setItem('ragasaan_style_v3',JSON.stringify({designs:state.designs,eventSessions,eventRecords,companyLogo:state.sharedCompanyLogo||'',coupleLogo:state.sharedCoupleLogo||'',appTheme:state.appTheme||'dark',includeClientSummary,event:{title:state.event.title,date:state.event.date,venue:state.event.venue,partyNo:state.event.partyNo||''}}));}
+      try {localStorage.setItem('ragasaan_style_v3',JSON.stringify({designs:state.designs,eventSessions,eventRecords,companyLogo:state.sharedCompanyLogo||'',coupleLogo:state.sharedCoupleLogo||'',appTheme:'light',includeClientSummary,event:{title:state.event.title,date:state.event.date,venue:state.event.venue,partyNo:state.event.partyNo||''}}));}
       catch(e){console.warn('Storage full; consider smaller logo images',e);}
     }
-    function applyAppTheme(theme) {
-      state.appTheme=theme;
-      document.body.classList.toggle('app-light',theme==='light');
-      const headerTheme=document.getElementById('header-app-theme');
-      if(headerTheme) headerTheme.value=theme;
+    function applyAppTheme() {
+      // One official interface palette. Print-format themes remain independent.
+      state.appTheme='light';
+      document.body.classList.add('app-light');
       saveStyle();
     }
     function showStartupLogos() { document.getElementById('startup-logos')?.classList.remove('hidden'); }
