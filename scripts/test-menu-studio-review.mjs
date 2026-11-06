@@ -49,6 +49,10 @@ pass('Word two-column layout uses fixed geometry',html.includes('<w:tblLayout w:
 pass('Cloud records sorted then limited to latest five in UI',client.includes('const visible=s.cloudShowArchive?sorted:sorted.slice(0,5)'));
 pass('Cloud planner filter and older-record archive exist',client.includes('rs-cloud-planner-filter')&&client.includes('rs-cloud-archive-toggle'));
 pass('All records retained in client state, not deleted by five-row display',client.includes('s.events=r.events||[];'));
+pass('Feedback heading and message editable on print preview',html.includes('data-preview-text="feedbackTitle"')&&html.includes('data-preview-text="feedbackMessage"'));
+pass('Feedback editable in Print Studio without a QR image',html.includes('raga-feedback-title-input')&&html.includes('raga-feedback-message-input')&&html.includes('ragaUpdateFeedbackCopy'));
+pass('Feedback text persisted and included in editable Word',html.includes("'feedbackTitle','feedbackMessage'")&&html.includes("w.paragraph(d.feedbackTitle ?? 'We Value Your Feedback'")&&html.includes("w.paragraph(d.feedbackMessage ?? 'Thank you for celebrating with us."));
+pass('Feedback fields and editor have no dedicated print spacing',html.includes('id="raga-feedback-copy-editor" class="no-print'));
 pass('Review-only Worker provides saved timestamps',worker.includes('createdAt:event.created_at,updatedAt:event.updated_at'));
 pass('Review-only Worker orders both cloud list routes by latest update',worker.split('ORDER BY COALESCE(updated_at,created_at) DESC,created_at DESC LIMIT 500').length-1===2);
 console.log('REVIEW CHECKS COMPLETE. Real browser, D1 and Word/PDF layout checks are required before production deployment.');
