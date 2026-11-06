@@ -1241,8 +1241,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     function table(columns, opts={}){
       const width=Math.floor((opts.width||9800)/columns.length);
       const grid=columns.map(()=>`<w:gridCol w:w="${width}"/>`).join('');
-      const cells=columns.map(body=>`<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="dxa"/><w:tcMar><w:top w:w="80" w:type="dxa"/><w:left w:w="140" w:type="dxa"/><w:bottom w:w="80" w:type="dxa"/><w:right w:w="140" w:type="dxa"/></w:tcMar></w:tcPr>${body||paragraph(' ')} </w:tc>`).join('');
-      return `<w:tbl><w:tblPr><w:tblW w:w="${opts.width||9800}" w:type="dxa"/>${opts.border?'<w:tblBorders><w:insideV w:val="single" w:sz="4" w:color="D9C7AA"/></w:tblBorders>':''}</w:tblPr><w:tblGrid>${grid}</w:tblGrid><w:tr>${cells}</w:tr></w:tbl>`;
+      const cells=columns.map(body=>`<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="dxa"/><w:vAlign w:val="top"/><w:tcMar><w:top w:w="80" w:type="dxa"/><w:left w:w="140" w:type="dxa"/><w:bottom w:w="80" w:type="dxa"/><w:right w:w="140" w:type="dxa"/></w:tcMar></w:tcPr>${body||paragraph(' ')} </w:tc>`).join('');
+      return `<w:tbl><w:tblPr><w:tblW w:w="${opts.width||9800}" w:type="dxa"/><w:tblLayout w:type="fixed"/>${opts.border?'<w:tblBorders><w:insideV w:val="single" w:sz="4" w:color="D9C7AA"/></w:tblBorders>':''}</w:tblPr><w:tblGrid>${grid}</w:tblGrid><w:tr>${cells}</w:tr></w:tbl>`;
     }
     function image(dataUrl, widthPx=160, heightPx=160){
       const matched=String(dataUrl||'').match(/^data:image\/(png|jpe?g);base64,([A-Za-z0-9+/=]+)$/i);
@@ -3281,7 +3281,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           <summary class="font-semibold text-gold-400 cursor-pointer mb-2">FoldTags Layout</summary>
           <p class="text-[10px] text-slate-400">Physical tag size is fixed to approximately 9 × 6 cm, matching your sample. Adjust the lower text panel and dividing line here.</p>
           <div class="grid grid-cols-2 gap-2">
-            <label class="text-slate-400">Bottom panel height (cm)<input type="number" min="2.2" max="4.5" step="0.1" value="${Number(d.foldTagsBottomHeightCm)||3}" oninput="state.design.foldTagsBottomHeightCm=Math.max(2.2,Math.min(4.5,Number(this.value)||3));renderPreview()" class="w-full mt-1 p-1.5 rounded bg-slate-900 border border-slate-700 text-white"></label>
+            <div class="text-slate-400" style="font-size:11px">Fold balance: <strong>3 cm top / 3 cm text</strong><small style="display:block">Fixed equal halves</small></div>
             <label class="text-slate-400">Panel inset (mm)<input type="number" min="1" max="8" step="0.5" value="${Number(d.foldTagsPanelInsetMm)||2.5}" oninput="state.design.foldTagsPanelInsetMm=Math.max(1,Math.min(8,Number(this.value)||2.5));renderPreview()" class="w-full mt-1 p-1.5 rounded bg-slate-900 border border-slate-700 text-white"></label>
             <label class="text-slate-400">Divider line width (mm)<input type="number" min="0.2" max="2" step="0.1" value="${Number(d.foldTagsDividerWidthMm)||0.3}" oninput="state.design.foldTagsDividerWidthMm=Math.max(0.2,Math.min(2,Number(this.value)||0.3));renderPreview()" class="w-full mt-1 p-1.5 rounded bg-slate-900 border border-slate-700 text-white"></label>
             <label class="text-slate-400">Divider line color<input type="color" value="${d.foldTagsDividerColor||d.borderColor}" oninput="state.design.foldTagsDividerColor=this.value;renderPreview()" class="w-full mt-1 h-8 rounded"></label>
@@ -4145,7 +4145,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
             label.style.cssText=`background:#ffffff;color:${d.textColor};--body-family:${bodyFamily};--label-border:${d.borderColor};${d.borderStyle==='none'?'border:none;':''}`;
             if(fmt==='foldtags-grid') {
               const outerStyle = d.borderStyle==='none' ? 'border:none;' : `border:${Math.max(.2,Math.min(2,Number(d.borderWidth)||.8))}mm ${d.borderStyle==='triple'?'double':d.borderStyle} ${d.borderColor};`;
-              const panelHeight = Math.max(2.2,Math.min(4.5,Number(d.foldTagsBottomHeightCm)||3));
+              const panelHeight = 3; // Fixed equal halves to protect the fold line.
               const inset = Math.max(1,Math.min(8,Number(d.foldTagsPanelInsetMm)||2.5));
               const dividerWidth = Math.max(.2,Math.min(2,Number(d.foldTagsDividerWidthMm)||.3));
               const dividerColor = d.foldTagsDividerColor || d.borderColor;
@@ -4466,7 +4466,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     function safeFilename(text) {
       return String(text||'Menu').replace(/[^a-z0-9_-]/gi,'_').replace(/_+/g,'_').slice(0,65);
     }
-    // Files use Windows-safe day-month-year + venue + format, as requested.
+    // Word exports: DD-MM-VenueName.docx. Other downloads retain a descriptive suffix.
     function ragaDownloadFilename(original){
           const raw=String(original||'Menu');
           const date=String(document.getElementById('cfg-date')?.value||'');
@@ -5052,7 +5052,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
           if(d.showMenuHeading!==false)parts.push(w.paragraph(d.menuHeading||'Menu',{bold:true,size:18,serif:true,align:'center',color:color(),after:110}));
           if(s.showPrintHeading!==false)parts.push(w.paragraph(s.printHeading??s.name,{bold:true,size:13,align:'center',after:160,color:color()}));
           let prev='',count=0;
-          for(const item of rows){
+          for(const item of (isCourseWise(s)?rows:[...rows].sort((a,b)=>{const rank=c=>c==='Main Course'?0:c==='Dessert'?1:c==='Canapé'?2:c==='Live Station'?3:4;return rank(a.menuCourse)-rank(b.menuCourse)}))){
             const group=getGroupName(s,item);
             if(group!==prev){parts.push(w.paragraph(group,{bold:true,size:11,color:color(),align:'center',after:100}));prev=group;}
             parts.push(...menuItem(w,item,++count));
