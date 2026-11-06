@@ -3936,11 +3936,11 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     function addManualDishToMenu() {
       const get=id=>document.getElementById(id).value.trim();
       const menuCourse=selectedMenuCourse(); if(!menuCourse)return;
-      const name=get('manual-name');
+      const name=ragaDisplayText(get('manual-name'),'dish');
       if(!name){alert('Please enter a dish name.');document.getElementById('manual-name').focus();return;}
       const checks=id=>[...document.querySelectorAll('#'+id+' input:checked')].map(el=>el.value);
       const dish={id:'manual-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),name,menuCourse,
-        category:get('manual-category')||'Other',subcategory:get('manual-subcategory'),desc:get('manual-description'),
+        category:get('manual-category')||'Other',subcategory:get('manual-subcategory'),desc:ragaDisplayText(get('manual-description'),'description'),
         allergens:checks('manual-allergens'),mayContain:checks('manual-maycontain'),price:'',manual:true};
       addEventDish(dish,menuCourse);
       const feedback=document.getElementById('manual-add-feedback');
@@ -4991,7 +4991,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     const current=Array.isArray(selected)?selected:[];
     const options=[...RAGA_CARD_ALLERGENS,...current.filter(v=>!RAGA_CARD_ALLERGENS.includes(v))];
     const text=field==='allergens'?'Declared allergens':'May contain';
-    return '<fieldset class="raga-allergen-ticks"><legend>'+text+' (tick to select)</legend><div class="raga-tick-grid">'+options.map(v=>'<label><input type="checkbox" value="'+safe(v)+'" '+(manual?'data-raga-manual-check="'+field+'"':'data-raga-check="'+field+'" data-uid="'+safe(uid)+'"')+' '+(current.includes(v)?'checked':'')+'>'+safe(v)+'</label>').join('')+'</div></fieldset>';
+    return '<fieldset class="raga-allergen-ticks"><legend>'+text+' (tick to select)</legend><div class="raga-tick-grid">'+options.map(v=>'<label><input type="checkbox" value="'+safe(v)+'" '+(manual?'data-raga-manual-check="'+field+'"':'data-raga-check="'+field+'" data-uid="'+safe(uid)+'"')+' '+(current.includes(v)?'checked':'')+'>'+safe(ragaDisplayText(v,'allergen'))+'</label>').join('')+'</div></fieldset>';
   }
   function dishEditor(item){
     const uid=safe(item.eventUid);
@@ -5008,7 +5008,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     const liveEditor=cat==='Live Station'?`<div class="raga-card-note"><strong>Dedicated A4 per Live Station</strong>${ragaEnsureLiveStations(session).map(st=>`<div style="display:flex;gap:6px;margin:5px 0;align-items:center"><input type="text" aria-label="Live station name" data-raga-action="live-station-name" data-session="${safe(session.id)}" data-station-id="${safe(st.id)}" value="${safe(st.name)}"><button type="button" data-raga-action="remove-live-station" data-session="${safe(session.id)}" data-station-id="${safe(st.id)}">Remove</button></div>`).join('')}<button type="button" data-raga-action="add-live-station" data-session="${safe(session.id)}">+ Add Live Station</button></div>`:'';
     const printLabels=selected.length?selected.map(f=>MENU_NAMES[f]||f).join(' · '):'No print formats';
     return `<details class="raga-course-card" data-session="${safe(session.id)}" data-category="${safe(cat)}" ${opened?'open':''}><summary data-raga-action="toggle-category" data-session="${safe(session.id)}" data-course="${safe(cat)}"><span class="raga-course-icon">${(categoryIcons[cat]||'🍽️')}</span><span><strong>${safe(courseDisplay(session,cat))}</strong><small>${rows.length} ${rows.length===1?'dish':'dishes'} · ${safe(printLabels)}</small></span></summary>
-      <div class="raga-course-body"><section><h5 class="raga-course-section-title">1. Serving style &amp; add dishes</h5><div class="raga-course-setup">${serviceChoice(session,cat)}${stationEditor}${liveEditor}</div><div class="raga-card-picker"><input type="search" data-raga-search="true" data-session="${safe(session.id)}" data-course="${safe(cat)}" placeholder="Search the master dish database" autocomplete="off"><button type="button" class="raga-btn-add" data-raga-action="search" data-session="${safe(session.id)}" data-course="${safe(cat)}">Find dishes</button></div><div class="raga-card-results" data-raga-results="${safe(idKey(session.id,cat))}"></div><details class="raga-card-manual"><summary>+ Add manual dish to this category</summary><label>Dish name<input data-raga-manual="name" type="text" placeholder="New dish name"></label><label>Description<textarea data-raga-manual="desc" rows="2" placeholder="Optional description"></textarea></label>${ragaCardTicks("allergens",[],null,true)}${ragaCardTicks("mayContain",[],null,true)}<label class="raga-verify"><input type="checkbox" data-raga-manual="verified"> Allergen information checked for this event</label><button type="button" class="raga-btn-add" data-raga-action="manual-add" data-session="${safe(session.id)}" data-course="${safe(cat)}">Add manual dish</button></details></section>
+      <div class="raga-course-body"><section><h5 class="raga-course-section-title">1. Serving style &amp; add dishes</h5><div class="raga-course-setup">${serviceChoice(session,cat)}${stationEditor}${liveEditor}</div><div class="raga-card-picker"><input type="search" data-raga-search="true" data-session="${safe(session.id)}" data-course="${safe(cat)}" placeholder="Search the master dish database" autocomplete="off"><button type="button" class="raga-btn-add" data-raga-action="search" data-session="${safe(session.id)}" data-course="${safe(cat)}">Find dishes</button></div><div class="raga-card-results" data-raga-results="${safe(idKey(session.id,cat))}"></div><details class="raga-card-manual"><summary>+ Add manual dish to this category</summary><label>Dish name<input data-raga-manual="name" type="text" placeholder="New dish name" onblur="ragaFormatManualField(this,'dish')"></label><label>Description<textarea data-raga-manual="desc" rows="2" placeholder="Optional description" onblur="ragaFormatManualField(this,'description')"></textarea></label>${ragaCardTicks("allergens",[],null,true)}${ragaCardTicks("mayContain",[],null,true)}<label class="raga-verify"><input type="checkbox" data-raga-manual="verified"> Allergen information checked for this event</label><button type="button" class="raga-btn-add" data-raga-action="manual-add" data-session="${safe(session.id)}" data-course="${safe(cat)}">Add manual dish</button></details></section>
       <section><h5 class="raga-course-section-title">2. Selected dishes · ${rows.length}</h5><div class="raga-card-items">${rows.length?rows.map(dishEditor).join(''):'<div class="raga-empty">No dishes in this category yet. Search above to add.</div>'}</div></section>
       <section class="raga-course-print"><h5 class="raga-course-section-title">3. Print formats for this category</h5><div class="raga-format-grid">${allowed.map(fmt=>`<label><input type="checkbox" data-raga-format="${safe(fmt)}" data-session="${safe(session.id)}" data-course="${safe(cat)}" ${selected.includes(fmt)?'checked':''}>${safe(MENU_NAMES[fmt])}</label>`).join('')||'<span>No print formats enabled by Admin.</span>'}</div><p class="raga-format-hint">Changing these formats updates the dishes above. Other meals and categories are unaffected. Each meal prints separately.</p></section></div></details>`;
   }
@@ -5050,11 +5050,11 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     }
     if(act==='manual-add'){
       const panel=b.closest('.raga-card-manual');const get=name=>panel?.querySelector(`[data-raga-manual="${name}"]`);
-      const name=get('name')?.value.trim(),confirmed=get('verified')?.checked,selected=field=>[...panel.querySelectorAll('[data-raga-manual-check="'+field+'"]:checked')].map(x=>x.value),allergens=selected('allergens');
+      const name=ragaDisplayText(get('name')?.value.trim()||'','dish'),confirmed=get('verified')?.checked,selected=field=>[...panel.querySelectorAll('[data-raga-manual-check="'+field+'"]:checked')].map(x=>x.value),allergens=selected('allergens');
       if(!name)return alert('Enter the dish name.');
       if(!confirmed)return alert('Confirm you have checked the allergen information, including none if verified.');
       const csv=value=>String(value||'').split(',').map(x=>x.trim()).filter(x=>x&&x.toLowerCase()!=='none');
-      insertDish(session,course,{id:'manual-'+eventUid(),name,category:course,desc:get('desc')?.value||'',allergens:allergens,mayContain:selected('mayContain'),manual:true});
+      insertDish(session,course,{id:'manual-'+eventUid(),name,category:course,desc:ragaDisplayText(get('desc')?.value||'','description'),allergens:allergens,mayContain:selected('mayContain'),manual:true});
     }
     if(act==='edit'){if(editItems.has(b.dataset.uid))editItems.delete(b.dataset.uid);else editItems.add(b.dataset.uid);render();}
     if(act==='remove'){if(confirm('Remove this dish from the event?'))removeEventRecord(b.dataset.uid);}
