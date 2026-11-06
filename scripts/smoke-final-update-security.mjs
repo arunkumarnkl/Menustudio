@@ -95,6 +95,8 @@ try{
   state.design.showDescription=true;
   normalizeEventFormatRecords();renderPreview();
  });
+ const pdfDiagnostic=await page.evaluate(()=>{const root=document.querySelector('#paper-render-target');const sheets=[...root.querySelectorAll('.print-sheet')];return {sheetCount:sheets.length,text:sheets.map(s=>s.innerText.slice(0,160)),sizes:sheets.map(s=>({width:s.getBoundingClientRect().width,height:s.getBoundingClientRect().height,display:getComputedStyle(s).display,visibility:getComputedStyle(s).visibility})),layout:state.layout,records:eventRecords.length};});
+ console.log('PDF DIAGNOSTICS',JSON.stringify(pdfDiagnostic));
  assert.equal(await page.evaluate(()=>typeof window.html2pdf),'function','Real html2pdf.js library is available');
  const [pdfDownload]=await Promise.all([
    page.waitForEvent('download',{timeout:120000}),
