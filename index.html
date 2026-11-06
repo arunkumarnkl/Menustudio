@@ -1405,8 +1405,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
     .summary-item-row:last-child{border-bottom:0}
     .summary-item-text{display:block;min-width:0}
     .summary-item-name{font-weight:700;color:#26221f}
-    .summary-item-allergens{color:#a3290a}
-    .summary-item-may{color:#93600f}
+    .summary-item-allergens{color:#8B1E20;font-weight:800}
+    .summary-item-may{color:#704600;font-weight:650}
     .summary-item-none{color:#777}
     .summary-footer{font-size:8px;line-height:1.3;color:#555;border-top:.2mm solid #d4c7b4;margin-top:3mm;padding-top:1.5mm}
     #summary-print-root{display:none}
@@ -1652,6 +1652,29 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 @media print {
   /* All editing controls remain absent; never alter physical page measurements. */
   #raga-print-studio-preview-controls, #raga-feedback-copy-editor { display:none !important; }
+}
+</style>
+<style id="ragasaan-allergen-print-emphasis">
+/* Distinguish declared allergens by weight as well as colour on all menu media. */
+.raga-declared-allergens,
+.summary-item-allergens {
+  color:#8B1E20 !important;
+  font-weight:800 !important;
+  -webkit-print-color-adjust:exact;
+  print-color-adjust:exact;
+}
+.raga-maycontain-allergens,
+.summary-item-may {
+  color:#704600 !important;
+  font-weight:650 !important;
+  -webkit-print-color-adjust:exact;
+  print-color-adjust:exact;
+}
+@media print {
+  .print-sheet .raga-declared-allergens,
+  #summary-print-root .summary-item-allergens {color:#8B1E20!important;font-weight:800!important;}
+  .print-sheet .raga-maycontain-allergens,
+  #summary-print-root .summary-item-may {color:#704600!important;font-weight:650!important;}
 }
 </style>
 </head>
@@ -4053,10 +4076,14 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
             <p contenteditable="true" data-preview-text="noticeMessage">${escText(d.noticeMessage ?? 'Red text identifies declared allergens; amber text indicates possible cross-contact (may contain). Please speak to event staff about allergies before eating. Colours supplement, not replace, written allergen information.')}</p>
             <div style="margin-top:12px">${brand()}</div></div>`;
       const allergies = (item,idx) => {
-        const a=(item.allergens||[]).join(', ');
-        const m=(item.mayContain||[]).join(', ');
+        const a=(item.allergens||[]).map(value=>ragaDisplayText(value,'allergen',fmt)).join(', ');
+        const m=(item.mayContain||[]).map(value=>ragaDisplayText(value,'allergen',fmt)).join(', ');
         if(!a&&!m)return '';
-        return `<span aria-label="Declared allergens" title="Declared allergens" contenteditable="true" oninput="editAllergenValues(${idx},'allergens',this.innerText)" style="color:#a3290a">${escText(a)}</span>${m?`<span style="padding:0 5px;color:#555">•</span><span aria-label="May contain" title="May contain (cross-contact)" contenteditable="true" oninput="editAllergenValues(${idx},'mayContain',this.innerText)" style="color:#b7791f">${escText(m)}</span>`:''}`;
+        // UK allergen declaration: bold weight + dark red; colour never used alone.
+        // Keep may-contain visually distinct from declared allergens.
+        const declared=a?`<span class="raga-declared-allergens" aria-label="Declared allergens" title="Declared allergens" contenteditable="true" oninput="editAllergenValues(${idx},'allergens',this.innerText)" style="color:#8B1E20;font-weight:800">${escText(a)}</span>`:'';
+        const precaution=m?`<span class="raga-maycontain-allergens" aria-label="May contain (cross-contact)" title="May contain (cross-contact)" contenteditable="true" oninput="editAllergenValues(${idx},'mayContain',this.innerText)" style="color:#704600;font-weight:650">${escText(m)}</span>`:'';
+        return declared+(a&&m?'<span aria-hidden="true" style="padding:0 5px;color:#555">•</span>':'')+precaution;
       };
       // All text (including event header) uses the same page-local scaling variable.
       // Editing the font fields changes the baseline; auto-fit never overwrites those values.
@@ -4079,8 +4106,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       const itemBlock = (item, idx, factor=1) => `
         <div class="menu-body-font text-center space-y-1" data-preview-drop-item-uid="${esc(item.eventUid||'')}" style="overflow-wrap:anywhere;position:relative;">
           ${(fmt==='a4'||fmt==='half-a4')&&item.eventUid?`<span role="button" class="raga-drag-handle no-print" title="Drag to reorder or move into another course" aria-label="Drag ${escText(item.name)}" draggable="true" data-preview-drag-uid="${esc(item.eventUid)}">↕ Move</span>`:''}
-          <h4 contenteditable="true" oninput="updateActiveItem(${idx},'name',this.innerText)" onblur="finishCanvasItemEdit(${idx})" class="font-bold leading-tight" style="color:${d.textColor};${font(d.dishNameFontSize*factor)}">${escText(item.name)}</h4>
-          ${d.showDescription && item.desc?`<p contenteditable="true" oninput="updateActiveItem(${idx},'desc',this.innerText)" class="leading-snug" style="${font(d.descFontSize*factor)}">${escText(item.desc)}</p>`:''}
+          <h4 contenteditable="true" oninput="updateActiveItem(${idx},'name',this.innerText)" onblur="finishCanvasItemEdit(${idx})" class="font-bold leading-tight" style="color:${d.textColor};${font(d.dishNameFontSize*factor)}">${escText(ragaDisplayText(item.name,'dish',fmt))}</h4>
+          ${d.showDescription && item.desc?`<p contenteditable="true" oninput="updateActiveItem(${idx},'desc',this.innerText)" class="leading-snug" style="${font(d.descFontSize*factor)}">${escText(ragaDisplayText(item.desc,'description',fmt))}</p>`:''}
           <div class="leading-tight" style="${font(d.allergenFontSize*factor)}">${allergies(item,idx)}</div>
         </div>`;
       const bodyHeader = () => `<div class="text-center" style="border-bottom:1px solid ${d.accentColor}44;padding-bottom:12px">
@@ -4308,7 +4335,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
                 <div style="height:3cm;flex:0 0 50%;margin:0 ${inset}mm;border:${dividerWidth}mm solid ${dividerColor};display:flex;flex-direction:column;justify-content:flex-start;align-items:center;padding:0.7mm 1.5mm;box-sizing:border-box;overflow:hidden">
                   <div style="flex:0 0 auto;margin-bottom:1.2mm;line-height:1">${brandMark(Number(d.foldTagsLogoWidth)||100)}</div>
                   <div class="menu-body-font" style="min-width:0;max-width:100%;overflow-wrap:anywhere;word-break:break-word;white-space:normal;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:1.2mm;overflow:hidden">
-                    <h4 contenteditable="true" oninput="updateActiveItem(${i},'name',this.innerText)" onblur="finishCanvasItemEdit(${i})" class="font-bold leading-tight" style="margin:0;color:${d.textColor};${font(Math.max(10,(Number(d.dishNameFontSize)||10)*0.96))};text-transform:uppercase">${escText(item.name)}</h4>
+                    <h4 contenteditable="true" oninput="updateActiveItem(${i},'name',this.innerText)" onblur="finishCanvasItemEdit(${i})" class="font-bold leading-tight" style="margin:0;color:${d.textColor};${font(Math.max(10,(Number(d.dishNameFontSize)||10)*0.96))};text-transform:uppercase">${escText(ragaDisplayText(item.name,'dish',fmt))}</h4>
                     <div class="leading-tight" style="${font(Math.max(9,(Number(d.allergenFontSize)||10)*0.84))}">${allergies(item,i)}</div>
                   </div>
                 </div>`;
