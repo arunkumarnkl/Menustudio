@@ -104,3 +104,73 @@ body.ragasaan-locked #ragasaan-auth-root.raga-client-on {display:block;padding:0
 .raga-client-paper--actual>.print-sheet{display:block;flex-shrink:0;box-shadow:0 8px 30px #1115!important;pointer-events:none;user-select:none;max-width:none!important}
 .raga-client-paper--actual [contenteditable]{outline:none!important;cursor:default!important}
 .raga-client-preview{overflow:auto}
+
+
+/* -------------------------------------------------------------------------
+   SINGLE COLORFUL APPLICATION THEME (2026-11).
+   Screen/UI only: physical menu pages, fonts, logos, borders and label
+   dimensions are controlled by the separate print-design system.
+   ------------------------------------------------------------------------- */
+@media screen {
+  html { color-scheme:light; background:#f8f7ff; }
+  body.app-light {color-scheme:light; background:linear-gradient(135deg,#f7f5ff 0%,#eff9ff 46%,#fff8ec 100%)!important;color:#233354!important;}
+  body.app-light > header {background:linear-gradient(102deg,#fcf4ff 0%,#f0f8ff 46%,#e9fff3 100%)!important;border-bottom:2px solid #bdb4e8!important;color:#2a3051!important;box-shadow:0 2px 14px #555e9320!important;}
+  body.app-light header h1 {color:#352e63!important;}
+  body.app-light header nav,body.app-light header nav .tab-btn {color:#344263!important;}
+  body.app-light .tab-btn {border:1px solid #d4d8e8!important;border-radius:9px!important;transition:background .15s,color .15s,border-color .15s;}
+  body.app-light .tab-btn:nth-child(6n+1) {background:#f1eaff!important;}
+  body.app-light .tab-btn:nth-child(6n+2) {background:#e7f5ff!important;}
+  body.app-light .tab-btn:nth-child(6n+3) {background:#e6f9f1!important;}
+  body.app-light .tab-btn:nth-child(6n+4) {background:#fff0e8!important;}
+  body.app-light .tab-btn:nth-child(6n+5) {background:#fff5d9!important;}
+  body.app-light .tab-btn:nth-child(6n+6) {background:#fceafa!important;}
+  body.app-light .tab-btn[aria-selected="true"],body.app-light .tab-btn.text-gold-400 {background:#5146a0!important;border-color:#5146a0!important;color:#fff!important;box-shadow:0 3px 9px #5146a02a!important;}
+  body.app-light .tab-btn.text-gold-400 *,body.app-light .tab-btn[aria-selected="true"] * {color:#fff!important;}
+  body.app-light #sidebar-controls {background:#f8f7ff!important;border-color:#d6d7ec!important;}
+  body.app-light #tab-builder {background:#f6f2ff!important;}
+  body.app-light #tab-design {background:#eef8ff!important;}
+  body.app-light #tab-export {background:#e9f9f3!important;}
+  body.app-light #tab-master {background:#fff8e9!important;}
+  body.app-light #tab-venues {background:#fff0f1!important;}
+  body.app-light #tab-summary {background:#f1f2ff!important;}
+  body.app-light .tab-content .bg-slate-950,
+  body.app-light .tab-content .bg-slate-900 {background:#fff!important;border-color:#d3d9ed!important;color:#253555!important;}
+  body.app-light .tab-content .bg-slate-800 {background:#f3f0ff!important;}
+  body.app-light .raga-meal-card {box-shadow:0 4px 18px #5c68a014!important;}
+  body.app-light .raga-cards-toolbar h3 {color:#423477!important;}
+  body.app-light .raga-cards-footer button {background:#6452a6!important;color:#fff!important;}
+  body.app-light .raga-course-card {border-color:#cfc7ed!important;}
+  body.app-light .raga-card-manual {background:#f7f6ff!important;border-color:#bdb8df!important;}
+  body.app-light .raga-course-print {background:#f1f9ff!important;}
+  body.app-light :is(#ragasaan-auth-root,.raga-cloud-sheet,.raga-client-side,#rs-theme-gallery,.raga-theme-card) {color-scheme:light;}
+  body.app-light #ragasaan-auth-root {color:#273550!important;background:radial-gradient(circle at 15% 10%,#f4e7ff 0%,#e6f7ff 46%,#fff4e6 100%)!important;}
+  body.app-light .raga-login-card {background:#fff!important;border-color:#b7aee4!important;color:#253555!important;box-shadow:0 18px 55px #635c942c!important;}
+  body.app-light .raga-login-card h1 {color:#6043a7!important;}
+  body.app-light .raga-login-card p,body.app-light .raga-login-card label {color:#41516d!important;}
+  body.app-light .raga-cloud-backdrop {background:rgba(52,56,90,.48)!important;}
+  body.app-light .raga-cloud-sheet {background:#f9f7ff!important;color:#26334c!important;border-color:#c5bee7!important;}
+  body.app-light .raga-cloud-header h2,body.app-light .raga-panel h3,body.app-light .raga-gallery-head h3,body.app-light .raga-client-side h2,body.app-light .raga-client-side h3.raga-section-title {color:#563994!important;}
+  body.app-light .raga-panel {background:#fff!important;border-color:#d6d2ed!important;}
+  body.app-light .raga-panel:nth-child(3n+1) {border-top:3px solid #9072ce!important;}
+  body.app-light .raga-panel:nth-child(3n+2) {border-top:3px solid #6cbdad!important;}
+  body.app-light .raga-panel:nth-child(3n+3) {border-top:3px solid #e3ae6f!important;}
+  body.app-light .raga-panel p,body.app-light .raga-help,body.app-light .raga-small,body.app-light .raga-muted,body.app-light .raga-cloud-sheet label {color:#42536b!important;}
+  body.app-light .raga-input {background:#fff!important;color:#1f2f4d!important;border-color:#a7b2cd!important;}
+  body.app-light .raga-btn {background:#ebe9fb!important;color:#372b69!important;border-color:#bab3de!important;}
+  body.app-light .raga-btn.primary {background:#6047a9!important;color:#fff!important;border-color:#6047a9!important;}
+  body.app-light .raga-btn.danger {background:#fff0f0!important;color:#9c2844!important;border-color:#e1a9ba!important;}
+  body.app-light .raga-alert {color:#5f3b91!important;}
+  body.app-light .raga-error,body.app-light .raga-login-error {color:#a42342!important;}
+  body.app-light .raga-list-item {background:#f5f7ff!important;color:#263851!important;border-color:#cbd4e7!important;}
+  body.app-light .raga-client-side {background:#fff!important;border-color:#d5cee9!important;color:#253555!important;}
+  body.app-light .raga-client-side label {color:#42536b!important;}
+  body.app-light #rs-theme-gallery {background:#f3f2ff!important;color:#293550!important;border-color:#c5b9ea!important;}
+  body.app-light .raga-theme-card {background:#fff!important;color:#293550!important;border-color:#d3d2e9!important;}
+  body.app-light .raga-theme-card > span:last-child {color:#56667d!important;}
+  body.app-light .raga-rule {background:#d3daec!important;}
+  body.app-light .raga-pill {border-color:#b0bee1!important;color:#46536b!important;}
+  body.app-light #raga-print-studio-preview-controls {background:#edf7ff!important;border-color:#a5c8e4!important;color:#263a59!important;}
+  body.app-light #raga-print-studio-preview-controls strong {color:#453b8a!important;}
+  body.app-light :is(input,textarea,select):not([type="color"]) {color-scheme:light;}
+  /* Browser print canvases and layout artwork are deliberately excluded. */
+}
