@@ -60,4 +60,42 @@ pass('Company logo publishing checks the stored D1 logo before claiming success'
 pass('Company logo publishing surfaces API failures beside uploader',client.includes("companyLogoStatus('Company logo was not confirmed as published: "));
 pass('Company logo publishing remains admin-only',client.includes("if(s.user?.role!=='admin'){companyLogoStatus"));
 pass('Feedback heading and message remain editable in print and Word',html.includes('raga-feedback-title-input')&&html.includes('raga-feedback-message-input')&&html.includes('data-preview-text="feedbackTitle"')&&html.includes('data-preview-text="feedbackMessage"')&&html.includes("d.feedbackTitle ?? 'We Value Your Feedback'"));
+
+// Logo publisher must accept oversized PNG/JPEG/WebP via browser-only WebP optimisation.
+pass('Company logo has an accessible Admin publishing status',html.includes('id="rs-company-status"')&&html.includes('aria-live="polite"'));
+pass('Logo publish checks actual server save and verifies the GET response',
+     client.includes("const response=await call('/admin/company-logo','PUT',{image})") &&
+     client.includes("if(response?.updated!==true)") &&
+     client.includes("if(confirmed!==image)"));
+pass('Company logo supports auto-resizing rather than rejecting at 150 KB',
+     client.includes('async function ragaOptimiseCompanyLogo(file,progress)') &&
+     client.includes("canvas.toBlob(resolve,'image/webp',quality)") &&
+     client.includes('compressed.size<=145000'));
+const logoStart=client.indexOf('function ragaReadLogoDataUrl(blob){');
+const logoEnd=client.indexOf('async function publishCompanyLogo(remove=false){',logoStart);
+assert.ok(logoStart>=0&&logoEnd>logoStart,'Logo optimiser must have a bounded function body');
+const readPayload='data:image/webp;base64,TU9DSw==';
+class MockFileReader {
+  readAsDataURL(blob){this.result=blob.mockData||readPayload;this.onload?.();}
+}
+class MockImage {
+  naturalWidth=2400;
+  naturalHeight=1200;
+  set src(v){this.onload?.();}
+}
+let encoded=0,revoked=false;
+const canvas={width:0,height:0,getContext(){return {clearRect(){},drawImage(){}};},
+ toBlob(cb,mime,quality){encoded++;cb({type:mime,size:100000,mockData:readPayload});}};
+const logoCtx={FileReader:MockFileReader,Image:MockImage,
+ URL:{createObjectURL(){return 'blob:mock';},revokeObjectURL(){revoked=true;}},
+ document:{createElement(type){assert.equal(type,'canvas');return canvas;}},
+ console};
+vm.runInNewContext(client.slice(logoStart,logoEnd)+'globalThis.optimise=ragaOptimiseCompanyLogo;',logoCtx);
+assert.equal(await logoCtx.optimise({type:'image/png',size:600000}),readPayload);
+assert.equal(encoded,1);
+assert.equal(revoked,true);
+pass('Oversized PNG is converted and object URL released',true);
+assert.equal(await logoCtx.optimise({type:'image/png',size:100000,mockData:'data:image/png;base64,U01BTEw='}),'data:image/png;base64,U01BTEw=');
+pass('Already-small logo is preserved unchanged',true);
+
 console.log('REVIEW CHECKS COMPLETE. Real browser, D1 and Word/PDF layout checks are required before production deployment.');
