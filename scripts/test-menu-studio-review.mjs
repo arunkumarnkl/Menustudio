@@ -55,10 +55,10 @@ pass('Feedback text persisted and included in editable Word',html.includes("'fee
 pass('Feedback fields and editor have no dedicated print spacing',html.includes('id="raga-feedback-copy-editor" class="no-print'));
 pass('Review-only Worker provides saved timestamps',worker.includes('createdAt:event.created_at,updatedAt:event.updated_at'));
 pass('Review-only Worker orders both cloud list routes by latest update',worker.split('ORDER BY COALESCE(updated_at,created_at) DESC,created_at DESC LIMIT 500').length-1===2);
-pass('Company logo publishing automatically resizes high-resolution files',client.includes('async function companyLogoData(file)')&&client.includes('canvas.toDataURL(\'image/webp\'')&&client.includes('canvas.toDataURL(\'image/jpeg\''));
-pass('Company logo publishing checks the stored D1 logo before claiming success',client.includes("const published=await fetchCompanyLogo()")&&client.includes('Company logo published and verified for all menus'));
-pass('Company logo publishing surfaces API failures beside uploader',client.includes("companyLogoStatus('Company logo was not confirmed as published: "));
-pass('Company logo publishing remains admin-only',client.includes("if(s.user?.role!=='admin'){companyLogoStatus"));
+pass('Company logo publishing automatically resizes high-resolution files',client.includes('async function ragaOptimiseCompanyLogo(file,progress)')&&client.includes("canvas.toBlob(resolve,'image/webp',quality)"));
+pass('Company logo publishing checks the stored D1 logo before claiming success',client.includes("const confirmed=await fetchCompanyLogo()")&&client.includes('Company logo published and verified. It will appear for all users on refresh.'));
+pass('Company logo publishing surfaces API failures beside uploader',client.includes("setStatus('Company logo not confirmed: '"));
+pass('Company logo publishing remains admin-only',client.includes("if(s.user?.role!=='admin'){setStatus"));
 pass('Feedback heading and message remain editable in print and Word',html.includes('raga-feedback-title-input')&&html.includes('raga-feedback-message-input')&&html.includes('data-preview-text="feedbackTitle"')&&html.includes('data-preview-text="feedbackMessage"')&&html.includes("d.feedbackTitle ?? 'We Value Your Feedback'"));
 
 // Logo publisher must accept oversized PNG/JPEG/WebP via browser-only WebP optimisation.
