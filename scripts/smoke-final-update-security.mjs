@@ -105,6 +105,22 @@ try{
  await tp.waitForTimeout(500);
  assert.equal(await tp.evaluate(()=>state.designs.a4.accentColor),themeAfter.color,'Selected theme survives browser reload');
  console.log('PASS Staff gallery click changes preview and persists across reload');
+ // Repeated rapid clicks must not lose selection or leave the preview stale.
+ await tp.evaluate(()=>{
+   const buttons=[...document.querySelectorAll('#rs-theme-gallery .raga-theme-card')];
+   if(buttons.length<3)throw new Error('Expected three theme presets for rapid selection test');
+   buttons[0].click();buttons[2].click();buttons[1].click();
+ });
+ await tp.waitForFunction(()=>{
+  const chosen=document.querySelector('#rs-theme-gallery .raga-theme-card.active');
+  return chosen?.getAttribute('aria-pressed')==='true' &&
+   document.querySelector('#paper-render-target')?.innerHTML.includes(state.designs.a4.accentColor) &&
+   JSON.parse(localStorage.getItem('ragasaan_theme_styles_v1')||'{}').designs?.a4?.accentColor===state.designs.a4.accentColor &&
+   document.getElementById('raga-theme-status')?.textContent.includes('applied');
+ },{timeout:20000});
+ assert.equal(await tp.locator('#rs-theme-gallery .raga-theme-card.active').count(),1,'Exactly one theme remains selected');
+ assert.equal(await tp.evaluate(()=>window.ragaActiveThemeId),await tp.locator('#rs-theme-gallery .raga-theme-card').nth(1).getAttribute('data-theme-id'),'Last rapid theme click wins');
+ console.log('PASS Rapid repeated theme clicks update selected card, preview and compact storage');
  await themeTest.context.close();
 
  // Approved client route: click a theme and download an actual PDF.
