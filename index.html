@@ -2773,9 +2773,9 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       if(area){
         const services=ensureSessionServices(session);
         area.innerHTML=['Canapé','Live Station','Starter','Main Course','Dessert'].map(course=>{
-          const standard=course==='Main Course'?(sessionMode(session)==='Buffet-Selective'?['Plated Service','Buffet']:['Plated Service','Buffet','Bowl Food']):(course==='Starter'||course==='Dessert')?['Plated Service','Buffet']:[];
+          const standard=['Starter','Main Course','Dessert'].includes(course)?['Plated Service','Buffet','Bowl Food','Thali']:[];
           const configured=window.ragaMealDefaults?.[sessionKind(session)]?.courses?.[course]?.enabled;
-          const allowed=Array.isArray(configured)?standard.filter(v=>configured.includes(v)):standard;
+          const allowed=standard;
           const service=allowed.length?`<select aria-label="${esc(course)} service" onchange="updateCourseService('${esc(session.id)}','${esc(course)}',this.value)" class="w-full rounded bg-slate-950 border border-slate-700 p-1 text-white">${(allowed.includes(services[course])?allowed:[...allowed,services[course]]).map(v=>`<option value="${esc(v)}" ${services[course]===v?'selected':''}>${esc(v)}${allowed.includes(v)?'':' (saved event)'}</option>`).join('')}</select>`:`<span class="text-slate-400">${esc(normalizeGroupService(session,course))}</span>`;
           const courseTime=includeClientSummary?`<label class="text-[10px]">Course time <input type="time" aria-label="${esc(course)} time" value="${esc(session.courseTimes?.[course]||'')}" onchange="setCourseTime('${esc(session.id)}','${esc(course)}',this.value)" class="w-full mt-1 p-1 rounded bg-slate-950 border border-slate-700 text-white"></label>`:'';
           return `<div class="rounded bg-slate-950 p-2 border border-slate-700"><b class="text-amber-300">${esc(courseDisplay(session,course))}</b><div class="mt-1">${service}</div>${courseTime}</div>`;
@@ -2787,8 +2787,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
         courses.innerHTML=list.map(c=>`<option value="${esc(c)}" ${old===c?'selected':''}>${esc(courseDisplay(session,c))}</option>`).join('');
         if(!list.includes(old))courses.value=list[0];
       }
-      const selector=document.getElementById('builder-course-control');if(selector)selector.hidden=!isCourseWise(session);
-      if(document.getElementById('builder-service-hint'))document.getElementById('builder-service-hint').textContent=sessionMode(session)==='Buffet-Selective'?'Dinner: choose Plated Service or Buffet for each course. Plated courses print on Table Menu Card; Buffet courses print on A4 plus labels. Canapés print only on canapé/A8/A6 labels.':sessionKind(session)==='dinner'&&sessionMode(session)==='Plated Service'?'Dinner Plated Service: all dishes except canapés print on Table Menu Card; canapés print only as Canapé/A8/A6 labels.':isCourseWise(session)?'Choose course and, when requesting A4 Client Summary, enter a time for each course.':'One section for all dishes — course selection is not needed.';
+      const selector=document.getElementById('builder-course-control');if(selector)selector.hidden=!(isCourseWise(session)||isMultiStationMode(session));
+      if(document.getElementById('builder-service-hint'))document.getElementById('builder-service-hint').textContent=isMultiStationMode(session)?'Select the station to add dishes. Each station receives its own A4 page; defaults A4 and FoldTags.':isCourseWise(session)?'Canapé defaults to FoldTags; Live Station to dedicated A4; Plated courses to Table Menu Card, Buffet/Bowl/Thali courses to A4 and FoldTags.':'General / Buffet Items only. Default print formats: A4 and FoldTags.';
     }
 
     let activeEventName='';
@@ -2843,13 +2843,12 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       const session=selectedBuilderSession();if(!session)return;
       // Each meal has its own print-format selection for subsequently added dishes.
       const rule=window.ragaMealDefaults?.[sessionKind(session)];
-      const fallback=RAGA_INITIAL_MEAL_DEFAULTS[sessionKind(session)]?.formats||['a4'];
-      const source=Array.isArray(session.formatSelection)?session.formatSelection:(Array.isArray(rule?.formats)?rule.formats:fallback);
+      const fallback=ragaInitialFormats(session,selectedMenuCourse()||availableCourses(session)[0]||'Other');
+      const source=Array.isArray(session.categoryFormats?.[selectedMenuCourse()])?session.categoryFormats[selectedMenuCourse()]:fallback;
       const chosen=new Set(source);
-      const enabled=window.ragaAdminChoices?.printFormats?.enabled;
-      const available=Array.isArray(enabled)?MENU_FORMATS.filter(f=>enabled.includes(f)):MENU_FORMATS;
+      const available=ragaAllowedFormats(session,selectedMenuCourse()||availableCourses(session)[0]||'Other');
       // A format hidden by Admin remains visible on old events if already selected.
-      const formats=MENU_FORMATS.filter(f=>available.includes(f)||chosen.has(f));
+      const formats=MENU_FORMATS.filter(f=>available.includes(f));
       root.innerHTML=formats.map(fmt=>`<label class="flex items-center gap-1"><input type="checkbox" value="${esc(fmt)}" ${chosen.has(fmt)?'checked':''}> ${esc(MENU_NAMES[fmt])}${available.includes(fmt)?'':' (saved event)'}</label>`).join('');
       root.dataset.sessionId=session.id;
       syncRelevantTagCopies();
@@ -2915,8 +2914,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
       ragaCurrentPrintRules=ragaNormalisePrintRules(snapshot.printRules);
       const publicPlanner=document.getElementById('rs-public-planner-name');if(publicPlanner)publicPlanner.value=String(snapshot.plannerName||'');
       state.event.title=String(snapshot.title||'');state.event.date=String(snapshot.date||'');state.event.venue=String(snapshot.venue||'');state.event.partyNo='';includeClientSummary=!!snapshot.includeClientSummary;localStorage.setItem(SUMMARY_PREF,String(includeClientSummary));
-      eventSessions=snapshot.sessions.filter(x=>x&&x.id&&x.name&&String(x.name).toLowerCase()!=='reception').map(x=>({id:String(x.id),name:String(x.name),time:String(x.time||''),serviceMode:x.serviceMode,courseTimes:{...(x.courseTimes||{})},courseServices:{...(x.courseServices||{})},formatSelection:Array.isArray(x.formatSelection)?x.formatSelection:undefined,categoryFormats:x.categoryFormats&&typeof x.categoryFormats==='object'?JSON.parse(JSON.stringify(x.categoryFormats)):{},printHeading:x.printHeading,showPrintHeading:x.showPrintHeading}));
-      if(!eventSessions.length)eventSessions=[{id:'lunch',name:'Lunch',time:'',serviceMode:'Regular Buffet',courseServices:{}}];
+      eventSessions=snapshot.sessions.filter(x=>x&&x.id&&x.name&&String(x.name).toLowerCase()!=='reception').map(x=>({id:String(x.id),name:String(x.name),time:String(x.time||''),serviceMode:x.serviceMode,courseTimes:{...(x.courseTimes||{})},courseServices:{...(x.courseServices||{})},formatSelection:Array.isArray(x.formatSelection)?x.formatSelection:undefined,categoryFormats:x.categoryFormats&&typeof x.categoryFormats==='object'?JSON.parse(JSON.stringify(x.categoryFormats)):{},stations:Array.isArray(x.stations)?x.stations.map(st=>({...st})):undefined,liveStations:Array.isArray(x.liveStations)?x.liveStations.map(st=>({...st})):undefined,printHeading:x.printHeading,showPrintHeading:x.showPrintHeading}));
+      if(!eventSessions.length)eventSessions=[{id:'lunch',name:'Lunch',time:'',serviceMode:'Buffet',courseServices:{}}];
       eventRecords=snapshot.items.filter(x=>x&&x.name).map(x=>({...x,eventUid:x.eventUid||eventUid(),sessionId:String(x.sessionId)==='reception'?'dinner':(x.sessionId||eventSessions[0].id),printFormats:Array.isArray(x.printFormats)?x.printFormats.filter(f=>MENU_FORMATS.includes(f)):[],tagCopies:x.tagCopies||{}}));
       if(snapshot.designs&&typeof snapshot.designs==='object')MENU_FORMATS.forEach(f=>{if(snapshot.designs[f])Object.assign(state.designs[f],snapshot.designs[f])});
       currentBuilderSession=eventSessions[0].id;setClientSummaryEnabled(includeClientSummary);state.design=state.designs[state.layout];activeEventName=snapshot.name||'';window.ragaActiveThemeId=snapshot.themeId||'';
